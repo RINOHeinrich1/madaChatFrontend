@@ -6,14 +6,22 @@ const AuthContext = createContext();
 
 export function AuthProvider({ children }) {
   const [user, setUser] = useState(null);
+  const [loading, setLoading] = useState(true); // Ajout
 
   useEffect(() => {
-    // Vérifie l'utilisateur déjà connecté
-    const session = supabase.auth.getSession().then(({ data }) => {
+    const initialize = async () => {
+      const { data } = await supabase.auth.getSession();
       setUser(data?.session?.user ?? null);
-    });
 
-    // Gère les changements d’auth
+      // Forcer 2 secondes de "chargement"
+     /*  setTimeout(() => {
+        setLoading(false);
+      }, 2000); */
+      setLoading(false)
+    };
+
+    initialize();
+
     const { data: authListener } = supabase.auth.onAuthStateChange((event, session) => {
       setUser(session?.user ?? null);
     });
@@ -24,10 +32,7 @@ export function AuthProvider({ children }) {
   }, []);
 
   const login = async (email, password) => {
-    const { error, data } = await supabase.auth.signInWithPassword({
-      email,
-      password,
-    });
+    const { error, data } = await supabase.auth.signInWithPassword({ email, password });
     if (error) throw error;
     setUser(data.user);
   };
@@ -38,7 +43,7 @@ export function AuthProvider({ children }) {
   };
 
   return (
-    <AuthContext.Provider value={{ user, login, logout }}>
+    <AuthContext.Provider value={{ user, loading, login, logout }}>
       {children}
     </AuthContext.Provider>
   );

@@ -4,13 +4,24 @@ import { Routes, Route, useLocation, Navigate } from "react-router-dom";
 import { useAuth } from "../contexts/AuthContext";
 import Sidebar from "./Sidebar";
 import ChatWidget from "./ChatWidget";
+import { Loader2 } from "lucide-react";
 import FineTunePage from "./FineTunePage";
 import DocumentManager from "./DocumentManagement";
 import EmbedGenerator from "./ChatBotGenerator";
 import LoginPage from "./LoginPage";
 
 function PrivateRoute({ children }) {
-  const { user } = useAuth();
+  const { user, loading } = useAuth();
+
+  if (loading) {
+    return (
+      <div className="min-h-screen flex flex-col items-center justify-center gap-4 text-indigo-600 dark:text-indigo-400 bg-gray-100 dark:bg-gray-900 transition-colors">
+        <Loader2 className="w-10 h-10 animate-spin" />
+        <p className="text-lg font-medium">Chargement en cours...</p>
+      </div>
+    );
+  }
+
   return user ? children : <Navigate to="/login" />;
 }
 
