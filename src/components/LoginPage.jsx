@@ -31,11 +31,10 @@ export default function LoginPage() {
     <div className="min-h-screen bg-gray-100 dark:bg-gray-900 text-gray-800 dark:text-gray-100 flex items-center justify-center font-inter transition-colors duration-300 px-4">
       <div className="w-full max-w-md bg-white dark:bg-gray-800 rounded-2xl shadow-lg p-8 space-y-6">
         <h1 className="text-3xl font-bold text-center text-indigo-600 dark:text-indigo-400 flex items-center justify-center gap-2">
-          💬 <span>Interface Admin — MadaChat</span>
+          💬 <span> Admin — MadaChat</span>
         </h1>
         <p className="text-center text-sm text-gray-600 dark:text-gray-400">
-          Connectez-vous pour administrer les contenus et les utilisateurs de la
-          plateforme.
+          Connectez-vous pour administrer votre chatBot
         </p>
 
         <form onSubmit={handleLogin} className="space-y-5">
