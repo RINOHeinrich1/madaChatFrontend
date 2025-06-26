@@ -2,6 +2,8 @@ import { useState } from "react";
 import axios from "axios";
 import { supabase } from "../lib/supabaseClient";
 import { FileText, Search, UploadCloud, Clock } from "lucide-react";
+import Swal from "sweetalert2";
+import "sweetalert2/dist/sweetalert2.min.css";
 
 const API_URL = import.meta.env.VITE_TUNE_API_URL;
 
@@ -13,8 +15,12 @@ function DocumentManager() {
   const handleSearch = async () => {
     if (!query.trim()) return;
 
+    Swal.fire({ title: "Recherche en cours...", didOpen: () => Swal.showLoading() });
+
     try {
-      const { data: { session } } = await supabase.auth.getSession();
+      const {
+        data: { session },
+      } = await supabase.auth.getSession();
       const token = session?.access_token || "";
 
       const res = await axios.get(`${API_URL}/search-docs?q=${query}`, {
@@ -24,7 +30,14 @@ function DocumentManager() {
       });
 
       setResults(res.data);
+      Swal.close();
     } catch (err) {
+      Swal.close();
+      Swal.fire({
+        icon: "error",
+        title: "Erreur lors de la recherche",
+        text: err.message || "Une erreur est survenue",
+      });
       console.error("Erreur lors de la recherche :", err);
     }
   };
@@ -37,8 +50,12 @@ function DocumentManager() {
     const formData = new FormData();
     formData.append("file", file);
 
+    Swal.fire({ title: "Indexation du fichier...", didOpen: () => Swal.showLoading() });
+
     try {
-      const { data: { session } } = await supabase.auth.getSession();
+      const {
+        data: { session },
+      } = await supabase.auth.getSession();
       const token = session?.access_token || "";
 
       await axios.post(`${API_URL}/upload-file`, formData, {
@@ -48,12 +65,24 @@ function DocumentManager() {
         },
       });
 
-      alert("✅ Fichier indexé !");
+      Swal.close();
+      Swal.fire({
+        icon: "success",
+        title: "Fichier indexé avec succès !",
+        timer: 1500,
+        showConfirmButton: false,
+      });
     } catch (err) {
-      alert("❌ Échec de l’upload.");
+      Swal.close();
+      Swal.fire({
+        icon: "error",
+        title: "Échec de l’upload",
+        text: err.message || "Une erreur est survenue",
+      });
       console.error(err);
     } finally {
       setUploading(false);
+      e.target.value = null; // Reset input file
     }
   };
 
@@ -93,7 +122,8 @@ function DocumentManager() {
           <input
             type="file"
             onChange={handleFileUpload}
-            className="block w-full text-sm text-gray-600 dark:text-gray-300 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-indigo-50 file:text-indigo-700 hover:file:bg-indigo-100"
+            disabled={uploading}
+            className="block w-full text-sm text-gray-600 dark:text-gray-300 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-indigo-50 file:text-indigo-700 hover:file:bg-indigo-100 disabled:opacity-50 disabled:cursor-not-allowed"
           />
           {uploading && (
             <p className="mt-2 text-sm text-gray-500 dark:text-gray-400 italic flex items-center gap-2 animate-pulse">

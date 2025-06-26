@@ -12,23 +12,25 @@ import {
   CheckCircle,
   FileText,
 } from "lucide-react";
+import Swal from "sweetalert2";
+import "sweetalert2/dist/sweetalert2.min.css";
 
 const API_URL = import.meta.env.VITE_TUNE_API_URL;
-
 
 export default function FineTunePage() {
   const [question, setQuestion] = useState("");
   const [results, setResults] = useState([]);
   const [selected, setSelected] = useState([]);
-  const [status, setStatus] = useState("");
   const [showAllDocs, setShowAllDocs] = useState(false);
   const [allDocs, setAllDocs] = useState([]);
   const [selectedAllDocs, setSelectedAllDocs] = useState([]);
 
   const askQuestion = async () => {
-    setStatus("Recherche...");
+    Swal.fire({ title: "Recherche...", didOpen: () => Swal.showLoading() });
     try {
-      const { data: { session } } = await supabase.auth.getSession();
+      const {
+        data: { session },
+      } = await supabase.auth.getSession();
       const token = session?.access_token || "";
 
       const res = await axios.post(
@@ -42,17 +44,31 @@ export default function FineTunePage() {
       );
       setResults(res.data.results);
       setSelected([]);
-      setStatus("Résultats reçus.");
       setShowAllDocs(false);
+      Swal.close();
+      Swal.fire({
+        icon: "success",
+        title: "Résultats reçus",
+        timer: 1500,
+        showConfirmButton: false,
+      });
     } catch (err) {
       console.error(err);
-      setStatus("❌ Erreur lors de la requête.");
+      Swal.close();
+      Swal.fire({
+        icon: "error",
+        title: "Erreur lors de la requête",
+        text: err.message || "Une erreur est survenue",
+      });
     }
   };
 
   const fetchAllDocs = async () => {
+    Swal.fire({ title: "Chargement des documents...", didOpen: () => Swal.showLoading() });
     try {
-      const { data: { session } } = await supabase.auth.getSession();
+      const {
+        data: { session },
+      } = await supabase.auth.getSession();
       const token = session?.access_token || "";
 
       const res = await axios.get(`${API_URL}/documents`, {
@@ -63,9 +79,15 @@ export default function FineTunePage() {
       setAllDocs(res.data.documents);
       setSelectedAllDocs([]);
       setShowAllDocs(true);
+      Swal.close();
     } catch (err) {
       console.error(err);
-      setStatus("❌ Erreur lors de la récupération des documents.");
+      Swal.close();
+      Swal.fire({
+        icon: "error",
+        title: "Erreur lors de la récupération des documents",
+        text: err.message || "Une erreur est survenue",
+      });
     }
   };
 
@@ -78,42 +100,75 @@ export default function FineTunePage() {
       ? allDocs.filter((_, i) => !selectedAllDocs.includes(i))
       : results.filter((_, i) => !selected.includes(i)).map((r) => r.doc);
 
-    setStatus("Envoi du feedback...");
+    Swal.fire({ title: "Envoi du feedback...", didOpen: () => Swal.showLoading() });
     try {
-      const { data: { session } } = await supabase.auth.getSession();
+      const {
+        data: { session },
+      } = await supabase.auth.getSession();
       const token = session?.access_token || "";
-      const res = await axios.post(`${API_URL}/feedback`, {
-        question,
-        positive_docs: positives,
-        negative_docs: negatives,
-      },   {
-	     headers: {
-	           Authorization: `Bearer ${token}`,
-	      },
-	  }
+      const res = await axios.post(
+        `${API_URL}/feedback`,
+        {
+          question,
+          positive_docs: positives,
+          negative_docs: negatives,
+        },
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        }
       );
-      setStatus(res.data.message || "✅ Feedback envoyé !");
       setShowAllDocs(false);
+      Swal.close();
+      Swal.fire({
+        icon: "success",
+        title: res.data.message || "Feedback envoyé !",
+        timer: 1500,
+        showConfirmButton: false,
+      });
     } catch (err) {
       console.error(err);
-      setStatus("❌ Erreur lors de l’envoi du feedback.");
+      Swal.close();
+      Swal.fire({
+        icon: "error",
+        title: "Erreur lors de l’envoi du feedback",
+        text: err.message || "Une erreur est survenue",
+      });
     }
   };
 
   const deployModel = async () => {
-    setStatus("📦 Déploiement du modèle en cours...");
+    Swal.fire({ title: "Déploiement du modèle en cours...", didOpen: () => Swal.showLoading() });
     try {
-      const { data: { session } } = await supabase.auth.getSession();
+      const {
+        data: { session },
+      } = await supabase.auth.getSession();
       const token = session?.access_token || "";
-      const res = await axios.post(`${API_URL}/deploy` ,{},{
-                   headers: {
-                         Authorization: `Bearer ${token}`,
-                    },
-                });
-      setStatus(res.data.message || "✅ Modèle déployé avec succès !");
+      const res = await axios.post(
+        `${API_URL}/deploy`,
+        {},
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
+      Swal.close();
+      Swal.fire({
+        icon: "success",
+        title: res.data.message || "Modèle déployé avec succès !",
+        timer: 1500,
+        showConfirmButton: false,
+      });
     } catch (err) {
       console.error(err);
-      setStatus("❌ Erreur lors du déploiement du modèle.");
+      Swal.close();
+      Swal.fire({
+        icon: "error",
+        title: "Erreur lors du déploiement du modèle",
+        text: err.message || "Une erreur est survenue",
+      });
     }
   };
 
@@ -245,20 +300,6 @@ export default function FineTunePage() {
               <CheckCircle className="w-5 h-5" />
               Envoyer les bons documents
             </button>
-          </div>
-        )}
-
-        {/* Statut */}
-        {status && (
-          <div
-            className={`px-5 py-4 rounded-lg text-sm font-medium transition flex items-center gap-2 ${
-              status.includes("❌")
-                ? "bg-red-100 text-red-800 dark:bg-red-800/20 dark:text-red-400"
-                : "bg-green-100 text-green-800 dark:bg-green-800/20 dark:text-green-400"
-            }`}
-          >
-            <FileText className="w-5 h-5" />
-            {status}
           </div>
         )}
       </div>
