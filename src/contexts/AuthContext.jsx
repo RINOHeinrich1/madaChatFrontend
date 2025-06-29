@@ -13,10 +13,7 @@ export function AuthProvider({ children }) {
       const { data } = await supabase.auth.getSession();
       setUser(data?.session?.user ?? null);
 
-      // Forcer 2 secondes de "chargement"
-     /*  setTimeout(() => {
-        setLoading(false);
-      }, 2000); */
+   
       setLoading(false)
     };
 

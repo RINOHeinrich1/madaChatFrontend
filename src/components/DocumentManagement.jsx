@@ -1,21 +1,33 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import axios from "axios";
 import { supabase } from "../lib/supabaseClient";
-import { FileText, Search, UploadCloud, Clock } from "lucide-react";
+import {
+  FileText,
+  Search,
+  UploadCloud,
+  Clock,
+  Trash2,
+  Download,
+} from "lucide-react";
+
 import Swal from "sweetalert2";
 import "sweetalert2/dist/sweetalert2.min.css";
 
 const API_URL = import.meta.env.VITE_TUNE_API_URL;
-
+const SUPABASE_URL = import.meta.env.VITE_SUPABASE_URL;
 function DocumentManager() {
   const [query, setQuery] = useState("");
   const [results, setResults] = useState([]);
   const [uploading, setUploading] = useState(false);
+  const [documents, setDocuments] = useState([]);
 
   const handleSearch = async () => {
     if (!query.trim()) return;
 
-    Swal.fire({ title: "Recherche en cours...", didOpen: () => Swal.showLoading() });
+    Swal.fire({
+      title: "Recherche en cours...",
+      didOpen: () => Swal.showLoading(),
+    });
 
     try {
       const {
@@ -41,7 +53,30 @@ function DocumentManager() {
       console.error("Erreur lors de la recherche :", err);
     }
   };
+  const fetchDocuments = async () => {
+    try {
+      const {
+        data: { session },
+      } = await supabase.auth.getSession();
+      const token = session?.access_token || "";
 
+      const { data, error } = await supabase
+        .from("documents")
+        .select("*")
+        .order("created_at", { ascending: false });
+
+      if (error) throw error;
+
+      setDocuments(data);
+    } catch (err) {
+      console.error("Erreur lors de la récupération des documents :", err);
+      Swal.fire({
+        icon: "error",
+        title: "Erreur",
+        text: "Impossible de charger les documents.",
+      });
+    }
+  };
   const handleFileUpload = async (e) => {
     const file = e.target.files[0];
     if (!file) return;
@@ -50,7 +85,10 @@ function DocumentManager() {
     const formData = new FormData();
     formData.append("file", file);
 
-    Swal.fire({ title: "Indexation du fichier...", didOpen: () => Swal.showLoading() });
+    Swal.fire({
+      title: "Indexation du fichier...",
+      didOpen: () => Swal.showLoading(),
+    });
 
     try {
       const {
@@ -82,9 +120,71 @@ function DocumentManager() {
       console.error(err);
     } finally {
       setUploading(false);
+      fetchDocuments();
       e.target.value = null; // Reset input file
     }
   };
+
+  const handleDelete = async (filename) => {
+    const confirm = await Swal.fire({
+      title: "Confirmer la suppression",
+      text: `Voulez-vous vraiment supprimer "${filename}" ?`,
+      icon: "warning",
+      showCancelButton: true,
+      confirmButtonColor: "#d33",
+      confirmButtonText: "Oui, supprimer",
+      cancelButtonText: "Annuler",
+    });
+
+    if (!confirm.isConfirmed) return;
+
+    try {
+      const {
+        data: { session },
+      } = await supabase.auth.getSession();
+      const token = session?.access_token || "";
+
+      await axios.delete(`${API_URL}/delete-document`, {
+        params: { filename },
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
+
+      Swal.fire("Supprimé !", "Le document a été supprimé.", "success");
+      fetchDocuments(); // recharge la liste
+    } catch (err) {
+      console.error(err);
+      Swal.fire(
+        "Erreur",
+        err.message || "Impossible de supprimer le document",
+        "error"
+      );
+    }
+  };
+  const handleDownload = async (filePath) => {
+    try {
+      console.log("FILE PATH: ",filePath)
+      const { data, error } = await supabase.storage
+        .from("documents")
+        .createSignedUrl(filePath, 60); // 60 secondes de validité
+
+      if (error || !data?.signedUrl) throw error;
+
+      window.open(data.signedUrl, "_blank"); // Ouvre dans un nouvel onglet
+    } catch (err) {
+      console.error("Erreur lors du téléchargement :", err);
+      Swal.fire({
+        icon: "error",
+        title: "Téléchargement échoué",
+        text: err.message || "Impossible de télécharger le fichier",
+      });
+    }
+  };
+
+  useEffect(() => {
+    fetchDocuments();
+  }, []);
 
   return (
     <div className="min-h-screen bg-gray-100 dark:bg-gray-900 text-gray-800 dark:text-gray-100 transition-colors duration-300 font-inter p-6 flex justify-center">
@@ -146,6 +246,63 @@ function DocumentManager() {
               </p>
             </div>
           ))}
+        </div>
+        <div className="mt-10">
+          <h2 className="text-2xl font-semibold mb-4 text-indigo-600 dark:text-indigo-400">
+            Liste des documents indexés
+          </h2>
+          <div className="overflow-x-auto">
+            <table className="w-full text-sm text-left text-gray-500 dark:text-gray-400 border border-gray-200 dark:border-gray-600 rounded-xl">
+              <thead className="text-xs text-gray-700 uppercase bg-gray-100 dark:bg-gray-700 dark:text-gray-300">
+                <tr>
+                  <th className="px-6 py-3">Nom</th>
+                  <th className="px-6 py-3">Date d'ajout</th>
+                  <th className="px-6 py-3">Propriétaire</th>
+                  <th className="px-6 py-3">Action</th>
+                </tr>
+              </thead>
+              <tbody>
+                {documents.map((doc, idx) => (
+                  <tr
+                    key={idx}
+                    className="bg-white dark:bg-gray-800 border-b border-gray-200 dark:border-gray-700"
+                  >
+                    <td className="px-6 py-4">{doc.name || "N/A"}</td>
+                    <td className="px-6 py-4">
+                      {new Date(doc.created_at).toLocaleString()}
+                    </td>
+                    <td className="px-6 py-4">{doc.owner_id}</td>
+                    <td className="px-6 py-4 flex gap-3 items-center justify-end">
+                      {/* Bouton de téléchargement */}
+                      <button
+                        onClick={() => handleDownload(doc.url)} // doc.url est le chemin dans le storage
+                        className="text-blue-600 hover:text-blue-800"
+                        title="Télécharger"
+                      >
+                        <Download className="w-5 h-5" />
+                      </button>
+
+                      {/* Bouton de suppression */}
+                      <button
+                        onClick={() => handleDelete(doc.name)}
+                        className="text-red-600 hover:text-red-800"
+                        title="Supprimer"
+                      >
+                        <Trash2 className="w-5 h-5" />
+                      </button>
+                    </td>
+                  </tr>
+                ))}
+                {documents.length === 0 && (
+                  <tr>
+                    <td colSpan="3" className="px-6 py-4 text-center italic">
+                      Aucun document trouvé.
+                    </td>
+                  </tr>
+                )}
+              </tbody>
+            </table>
+          </div>
         </div>
       </div>
     </div>
