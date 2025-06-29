@@ -38,36 +38,26 @@ export function AuthProvider({ children }) {
   };
 
   const signup = async (formData) => {
-    const { email, password, ...profileData } = formData;
-
-    // Étape 1 : Créer l'utilisateur dans Supabase Auth
-    const { data, error } = await supabase.auth.signUp({
-      email,
-      password
+    const response = await fetch("https://meqlbwxqcyeqkvaregpq.supabase.co/functions/v1/register", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify(formData),
     });
-
-    if (error) {
-      throw error;
+  
+    if (!response.ok) {
+      // Essaye d'extraire un message d'erreur dans le corps JSON
+      const errorData = await response.json().catch(() => null);
+      const message = errorData?.error || `Erreur lors de l'inscription (${response.status})`;
+      throw new Error(message);
     }
-
-    const userId = data.user?.id;
-
-    // Étape 2 : Insérer dans la table `profiles`
-    if (userId) {
-      const { error: insertError } = await supabase.from("profiles").insert({
-        owner_id: userId,
-        email,
-        ...profileData,
-      });
-
-      if (insertError) {
-        throw insertError;
-      }
-    }
-
-    return data;
+  
+    // Si besoin, tu peux retourner la réponse JSON ici
+    return response.json();
   };
-
+  
+  
   return (
     <AuthContext.Provider value={{ user, loading, login, logout, signup }}>
       {children}

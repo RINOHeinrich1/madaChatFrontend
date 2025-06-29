@@ -1,8 +1,10 @@
 import React, { useEffect, useRef, useState } from "react";
 import { Send, Trash2, MessageSquareText } from "lucide-react";
 import { askQuestion } from "../api";
+import { useParams } from "react-router-dom";
 
 export default function ChatPage() {
+  const { chatbot_id } = useParams();
   const [question, setQuestion] = useState("");
   const [messages, setMessages] = useState(() => {
     const saved = localStorage.getItem("chat_history");
@@ -35,7 +37,7 @@ export default function ChatPage() {
     setLoading(true);
 
     try {
-      const res = await askQuestion(trimmed);
+      const res = await askQuestion(trimmed,chatbot_id);
       setMessages((prev) => [
         ...prev,
         { type: "question", text: trimmed },

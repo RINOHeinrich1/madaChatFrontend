@@ -1,7 +1,6 @@
 import React, { useState } from "react";
 import ChatPage from "./ChatPage";
 import { ClipboardCopy, X } from "lucide-react";
-
 const FRONT_URL= import.meta.env.VITE_FRONT_URL;
 export default function EmbedGenerator() {
   const [showModal, setShowModal] = useState(false);

@@ -7,7 +7,9 @@ import ChatWidget from "./ChatWidget";
 import { Loader2 } from "lucide-react";
 import FineTunePage from "./FineTunePage";
 import DocumentManager from "./DocumentManagement";
-import EmbedGenerator from "./ChatBotGenerator";
+import EmbedGenerator from "./IntegrationCodeGenerator";
+import ChatPage from "./ChatPage";
+import ChatbotManager from "./ChatbotManager";
 import LoginPage from "./LoginPage";
 import RegisterPage from "./RegisterPage";
 
@@ -40,6 +42,8 @@ export default function AppLayout() {
         <Route path="/register" element={<RegisterPage />} />
         {/* Routes protégées */}
         <Route path="/" element={<PrivateRoute><EmbedGenerator /></PrivateRoute>} />
+        <Route path="/chatbots" element={<PrivateRoute><ChatbotManager /></PrivateRoute>} />
+        <Route path="/chat/:chatbot_id" element={<ChatPage />} />
         <Route path="/chat" element={<PrivateRoute><EmbedGenerator /></PrivateRoute>} />
         <Route path="/finetune" element={<PrivateRoute><FineTunePage /></PrivateRoute>} />
         <Route path="/docs" element={<PrivateRoute><DocumentManager /></PrivateRoute>} />

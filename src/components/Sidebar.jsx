@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { Link, useLocation, useNavigate } from "react-router-dom";
-import { MessageSquare, Cpu, BookOpen, LogOut, Menu } from "lucide-react";
+import { MessageSquare, Cpu, BookOpen, LogOut, Menu, List } from "lucide-react";
 import { supabase } from "../lib/supabaseClient";
 
 export default function Sidebar() {
@@ -16,6 +16,7 @@ export default function Sidebar() {
       : "text-indigo-300 hover:bg-indigo-600 hover:text-white";
 
   const menuItems = [
+    { label: "Chatbots", icon: List, to: "/chatbots" },
     { label: "Chat", icon: MessageSquare, to: "/chat" },
     { label: "Fine-Tune", icon: Cpu, to: "/finetune" },
     { label: "Documents", icon: BookOpen, to: "/docs" },
