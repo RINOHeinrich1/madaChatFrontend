@@ -86,6 +86,15 @@ export default function LoginPage() {
               </>
             )}
           </button>
+          <p className="text-center text-sm text-gray-600 dark:text-gray-400">
+            Pas encore inscrit ?{" "}
+            <a
+              href="/register"
+              className="text-indigo-600 dark:text-indigo-400 hover:underline font-medium"
+            >
+              Créer un compte
+            </a>
+          </p>
         </form>
       </div>
     </div>

@@ -9,6 +9,7 @@ import FineTunePage from "./FineTunePage";
 import DocumentManager from "./DocumentManagement";
 import EmbedGenerator from "./ChatBotGenerator";
 import LoginPage from "./LoginPage";
+import RegisterPage from "./RegisterPage";
 
 function PrivateRoute({ children }) {
   const { user, loading } = useAuth();
@@ -36,7 +37,7 @@ export default function AppLayout() {
       <Routes>
         <Route path="/login" element={<LoginPage />} />
         <Route path="/chat-widget" element={<ChatWidget />} />
-
+        <Route path="/register" element={<RegisterPage />} />
         {/* Routes protégées */}
         <Route path="/" element={<PrivateRoute><EmbedGenerator /></PrivateRoute>} />
         <Route path="/chat" element={<PrivateRoute><EmbedGenerator /></PrivateRoute>} />
