@@ -6,15 +6,13 @@ const AuthContext = createContext();
 
 export function AuthProvider({ children }) {
   const [user, setUser] = useState(null);
-  const [loading, setLoading] = useState(true); // Ajout
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     const initialize = async () => {
       const { data } = await supabase.auth.getSession();
       setUser(data?.session?.user ?? null);
-
-   
-      setLoading(false)
+      setLoading(false);
     };
 
     initialize();
@@ -39,8 +37,39 @@ export function AuthProvider({ children }) {
     setUser(null);
   };
 
+  const signup = async (formData) => {
+    const { email, password, ...profileData } = formData;
+
+    // Étape 1 : Créer l'utilisateur dans Supabase Auth
+    const { data, error } = await supabase.auth.signUp({
+      email,
+      password
+    });
+
+    if (error) {
+      throw error;
+    }
+
+    const userId = data.user?.id;
+
+    // Étape 2 : Insérer dans la table `profiles`
+    if (userId) {
+      const { error: insertError } = await supabase.from("profiles").insert({
+        owner_id: userId,
+        email,
+        ...profileData,
+      });
+
+      if (insertError) {
+        throw insertError;
+      }
+    }
+
+    return data;
+  };
+
   return (
-    <AuthContext.Provider value={{ user, loading, login, logout }}>
+    <AuthContext.Provider value={{ user, loading, login, logout, signup }}>
       {children}
     </AuthContext.Provider>
   );
