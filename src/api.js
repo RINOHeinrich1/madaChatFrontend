@@ -11,13 +11,15 @@ const tuneApi = axios.create({
 });
 
 // --- Fonctions pour le service de chat ---
-export const askQuestion = async (question, chatbot_id) => {
+export const askQuestion = async (question, chatbot_id, document_filter = []) => {
   const response = await chatApi.post("/ask", {
     question,
     chatbot_id,
+    document_filter, // ajouté pour transmettre la liste
   });
   return response.data;
 };
+
 
 
 // --- Fonctions pour le service de fine-tuning ---

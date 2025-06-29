@@ -17,7 +17,7 @@ export default function Sidebar() {
 
   const menuItems = [
     { label: "Chatbots", icon: List, to: "/chatbots" },
-    { label: "Chat", icon: MessageSquare, to: "/chat" },
+    // { label: "Chat", icon: MessageSquare, to: "/chat" },
     { label: "Fine-Tune", icon: Cpu, to: "/finetune" },
     { label: "Documents", icon: BookOpen, to: "/docs" },
   ];

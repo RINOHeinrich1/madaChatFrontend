@@ -2,6 +2,7 @@ import React, { useEffect, useRef, useState } from "react";
 import { Send, Trash2, MessageSquareText } from "lucide-react";
 import { askQuestion } from "../api";
 import { useParams } from "react-router-dom";
+import { supabase } from "../lib/supabaseClient";
 
 export default function ChatPage() {
   const { chatbot_id } = useParams();
@@ -24,6 +25,24 @@ export default function ChatPage() {
   useEffect(() => {
     localStorage.setItem("chat_history", JSON.stringify(messages));
   }, [messages]);
+  const [associatedDocs, setAssociatedDocs] = useState([]);
+
+  useEffect(() => {
+    const fetchAssociatedDocs = async () => {
+      if (!chatbot_id) return;
+      const { data, error } = await supabase
+        .from("chatbot_document_association")
+        .select("document_name")
+        .eq("chatbot_id", chatbot_id);
+
+      if (!error && data) {
+        const docNames = data.map((d) => d.document_name);
+        setAssociatedDocs(docNames);
+      }
+    };
+
+    fetchAssociatedDocs();
+  }, [chatbot_id]);
 
   useEffect(() => {
     chatEndRef.current?.scrollIntoView({ behavior: "smooth" });
@@ -32,12 +51,12 @@ export default function ChatPage() {
   const handleAsk = async () => {
     const trimmed = question.trim();
     if (!trimmed) return;
-
+  
     setQuestion("");
     setLoading(true);
-
+  
     try {
-      const res = await askQuestion(trimmed,chatbot_id);
+      const res = await askQuestion(trimmed, chatbot_id, associatedDocs);
       setMessages((prev) => [
         ...prev,
         { type: "question", text: trimmed },
@@ -57,6 +76,7 @@ export default function ChatPage() {
       setLoading(false);
     }
   };
+  
 
   const clearChat = () => {
     localStorage.removeItem("chat_history");
