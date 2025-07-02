@@ -63,7 +63,15 @@ export default function ChatPage({ chatbot_id }) {
   };
   const handleDeleteMessage = (index) => {
     const newMessages = [...messages];
+
+    // Supprime la question
     newMessages.splice(index, 1);
+
+    // Supprime la réponse juste après si elle existe
+    if (newMessages[index] && newMessages[index].type === "answer") {
+      newMessages.splice(index, 1);
+    }
+
     setMessages(newMessages);
   };
 
@@ -123,7 +131,7 @@ export default function ChatPage({ chatbot_id }) {
             className="text-sm flex items-center gap-1 text-red-500 hover:text-red-700 transition"
           >
             <Trash2 className="w-4 h-4" />
-            Effacer
+            <span className="hidden sm:inline">Vider</span>
           </button>
         </div>
 

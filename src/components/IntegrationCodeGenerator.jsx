@@ -62,13 +62,14 @@ export default function EmbedGenerator() {
   return (
     <div className="min-h-screen bg-gray-100 dark:bg-gray-900 text-gray-800 dark:text-gray-100 font-inter relative">
       {/* Button to trigger modal */}
-      <button
-        onClick={() => setShowModal(true)}
-        className="absolute top-5 right-5 bg-indigo-600 hover:bg-indigo-700 text-white px-4 py-2 rounded-lg flex items-center gap-2 shadow"
-      >
-        <ClipboardCopy className="w-4 h-4" />
-        Copier le code
-      </button>
+<button
+  onClick={() => setShowModal(true)}
+  className="absolute top-5 right-5 bg-indigo-600 hover:bg-indigo-700 text-white px-4 py-2 rounded-lg flex items-center gap-2 shadow"
+>
+  <ClipboardCopy className="w-4 h-4" />
+  <span className="hidden sm:inline">Copier le code</span>
+</button>
+
 
       {/* ChatPage avec le bon chatbot_id */}
       <ChatPage chatbot_id={chatbot_id} />
