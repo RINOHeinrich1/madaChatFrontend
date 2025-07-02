@@ -1,8 +1,13 @@
 import React, { useState } from "react";
 import ChatPage from "./ChatPage";
 import { ClipboardCopy, X } from "lucide-react";
-const FRONT_URL= import.meta.env.VITE_FRONT_URL;
+import { useParams } from "react-router-dom";
+
+const FRONT_URL = import.meta.env.VITE_FRONT_URL;
+
 export default function EmbedGenerator() {
+  const { chatbot_id } = useParams(); // ✅
+
   const [showModal, setShowModal] = useState(false);
   const [copied, setCopied] = useState(false);
 
@@ -31,7 +36,7 @@ export default function EmbedGenerator() {
       iframe = null;
     } else {
       iframe = document.createElement("iframe");
-      iframe.src = "${FRONT_URL}/chat-widget";
+      iframe.src = "${FRONT_URL}/chat-widget/${chatbot_id}";
       iframe.style.position = "fixed";
       iframe.style.bottom = "80px";
       iframe.style.right = "20px";
@@ -65,14 +70,13 @@ export default function EmbedGenerator() {
         Copier le code
       </button>
 
-      {/* Only chatbot */}
-      <ChatPage />
+      {/* ChatPage avec le bon chatbot_id */}
+      <ChatPage chatbot_id={chatbot_id} />
 
       {/* Modal */}
       {showModal && (
         <div className="fixed inset-0 bg-black bg-opacity-40 flex justify-center items-center z-50">
           <div className="bg-white dark:bg-gray-800 rounded-lg p-6 w-full max-w-2xl relative shadow-lg">
-            {/* Close button */}
             <button
               onClick={() => setShowModal(false)}
               className="absolute top-3 right-3 text-gray-500 hover:text-red-500"

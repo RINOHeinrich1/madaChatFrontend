@@ -179,7 +179,7 @@ export default function FineTunePage() {
         <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-4">
           <h1 className="text-3xl sm:text-4xl font-bold text-indigo-600 dark:text-indigo-400 flex items-center gap-2">
             <GraduationCap className="w-8 h-8" />
-            Assistant ONIR — Fine-Tuning RAG
+            Fine-tunning du model d'embedding
           </h1>
           <button
             onClick={deployModel}

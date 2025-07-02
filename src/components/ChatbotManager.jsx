@@ -3,9 +3,16 @@ import { supabase } from "../lib/supabaseClient";
 import ChatbotFormModal from "./ChatbotCreateForm";
 import Swal from "sweetalert2";
 import { useNavigate } from "react-router-dom";
-import ChatPage from "./ChatPage";
 import ChatbotDocumentsManager from "./ChatbotDocumentManager";
-import { Pencil, Trash,Plus, FileText, Search, MessageSquareText } from "lucide-react";
+import {
+  CheckCircle,
+  Pencil,
+  Trash,
+  Plus,
+  FileText,
+  Search,
+  MessageSquareText,
+} from "lucide-react";
 import Modal from "./Modal"; // si tu le mets dans le même dossier
 export default function ChatbotManager() {
   const navigate = useNavigate();
@@ -18,7 +25,7 @@ export default function ChatbotManager() {
   const [selectedForDocs, setSelectedForDocs] = useState(null); // chatbot sélectionné pour voir ses documents
   const [documentModalOpen, setDocumentModalOpen] = useState(false);
   const [selectedChatbotId, setSelectedChatbotId] = useState(null);
- 
+
   useEffect(() => {
     const getUserAndChatbots = async () => {
       const { data: authData } = await supabase.auth.getUser();
@@ -93,9 +100,11 @@ export default function ChatbotManager() {
               setEditing(null);
               setModalOpen(true);
             }}
-            className="bg-gradient-to-r from-indigo-600 to-purple-600 hover:scale-105 text-white font-semibold px-5 py-3 rounded-xl shadow-lg flex items-center gap-2 transition-all"
+            className="mr-2 bg-gradient-to-r from-indigo-600 to-purple-600 hover:scale-105 text-white font-semibold px-5 py-3 rounded-xl shadow-lg flex items-center justify-center gap-2 transition-all"
           >
-            <Plus className="w-4 h-4" /> Ajouter un chatbot
+            <Plus className="w-5 h-5 sm:w-4 sm:h-4" />
+
+            <span className="hidden sm:inline">Ajouter un chatbot</span>
           </button>
         </div>
 

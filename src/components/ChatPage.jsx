@@ -1,19 +1,18 @@
 import React, { useEffect, useRef, useState } from "react";
-import { Send, Trash2, MessageSquareText } from "lucide-react";
+import { Send, Pencil, Trash2, MessageSquareText } from "lucide-react";
 import { askQuestion } from "../api";
-import { useParams } from "react-router-dom";
 import { supabase } from "../lib/supabaseClient";
+import { nanoid } from "nanoid";
 
-export default function ChatPage() {
-  const { chatbot_id } = useParams();
+export default function ChatPage({ chatbot_id }) {
   const [question, setQuestion] = useState("");
   const [messages, setMessages] = useState(() => {
-    const saved = localStorage.getItem("chat_history");
+    const saved = localStorage.getItem(`chat_history_${chatbot_id}`);
     if (saved) return JSON.parse(saved);
     return [
       {
         type: "answer",
-        text: "Bonjour, comment puis-je vous assister aujourd'hui ? N'hésitez pas à poser votre question.",
+        text: "Comment puis-je vous assister aujourd'hui ? N'hésitez pas à poser votre question.",
         docs: [],
       },
     ];
@@ -23,8 +22,14 @@ export default function ChatPage() {
   const chatEndRef = useRef(null);
 
   useEffect(() => {
-    localStorage.setItem("chat_history", JSON.stringify(messages));
-  }, [messages]);
+    if (chatbot_id) {
+      localStorage.setItem(
+        `chat_history_${chatbot_id}`,
+        JSON.stringify(messages)
+      );
+    }
+  }, [messages, chatbot_id]);
+
   const [associatedDocs, setAssociatedDocs] = useState([]);
 
   useEffect(() => {
@@ -38,6 +43,8 @@ export default function ChatPage() {
       if (!error && data) {
         const docNames = data.map((d) => d.document_name);
         setAssociatedDocs(docNames);
+      } else {
+        console.log(error, data);
       }
     };
 
@@ -47,20 +54,32 @@ export default function ChatPage() {
   useEffect(() => {
     chatEndRef.current?.scrollIntoView({ behavior: "smooth" });
   }, [messages]);
+  const handleEditMessage = (index) => {
+    const msg = messages[index];
+    if (msg.type !== "question") return;
+
+    setQuestion(msg.text); // remet la question dans l'input
+    setMessages(messages.slice(0, index)); // supprime tous les messages à partir de cette question
+  };
+  const handleDeleteMessage = (index) => {
+    const newMessages = [...messages];
+    newMessages.splice(index, 1);
+    setMessages(newMessages);
+  };
 
   const handleAsk = async () => {
     const trimmed = question.trim();
     if (!trimmed) return;
-  
+
     setQuestion("");
     setLoading(true);
-  
+
     try {
       const res = await askQuestion(trimmed, chatbot_id, associatedDocs);
       setMessages((prev) => [
         ...prev,
-        { type: "question", text: trimmed },
-        { type: "answer", text: res.answer, docs: res.documents },
+        { id: nanoid(), type: "question", text: trimmed },
+        { id: nanoid(), type: "answer", text: res.answer, docs: res.documents },
       ]);
     } catch (err) {
       setMessages((prev) => [
@@ -76,10 +95,11 @@ export default function ChatPage() {
       setLoading(false);
     }
   };
-  
 
   const clearChat = () => {
-    localStorage.removeItem("chat_history");
+    if (chatbot_id) {
+      localStorage.removeItem(`chat_history_${chatbot_id}`);
+    }
     setMessages([
       {
         type: "answer",
@@ -110,21 +130,32 @@ export default function ChatPage() {
         {/* Messages */}
         <div className="flex-1 overflow-y-auto max-h-[60vh] space-y-4 p-2 rounded-lg bg-gray-50 dark:bg-gray-700">
           {messages.map((msg, idx) => (
-            <div
-              key={idx}
-              className={`max-w-[85%] p-3 rounded-xl shadow-sm text-sm break-words ${
-                msg.type === "question"
-                  ? "bg-indigo-100 dark:bg-indigo-500/20 ml-auto text-right"
-                  : "bg-gray-100 dark:bg-gray-700 mr-auto text-left"
-              }`}
-            >
-              <p>{msg.text}</p>
-              {msg.docs?.length > 0 && (
-                <ul className="mt-2 text-xs text-gray-600 dark:text-gray-300 list-disc list-inside">
-                  {msg.docs.map((doc, i) => (
-                    <li key={i}>{doc}</li>
-                  ))}
-                </ul>
+            <div key={idx} className="space-y-1">
+              <div
+                className={`max-w-[85%] p-3 rounded-xl shadow-sm text-sm break-words ${
+                  msg.type === "question"
+                    ? "bg-indigo-100 dark:bg-indigo-500/20 ml-auto text-right"
+                    : "bg-gray-100 dark:bg-gray-700 mr-auto text-left"
+                }`}
+              >
+                <p>{msg.text}</p>
+              </div>
+
+              {msg.type === "question" && (
+                <div className="flex justify-end pr-2 space-x-2 text-xs text-gray-500">
+                  <button
+                    onClick={() => handleEditMessage(idx)}
+                    className="hover:text-indigo-600 transition flex items-center gap-1"
+                  >
+                    <Pencil className="w-4 h-4" />
+                  </button>
+                  <button
+                    onClick={() => handleDeleteMessage(idx)}
+                    className="hover:text-red-600 transition flex items-center gap-1"
+                  >
+                    <Trash2 className="w-4 h-4" />
+                  </button>
+                </div>
               )}
             </div>
           ))}

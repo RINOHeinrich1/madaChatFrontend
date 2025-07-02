@@ -2,8 +2,8 @@ import { useState, useEffect } from "react";
 import { CheckCircle, Bot, AlertCircle, X } from "lucide-react";
 import { supabase } from "../lib/supabaseClient";
 import Swal from "sweetalert2";
-import React from "react";
-
+import FormInput from "../ui/FormInput";
+import FormTextarea from "../ui/Formtextarea";
 export default function ChatbotFormModal({ onClose, userId, existing }) {
   const isEdit = !!existing;
 
@@ -54,7 +54,9 @@ export default function ChatbotFormModal({ onClose, userId, existing }) {
       await Swal.fire({
         icon: "success",
         title: isEdit ? "Chatbot modifié avec succès 🎉" : "Chatbot créé 🎉",
-        text: isEdit ? "Les modifications ont été enregistrées." : "Votre chatbot a été enregistré.",
+        text: isEdit
+          ? "Les modifications ont été enregistrées."
+          : "Votre chatbot a été enregistré.",
         confirmButtonColor: "#6366f1",
       });
 
@@ -100,7 +102,7 @@ export default function ChatbotFormModal({ onClose, userId, existing }) {
             placeholder="Ex: Assistant OnirTech"
           />
 
-          <FormInput
+          <FormTextarea
             label="Description"
             name="description"
             value={formData.description}
@@ -123,7 +125,9 @@ export default function ChatbotFormModal({ onClose, userId, existing }) {
               type="submit"
               disabled={loading}
               className={`w-full bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-700 hover:to-purple-700 text-white font-semibold px-6 py-3 rounded-xl flex justify-center items-center gap-3 transition-all duration-300 shadow-lg hover:shadow-xl disabled:opacity-50 disabled:cursor-not-allowed ${
-                loading ? "animate-pulse" : "hover:scale-[1.02] active:scale-[0.98]"
+                loading
+                  ? "animate-pulse"
+                  : "hover:scale-[1.02] active:scale-[0.98]"
               }`}
             >
               {loading ? (
@@ -140,50 +144,6 @@ export default function ChatbotFormModal({ onClose, userId, existing }) {
             </button>
           </div>
         </form>
-      </div>
-    </div>
-  );
-}
-
-function FormInput({
-  label,
-  name,
-  type = "text",
-  required = false,
-  value,
-  onChange,
-  focused,
-  onFocus,
-  onBlur,
-  placeholder,
-}) {
-  return (
-    <div className="space-y-2">
-      <label htmlFor={name} className="block text-sm font-medium text-gray-700 dark:text-gray-300">
-        {label} {required && <span className="text-red-500">*</span>}
-      </label>
-      <div className="relative">
-        <input
-          id={name}
-          name={name}
-          type={type}
-          required={required}
-          value={value}
-          onChange={onChange}
-          onFocus={onFocus}
-          onBlur={onBlur}
-          placeholder={placeholder}
-          className={`w-full px-4 py-3 rounded-xl border-2 transition-all duration-300 bg-white/50 dark:bg-gray-700/50 backdrop-blur-sm text-gray-800 dark:text-white placeholder-gray-400 dark:placeholder-gray-500 focus:outline-none ${
-            focused
-              ? "border-indigo-500 ring-4 ring-indigo-500/20 shadow-lg scale-[1.02]"
-              : value
-              ? "border-green-400 dark:border-green-500"
-              : "border-gray-300 dark:border-gray-600 hover:border-indigo-300 dark:hover:border-indigo-400"
-          }`}
-        />
-        {value && !focused && (
-          <CheckCircle className="absolute right-4 top-1/2 -translate-y-1/2 w-5 h-5 text-green-500 animate-fade-in" />
-        )}
       </div>
     </div>
   );

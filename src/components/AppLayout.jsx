@@ -31,22 +31,57 @@ function PrivateRoute({ children }) {
 export default function AppLayout() {
   const location = useLocation();
   const { user } = useAuth();
-  const hideSidebar = location.pathname === "/chat-widget" || location.pathname === "/login";
+  const hideSidebar =
+    location.pathname === "/chat-widget" || location.pathname === "/login";
 
   return (
     <>
       {!hideSidebar && user && <Sidebar />}
       <Routes>
         <Route path="/login" element={<LoginPage />} />
-        <Route path="/chat-widget" element={<ChatWidget />} />
+        <Route path="/chat-widget/:chatbot_id" element={<ChatWidget />} />
         <Route path="/register" element={<RegisterPage />} />
         {/* Routes protégées */}
-        <Route path="/" element={<PrivateRoute><EmbedGenerator /></PrivateRoute>} />
-        <Route path="/chatbots" element={<PrivateRoute><ChatbotManager /></PrivateRoute>} />
-        <Route path="/chat/:chatbot_id" element={<ChatPage />} />
-        <Route path="/chat" element={<PrivateRoute><EmbedGenerator /></PrivateRoute>} />
-        <Route path="/finetune" element={<PrivateRoute><FineTunePage /></PrivateRoute>} />
-        <Route path="/docs" element={<PrivateRoute><DocumentManager /></PrivateRoute>} />
+        <Route
+          path="/"
+          element={
+            <PrivateRoute>
+              <ChatbotManager />
+            </PrivateRoute>
+          }
+        />
+        <Route
+          path="/chatbots"
+          element={
+            <PrivateRoute>
+              <ChatbotManager />
+            </PrivateRoute>
+          }
+        />
+        <Route
+          path="/chat/:chatbot_id"
+          element={
+            <PrivateRoute>
+              <EmbedGenerator />
+            </PrivateRoute>
+          }
+        />
+        <Route
+          path="/finetune"
+          element={
+            <PrivateRoute>
+              <FineTunePage />
+            </PrivateRoute>
+          }
+        />
+        <Route
+          path="/docs"
+          element={
+            <PrivateRoute>
+              <DocumentManager />
+            </PrivateRoute>
+          }
+        />
       </Routes>
     </>
   );
