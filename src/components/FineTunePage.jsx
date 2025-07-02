@@ -64,7 +64,10 @@ export default function FineTunePage() {
   };
 
   const fetchAllDocs = async () => {
-    Swal.fire({ title: "Chargement des documents...", didOpen: () => Swal.showLoading() });
+    Swal.fire({
+      title: "Chargement des documents...",
+      didOpen: () => Swal.showLoading(),
+    });
     try {
       const {
         data: { session },
@@ -93,14 +96,33 @@ export default function FineTunePage() {
 
   const submitFeedback = async (useAllDocs = false) => {
     const positives = useAllDocs
-      ? selectedAllDocs.map((i) => allDocs[i])
-      : selected.map((i) => results[i].doc);
+      ? selectedAllDocs.map((i) => ({
+          text: allDocs[i].text,
+          source: allDocs[i].source,
+        }))
+      : selected.map((i) => ({
+          text: results[i].doc,
+          source: results[i].source,
+        }));
 
     const negatives = useAllDocs
-      ? allDocs.filter((_, i) => !selectedAllDocs.includes(i))
-      : results.filter((_, i) => !selected.includes(i)).map((r) => r.doc);
+      ? allDocs
+          .filter((_, i) => !selectedAllDocs.includes(i))
+          .map((d) => ({
+            text: d.text,
+            source: d.source,
+          }))
+      : results
+          .filter((_, i) => !selected.includes(i))
+          .map((r) => ({
+            text: r.doc,
+            source: r.source,
+          }));
 
-    Swal.fire({ title: "Envoi du feedback...", didOpen: () => Swal.showLoading() });
+    Swal.fire({
+      title: "Envoi du feedback...",
+      didOpen: () => Swal.showLoading(),
+    });
     try {
       const {
         data: { session },
@@ -139,7 +161,10 @@ export default function FineTunePage() {
   };
 
   const deployModel = async () => {
-    Swal.fire({ title: "Déploiement du modèle en cours...", didOpen: () => Swal.showLoading() });
+    Swal.fire({
+      title: "Déploiement du modèle en cours...",
+      didOpen: () => Swal.showLoading(),
+    });
     try {
       const {
         data: { session },
