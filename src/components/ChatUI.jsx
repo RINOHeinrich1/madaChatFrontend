@@ -4,7 +4,7 @@ import { askQuestion } from "../api";
 import { supabase } from "../lib/supabaseClient";
 import { nanoid } from "nanoid";
 
-export default function ChatPage({ chatbot_id }) {
+export default function ChatUI({ chatbot_id }) {
   const [question, setQuestion] = useState("");
   const [messages, setMessages] = useState(() => {
     const saved = localStorage.getItem(`chat_history_${chatbot_id}`);

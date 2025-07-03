@@ -1,5 +1,5 @@
 // src/components/ChatWidget.js
-import ChatPage from "./ChatPage";
+import ChatUI from "./ChatUI";
 import { useParams } from "react-router-dom";
 
 export default function ChatWidget() {
@@ -7,7 +7,7 @@ export default function ChatWidget() {
 
   return (
     <div style={{ height: "100vh", width: "100%", overflow: "hidden" }}>
-      <ChatPage chatbot_id={chatbot_id} />
+      <ChatUI chatbot_id={chatbot_id} />
     </div>
   );
 }

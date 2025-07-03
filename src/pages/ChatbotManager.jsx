@@ -1,9 +1,9 @@
 import React, { useState, useEffect } from "react";
 import { supabase } from "../lib/supabaseClient";
-import ChatbotFormModal from "./ChatbotCreateForm";
+import ChatbotFormModal from "../components/ChatbotCreateForm";
 import Swal from "sweetalert2";
 import { useNavigate } from "react-router-dom";
-import ChatbotDocumentsManager from "./ChatbotDocumentManager";
+import ChatbotDocumentsManager from "../components/ChatbotDocumentManager";
 import {
   CheckCircle,
   Pencil,
@@ -13,7 +13,7 @@ import {
   Search,
   MessageSquareText,
 } from "lucide-react";
-import Modal from "./Modal"; // si tu le mets dans le même dossier
+import Modal from "../components/Modal"; // si tu le mets dans le même dossier
 export default function ChatbotManager() {
   const navigate = useNavigate();
   const [chatbots, setChatbots] = useState([]);

@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import ChatPage from "./ChatPage";
+import ChatUI from "../components/ChatUI";
 import { ClipboardCopy, X } from "lucide-react";
 import { useParams } from "react-router-dom";
 
@@ -71,8 +71,8 @@ export default function EmbedGenerator() {
 </button>
 
 
-      {/* ChatPage avec le bon chatbot_id */}
-      <ChatPage chatbot_id={chatbot_id} />
+      {/* ChatUI avec le bon chatbot_id */}
+      <ChatUI chatbot_id={chatbot_id} />
 
       {/* Modal */}
       {showModal && (

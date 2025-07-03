@@ -5,13 +5,12 @@ import { useAuth } from "../contexts/AuthContext";
 import Sidebar from "./Sidebar";
 import ChatWidget from "./ChatWidget";
 import { Loader2 } from "lucide-react";
-import FineTunePage from "./FineTunePage";
-import DocumentManager from "./DocumentManagement";
-import EmbedGenerator from "./IntegrationCodeGenerator";
-import ChatPage from "./ChatPage";
-import ChatbotManager from "./ChatbotManager";
-import LoginPage from "./LoginPage";
-import RegisterPage from "./RegisterPage";
+import FineTunePage from "../pages/FineTunePage";
+import DocumentManager from "../pages/DocumentManagement";
+import EmbedGenerator from "../pages/IntegrationCodeGenerator";
+import ChatbotManager from "../pages/ChatbotManager";
+import LoginPage from "../pages/LoginPage";
+import RegisterPage from "../pages/RegisterPage";
 
 function PrivateRoute({ children }) {
   const { user, loading } = useAuth();
