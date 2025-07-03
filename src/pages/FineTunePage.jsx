@@ -313,7 +313,12 @@ export default function FineTunePage() {
                     }
                     className="mt-1"
                   />
-                  <span className="text-sm">{doc}</span>
+                  <div className="text-sm space-y-1">
+                    <p>{doc.text}</p>
+                    <p className="text-xs text-gray-500 italic">
+                      Source : {doc.source}
+                    </p>
+                  </div>
                 </label>
               ))}
             </div>
