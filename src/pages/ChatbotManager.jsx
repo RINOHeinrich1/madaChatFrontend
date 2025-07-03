@@ -215,14 +215,6 @@ export default function ChatbotManager() {
                 )}
               </tbody>
             </table>
-            <Modal
-              open={documentModalOpen}
-              onClose={() => setDocumentModalOpen(false)}
-            >
-              {selectedChatbotId && (
-                <ChatbotDocumentsManager chatbotId={selectedChatbotId} />
-              )}
-            </Modal>
           </div>
         ) : (
           <div className="grid gap-4 grid-cols-1 sm:grid-cols-2 md:grid-cols-3">
@@ -280,7 +272,14 @@ export default function ChatbotManager() {
             )}
           </div>
         )}
-
+        <Modal
+          open={documentModalOpen}
+          onClose={() => setDocumentModalOpen(false)}
+        >
+          {selectedChatbotId && (
+            <ChatbotDocumentsManager chatbotId={selectedChatbotId} />
+          )}
+        </Modal>
         {/* Modal de création / édition */}
         {modalOpen && (
           <ChatbotFormModal
