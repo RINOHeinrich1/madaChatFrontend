@@ -30,8 +30,8 @@ function PrivateRoute({ children }) {
 export default function AppLayout() {
   const location = useLocation();
   const { user } = useAuth();
-  const hideSidebar =
-    location.pathname === "/chat-widget" || location.pathname === "/login";
+ const hideSidebar =
+  location.pathname.startsWith("/chat-widget") || location.pathname === "/login";
 
   return (
     <>
