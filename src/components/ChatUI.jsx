@@ -61,6 +61,29 @@ export default function ChatUI({ chatbot_id }) {
     setQuestion(msg.text); // remet la question dans l'input
     setMessages(messages.slice(0, index)); // supprime tous les messages à partir de cette question
   };
+  const [chatbotName, setChatbotName] = useState("ONIR Chat");
+  useEffect(() => {
+    const fetchChatbotName = async () => {
+      if (!chatbot_id) return;
+      const { data, error } = await supabase
+        .from("public_chatbots")
+        .select("nom")
+        .eq("id", chatbot_id)
+        .single();
+
+      if (!error && data) {
+        setChatbotName(data.nom);
+      } else {
+        console.error(
+          "Erreur lors de la récupération du nom du chatbot:",
+          error
+        );
+      }
+    };
+
+    fetchChatbotName();
+  }, [chatbot_id]);
+
   const handleDeleteMessage = (index) => {
     const newMessages = [...messages];
 
@@ -124,8 +147,9 @@ export default function ChatUI({ chatbot_id }) {
         <div className="flex justify-between items-center">
           <h1 className="text-xl sm:text-2xl font-bold flex items-center gap-2 text-indigo-600 dark:text-indigo-400">
             <MessageSquareText className="w-6 h-6" />
-            ONIR Chat
+            {chatbotName}
           </h1>
+
           <button
             onClick={clearChat}
             className="text-sm flex items-center gap-1 text-red-500 hover:text-red-700 transition"

@@ -13,7 +13,7 @@ import {
   Search,
   MessageSquareText,
 } from "lucide-react";
-import Modal from "../components/Modal"; // si tu le mets dans le même dossier
+import Modal from "../ui/Modal"; 
 export default function ChatbotManager() {
   const navigate = useNavigate();
   const [chatbots, setChatbots] = useState([]);
@@ -21,11 +21,11 @@ export default function ChatbotManager() {
   const [search, setSearch] = useState("");
   const [userId, setUserId] = useState(null);
   const [modalOpen, setModalOpen] = useState(false);
-  const [editing, setEditing] = useState(null); // chatbot à éditer
-  const [selectedForDocs, setSelectedForDocs] = useState(null); // chatbot sélectionné pour voir ses documents
+  const [editing, setEditing] = useState(null);
+  const [selectedForDocs, setSelectedForDocs] = useState(null); 
   const [documentModalOpen, setDocumentModalOpen] = useState(false);
   const [selectedChatbotId, setSelectedChatbotId] = useState(null);
-  const [viewMode, setViewMode] = useState("cards"); // "table" ou "cards"
+  const [viewMode, setViewMode] = useState("cards"); 
 
   useEffect(() => {
     const getUserAndChatbots = async () => {
