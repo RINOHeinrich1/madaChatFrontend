@@ -3,7 +3,7 @@ import { Send, Pencil, Trash2, MessageSquareText } from "lucide-react";
 import { askQuestion } from "../api";
 import { supabase } from "../lib/supabaseClient";
 import { nanoid } from "nanoid";
-
+import TypingIndicator from "../ui/TypingIndicator";
 export default function ChatUI({ chatbot_id }) {
   const [question, setQuestion] = useState("");
   const [messages, setMessages] = useState(() => {
@@ -167,6 +167,13 @@ export default function ChatUI({ chatbot_id }) {
               )}
             </div>
           ))}
+          {loading && (
+            <div className="flex items-center space-x-2">
+              <div className="bg-gray-100 dark:bg-gray-700 text-sm p-3 rounded-xl shadow-sm max-w-[85%]">
+                <TypingIndicator />
+              </div>
+            </div>
+          )}
           <div ref={chatEndRef} />
         </div>
 
