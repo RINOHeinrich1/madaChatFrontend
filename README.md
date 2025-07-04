@@ -1,12 +1,46 @@
-# React + Vite
+# 🤖 RAG Chatbot Builder - Frontend
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+Bienvenue dans le dépôt **frontend** du projet **RAG Chatbot Builder**, une plateforme open source permettant de créer facilement des chatbots IA alimentés par des documents personnalisés, grâce à l'architecture RAG.
 
-Currently, two official plugins are available:
+---
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Babel](https://babeljs.io/) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
+## 🧩 Stack utilisée
 
-## Expanding the ESLint configuration
+- ⚛️ **ReactJS** — pour une interface utilisateur réactive et moderne.
+- 🐘 **Supabase** — pour la gestion multitenant des utilisateurs, l'authentification (JWT), le stockage des fichiers, et la base de données.
+- 🧠 **FastAPI** — backend pour l'IA RAG (recherche et génération).
+- 🛡️ **JWT (JSON Web Token)** — pour une authentification sécurisée.
 
-If you are developing a production application, we recommend using TypeScript with type-aware lint rules enabled. Check out the [TS template](https://github.com/vitejs/vite/tree/main/packages/create-vite/template-react-ts) for information on how to integrate TypeScript and [`typescript-eslint`](https://typescript-eslint.io) in your project.
+---
+
+## 🚀 Fonctionnalités principales
+
+- 🔐 Authentification multitenant via Supabase (email / mot de passe).
+- 🧠 Création de chatbots basés sur des documents uploadés.
+- 📁 Téléversement et gestion de fichiers (PDF, DOCX, TXT, etc.).
+- 💬 Interface de chat avec génération IA (via FastAPI).
+- 🏢 Gestion multi-utilisateurs (inscription/authentification) 
+- 📊 Interface moderne en ReactJS.
+
+---
+
+## 📦 Installation locale
+
+### Prérequis
+
+- Node.js ≥ 18
+- Supabase Project (configuré)
+- Les backend FastAPI (en fonctionnement):
+https://github.com/RINOHeinrich1/embedder-api
+https://github.com/RINOHeinrich1/chatbot-service
+https://github.com/RINOHeinrich1/backend-finetune
+
+### Architecture du projet:
+- Microservice
+- Un peu de Jamstack
+- MVP
+### 1. Cloner le projet
+
+```bash
+git clone https://github.com/ton-org/rag-chatbot-frontend.git
+cd rag-chatbot-frontend
