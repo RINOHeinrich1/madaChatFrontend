@@ -15,7 +15,7 @@ export default function ChatWidget() {
           .from("chatbots")
           .select("allowed_url")
           .eq("id", chatbot_id)
-          .single();
+          .limit(1);
 
         if (error) throw error;
         if (!data) throw new Error("Chatbot introuvable");
@@ -32,8 +32,12 @@ export default function ChatWidget() {
           allowed.length === 0 ||
           allowed.includes(currentOrigin)
         ) {
+          console.log("allowed");
           setIsAllowed(true);
         } else {
+
+          console.log("not allowed:",allowed);
+          console.log(currentOrigin);
           setIsAllowed(false);
         }
       } catch (err) {
