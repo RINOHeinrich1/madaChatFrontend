@@ -2,6 +2,18 @@ import { useParams } from "react-router-dom";
 import { useEffect, useState } from "react";
 import { supabase } from "../lib/supabaseClient";
 import ChatUI from "./ChatUI";
+import { ScatterBoxLoader } from "react-awesome-loaders";
+
+export const ScatterBoxLoaderComponent = () => {
+  return (
+    <div className="flex items-center justify-center h-screen">
+      <ScatterBoxLoader
+        primaryColor={"#6366F1"}
+        background={"#ffffff"} // Remplace par theme.colors["background"] si tu utilises un thème
+      />
+    </div>
+  );
+};
 
 export default function ChatWidget() {
   const { chatbot_id } = useParams();
@@ -15,7 +27,8 @@ export default function ChatWidget() {
           .from("chatbots")
           .select("allowed_url")
           .eq("id", chatbot_id)
-          .limit(1);
+          .limit(1)
+          .single(); // pour ne pas avoir à faire data[0]
 
         if (error) throw error;
         if (!data) throw new Error("Chatbot introuvable");
@@ -27,16 +40,11 @@ export default function ChatWidget() {
 
         const currentOrigin = window.location.origin;
 
-        if (
-          !allowed ||
-          allowed.length === 0 ||
-          allowed.includes(currentOrigin)
-        ) {
+        if (!allowed || allowed.length === 0 || allowed.includes(currentOrigin)) {
           console.log("allowed");
           setIsAllowed(true);
         } else {
-
-          console.log("not allowed:",allowed);
+          console.log("not allowed:", allowed);
           console.log(currentOrigin);
           setIsAllowed(false);
         }
@@ -51,7 +59,7 @@ export default function ChatWidget() {
   }, [chatbot_id]);
 
   if (isAllowed === null) {
-    return <div>Chargement...</div>;
+    return <ScatterBoxLoaderComponent />;
   }
 
   if (!isAllowed) {
