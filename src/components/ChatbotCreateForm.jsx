@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { CheckCircle, Bot, AlertCircle, X } from "lucide-react";
+import { CheckCircle, Plus, Bot, AlertCircle, X } from "lucide-react";
 import { supabase } from "../lib/supabaseClient";
 import Swal from "sweetalert2";
 import FormInput from "../ui/FormInput";
@@ -10,11 +10,37 @@ export default function ChatbotFormModal({ onClose, userId, existing }) {
   const [formData, setFormData] = useState({
     nom: existing?.nom || "",
     description: existing?.description || "",
+    allowed_url: existing?.allowed_url || "",
   });
 
   const [focusedField, setFocusedField] = useState("");
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
+  const [newUrl, setNewUrl] = useState("");
+  const urls = formData.allowed_url
+    ? formData.allowed_url
+        .split(",")
+        .map((u) => u.trim())
+        .filter(Boolean)
+    : [];
+  const addUrl = () => {
+    const trimmed = newUrl.trim();
+    if (trimmed && !urls.includes(trimmed)) {
+      setFormData((prev) => ({
+        ...prev,
+        allowed_url: [...urls, trimmed].join(","),
+      }));
+      setNewUrl("");
+    }
+  };
+
+  const removeUrl = (urlToRemove) => {
+    const updated = urls.filter((u) => u !== urlToRemove);
+    setFormData((prev) => ({
+      ...prev,
+      allowed_url: updated.join(","),
+    }));
+  };
 
   const handleChange = (e) => {
     setFormData((prev) => ({
@@ -32,19 +58,21 @@ export default function ChatbotFormModal({ onClose, userId, existing }) {
     try {
       if (!userId) throw new Error("Utilisateur non authentifié");
 
+      const payload = {
+        nom: formData.nom,
+        description: formData.description,
+        allowed_url: formData.allowed_url, // 👈 ajoute ici
+      };
+
       let result;
       if (isEdit) {
         result = await supabase
           .from("chatbots")
-          .update({
-            nom: formData.nom,
-            description: formData.description,
-          })
+          .update(payload)
           .eq("id", existing.id);
       } else {
         result = await supabase.from("chatbots").insert({
-          nom: formData.nom,
-          description: formData.description,
+          ...payload,
           owner_id: userId,
         });
       }
@@ -112,6 +140,45 @@ export default function ChatbotFormModal({ onClose, userId, existing }) {
             onBlur={() => setFocusedField("")}
             placeholder="Ex: Chatbot d’assistance commerciale"
           />
+          <div>
+            <label className="block text-sm font-medium mb-1">
+              URLs autorisées
+            </label>
+            <div className="flex gap-2 mb-3">
+              <input
+                type="text"
+                value={newUrl}
+                onChange={(e) => setNewUrl(e.target.value)}
+                className="flex-1 px-3 py-2 border border-gray-300 dark:border-gray-700 rounded-lg text-sm bg-white dark:bg-gray-800 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                placeholder="https://example.com"
+              />
+              <button
+                type="button"
+                onClick={addUrl}
+                className="p-2 bg-indigo-600 hover:bg-indigo-700 text-white rounded-lg"
+              >
+                <Plus className="w-4 h-4" />
+              </button>
+            </div>
+
+            <div className="flex flex-wrap gap-2">
+              {urls.map((url, idx) => (
+                <div
+                  key={idx}
+                  className="flex items-center gap-1 px-3 py-1 bg-gray-100 dark:bg-gray-700 text-sm rounded-full"
+                >
+                  <span className="text-gray-800 dark:text-white">{url}</span>
+                  <button
+                    type="button"
+                    onClick={() => removeUrl(url)}
+                    className="text-red-500 hover:text-red-700"
+                  >
+                    <X className="w-4 h-4" />
+                  </button>
+                </div>
+              ))}
+            </div>
+          </div>
 
           {error && (
             <div className="flex items-center gap-3 p-4 bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-xl animate-shake">
