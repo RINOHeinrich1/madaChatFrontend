@@ -42,5 +42,5 @@ https://github.com/RINOHeinrich1/backend-finetune
 ### 1. Cloner le projet
 
 ```bash
-git clone https://github.com/ton-org/rag-chatbot-frontend.git
-cd rag-chatbot-frontend
+git clone https://github.com/RINOHeinrich1/madaChatFrontend.git
+cd madaChatFrontend
