@@ -215,14 +215,6 @@ export default function ChatbotManager() {
                 )}
               </tbody>
             </table>
-            <Modal
-              open={documentModalOpen}
-              onClose={() => setDocumentModalOpen(false)}
-            >
-              {selectedChatbotId && (
-                <ChatbotDocumentsManager chatbotId={selectedChatbotId} />
-              )}
-            </Modal>
           </div>
         ) : (
           <div className="grid gap-4 grid-cols-1 sm:grid-cols-2 md:grid-cols-3">
@@ -273,6 +265,7 @@ export default function ChatbotManager() {
                 </div>
               </div>
             ))}
+
             {filtered.length === 0 && (
               <div className="text-center col-span-full text-gray-500 dark:text-gray-300">
                 Aucun chatbot trouvé.
@@ -280,7 +273,14 @@ export default function ChatbotManager() {
             )}
           </div>
         )}
-
+        <Modal
+          open={documentModalOpen}
+          onClose={() => setDocumentModalOpen(false)}
+        >
+          {selectedChatbotId && (
+            <ChatbotDocumentsManager chatbotId={selectedChatbotId} />
+          )}
+        </Modal>
         {/* Modal de création / édition */}
         {modalOpen && (
           <ChatbotFormModal
@@ -289,6 +289,14 @@ export default function ChatbotManager() {
             existing={editing}
           />
         )}
+        <Modal
+          open={documentModalOpen}
+          onClose={() => setDocumentModalOpen(false)}
+        >
+          {selectedChatbotId && (
+            <ChatbotDocumentsManager chatbotId={selectedChatbotId} />
+          )}
+        </Modal>
       </div>
     </div>
   );
