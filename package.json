@@ -14,9 +14,12 @@
     "@tailwindcss/vite": "^4.1.10",
     "axios": "^1.10.0",
     "lucide-react": "^0.523.0",
+    "node-sass": "^9.0.0",
     "react": "^19.1.0",
     "react-dom": "^19.1.0",
     "react-router-dom": "^7.6.2",
+    "react-spinners": "^0.17.0",
+    "sass": "^1.89.2",
     "sweetalert2": "^11.22.1"
   },
   "devDependencies": {

@@ -204,14 +204,14 @@ export default function FineTunePage() {
         <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-4">
           <h1 className="text-3xl sm:text-4xl font-bold text-indigo-600 dark:text-indigo-400 flex items-center gap-2">
             <GraduationCap className="w-8 h-8" />
-            Fine-tunning du model d'embedding
+            Fine-tunne
           </h1>
           <button
             onClick={deployModel}
             className="bg-indigo-600 hover:bg-indigo-700 text-white px-5 py-2.5 rounded-xl shadow transition flex items-center gap-2"
           >
             <Rocket className="w-5 h-5" />
-            Déployer le modèle
+            Déployer 
           </button>
         </div>
 

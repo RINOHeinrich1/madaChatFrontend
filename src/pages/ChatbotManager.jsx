@@ -9,11 +9,13 @@ import {
   Pencil,
   Trash,
   Plus,
+  Table,
+  LayoutGrid,
   FileText,
   Search,
   MessageSquareText,
 } from "lucide-react";
-import Modal from "../ui/Modal"; 
+import Modal from "../ui/Modal";
 export default function ChatbotManager() {
   const navigate = useNavigate();
   const [chatbots, setChatbots] = useState([]);
@@ -22,10 +24,10 @@ export default function ChatbotManager() {
   const [userId, setUserId] = useState(null);
   const [modalOpen, setModalOpen] = useState(false);
   const [editing, setEditing] = useState(null);
-  const [selectedForDocs, setSelectedForDocs] = useState(null); 
+  const [selectedForDocs, setSelectedForDocs] = useState(null);
   const [documentModalOpen, setDocumentModalOpen] = useState(false);
   const [selectedChatbotId, setSelectedChatbotId] = useState(null);
-  const [viewMode, setViewMode] = useState("cards"); 
+  const [viewMode, setViewMode] = useState("cards");
 
   useEffect(() => {
     const getUserAndChatbots = async () => {
@@ -98,23 +100,23 @@ export default function ChatbotManager() {
           <div className="flex gap-2">
             <button
               onClick={() => setViewMode("table")}
-              className={`px-4 py-2 rounded-xl text-sm shadow ${
+              className={`px-4 py-2 rounded-xl text-sm shadow flex items-center justify-center ${
                 viewMode === "table"
                   ? "bg-indigo-600 text-white"
                   : "bg-gray-100 dark:bg-gray-700 dark:text-white"
               }`}
             >
-              Table
+              <Table className="w-5 h-5" />
             </button>
             <button
               onClick={() => setViewMode("cards")}
-              className={`px-4 py-2 rounded-xl text-sm shadow ${
+              className={`px-4 py-2 rounded-xl text-sm shadow flex items-center justify-center ${
                 viewMode === "cards"
                   ? "bg-indigo-600 text-white"
                   : "bg-gray-100 dark:bg-gray-700 dark:text-white"
               }`}
             >
-              Cartes
+              <LayoutGrid className="w-5 h-5" />
             </button>
           </div>
 

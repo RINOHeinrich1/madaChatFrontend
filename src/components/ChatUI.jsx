@@ -164,7 +164,7 @@ export default function ChatUI({ chatbot_id }) {
           {messages.map((msg, idx) => (
             <div key={idx} className="space-y-1">
               <div
-                className={`max-w-[85%] p-3 rounded-xl shadow-sm text-sm break-words ${
+                className={`inline-block max-w-[80%] p-3 rounded-xl shadow-sm text-sm break-words ${
                   msg.type === "question"
                     ? "bg-indigo-100 dark:bg-indigo-500/20 ml-auto text-right"
                     : "bg-gray-100 dark:bg-gray-700 mr-auto text-left"
