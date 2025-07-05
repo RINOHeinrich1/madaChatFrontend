@@ -10,6 +10,7 @@ import DocumentManager from "../pages/DocumentManagement";
 import EmbedGenerator from "../pages/IntegrationCodeGenerator";
 import ChatbotManager from "../pages/ChatbotManager";
 import LoginPage from "../pages/LoginPage";
+import LandingPage from "../pages/LandingPage";
 import RegisterPage from "../pages/RegisterPage";
 
 function PrivateRoute({ children }) {
@@ -30,8 +31,9 @@ function PrivateRoute({ children }) {
 export default function AppLayout() {
   const location = useLocation();
   const { user } = useAuth();
- const hideSidebar =
-  location.pathname.startsWith("/chat-widget") || location.pathname === "/login";
+  const hideSidebar =
+    location.pathname.startsWith("/chat-widget") ||
+    location.pathname === "/login";
 
   return (
     <>
@@ -44,11 +46,16 @@ export default function AppLayout() {
         <Route
           path="/"
           element={
-            <PrivateRoute>
-              <ChatbotManager />
-            </PrivateRoute>
+            user ? (
+              <PrivateRoute>
+                <ChatbotManager />
+              </PrivateRoute>
+            ) : (
+              <LandingPage />
+            )
           }
         />
+
         <Route
           path="/chatbots"
           element={
