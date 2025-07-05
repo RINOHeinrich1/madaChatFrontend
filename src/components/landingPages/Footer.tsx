@@ -40,7 +40,7 @@ export default function Footer() {
               <li><a href="#" className="text-gray-400 hover:text-white transition-colors">Discord</a></li>
               <li><a href="#" className="text-gray-400 hover:text-white transition-colors">GitHub</a></li>
               <li><a href="#" className="text-gray-400 hover:text-white transition-colors">Contribuer</a></li>
-              <li><a href="#" className="text-gray-400 hover:text-white transition-colors">Blog</a></li>
+              <li><a href="https://github.com/RINOHeinrich1/madaChatFrontend" target='_blank' className="text-gray-400 hover:text-white transition-colors">Blog</a></li>
             </ul>
           </div>
 
@@ -55,10 +55,7 @@ export default function Footer() {
                 <Mail className="w-4 h-4" />
                 contact@onirtech.com
               </a>
-              <div className="flex items-center gap-2 text-gray-400">
-                <Users className="w-4 h-4" />
-                150+ développeurs
-              </div>
+          
             </div>
           </div>
         </div>

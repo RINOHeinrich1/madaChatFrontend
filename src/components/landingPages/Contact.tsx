@@ -68,7 +68,7 @@ export default function Contact() {
                       Communauté
                     </h4>
                     <p className="text-gray-600 dark:text-gray-400">
-                      150+ développeurs actifs
+                      dizaines de développeurs actifs
                     </p>
                   </div>
                 </div>
