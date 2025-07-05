@@ -66,12 +66,11 @@ export default function Header() {
              dark:from-emerald-500 dark:to-lime-500 
              dark:hover:from-emerald-600 dark:hover:to-lime-600 
              text-white px-6 py-2 rounded-xl transition-all duration-300 
-             shadow-lg hover:shadow-xl text-left mt-2"
+             shadow-lg hover:shadow-xl text-left"
             >
               Se connecter
             </button>
           </nav>
-
           {/* Mobile Menu Button */}
           <button
             onClick={() => setIsMenuOpen(!isMenuOpen)}
