@@ -12,7 +12,7 @@ import ChatbotManager from "../pages/ChatbotManager";
 import LoginPage from "../pages/LoginPage";
 import LandingPage from "../pages/LandingPage";
 import RegisterPage from "../pages/RegisterPage";
-
+import ProfilePage from "../pages/ProfilePage";
 function PrivateRoute({ children }) {
   const { user, loading } = useAuth();
 
@@ -85,6 +85,14 @@ export default function AppLayout() {
           element={
             <PrivateRoute>
               <DocumentManager />
+            </PrivateRoute>
+          }
+        />
+        <Route
+          path="/profile"
+          element={
+            <PrivateRoute>
+              <ProfilePage />
             </PrivateRoute>
           }
         />

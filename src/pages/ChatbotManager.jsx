@@ -87,7 +87,8 @@ export default function ChatbotManager() {
   return (
     <div className="min-h-screen bg-gradient-to-br from-indigo-50 via-white to-purple-50 dark:from-gray-900 dark:via-gray-800 dark:to-indigo-900 text-gray-800 dark:text-gray-100 flex justify-center px-4 py-8 transition-all duration-500">
       <div className="w-full max-w-5xl space-y-6">
-        <div className="flex justify-between items-center mb-6">
+        <div className="flex flex-col lg:flex-row lg:justify-between lg:items-center gap-4 mb-6">
+          {/* Zone de recherche */}
           <div className="flex items-center gap-2 bg-white dark:bg-gray-700 px-4 py-2 rounded-xl shadow-sm w-full max-w-sm">
             <Search className="w-4 h-4 text-gray-500" />
             <input
@@ -97,40 +98,43 @@ export default function ChatbotManager() {
               className="w-full bg-transparent outline-none text-gray-800 dark:text-white"
             />
           </div>
-          <div className="flex gap-2">
+
+          {/* Boutons vue & ajout */}
+          <div className="flex flex-col sm:flex-row lg:items-center gap-2 w-full lg:w-auto">
+            <div className="flex gap-2">
+              <button
+                onClick={() => setViewMode("table")}
+                className={`px-4 py-2 rounded-xl text-sm shadow flex items-center justify-center ${
+                  viewMode === "table"
+                    ? "bg-indigo-600 text-white"
+                    : "bg-gray-100 dark:bg-gray-700 dark:text-white"
+                }`}
+              >
+                <Table className="w-5 h-5" />
+              </button>
+              <button
+                onClick={() => setViewMode("cards")}
+                className={`px-4 py-2 rounded-xl text-sm shadow flex items-center justify-center ${
+                  viewMode === "cards"
+                    ? "bg-indigo-600 text-white"
+                    : "bg-gray-100 dark:bg-gray-700 dark:text-white"
+                }`}
+              >
+                <LayoutGrid className="w-5 h-5" />
+              </button>
+            </div>
+
             <button
-              onClick={() => setViewMode("table")}
-              className={`px-4 py-2 rounded-xl text-sm shadow flex items-center justify-center ${
-                viewMode === "table"
-                  ? "bg-indigo-600 text-white"
-                  : "bg-gray-100 dark:bg-gray-700 dark:text-white"
-              }`}
+              onClick={() => {
+                setEditing(null);
+                setModalOpen(true);
+              }}
+              className="bg-gradient-to-r from-indigo-600 to-purple-600 hover:scale-105 text-white font-semibold px-5 py-3 rounded-xl shadow-lg flex items-center justify-center gap-2 transition-all w-full sm:w-auto"
             >
-              <Table className="w-5 h-5" />
-            </button>
-            <button
-              onClick={() => setViewMode("cards")}
-              className={`px-4 py-2 rounded-xl text-sm shadow flex items-center justify-center ${
-                viewMode === "cards"
-                  ? "bg-indigo-600 text-white"
-                  : "bg-gray-100 dark:bg-gray-700 dark:text-white"
-              }`}
-            >
-              <LayoutGrid className="w-5 h-5" />
+              <Plus className="w-5 h-5 sm:w-4 sm:h-4" />
+              <span className="hidden sm:inline">Ajouter un chatbot</span>
             </button>
           </div>
-
-          <button
-            onClick={() => {
-              setEditing(null);
-              setModalOpen(true);
-            }}
-            className="mr-2 bg-gradient-to-r from-indigo-600 to-purple-600 hover:scale-105 text-white font-semibold px-5 py-3 rounded-xl shadow-lg flex items-center justify-center gap-2 transition-all"
-          >
-            <Plus className="w-5 h-5 sm:w-4 sm:h-4" />
-
-            <span className="hidden sm:inline">Ajouter un chatbot</span>
-          </button>
         </div>
 
         {viewMode === "table" ? (

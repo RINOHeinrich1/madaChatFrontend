@@ -1,6 +1,14 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Link, useLocation, useNavigate } from "react-router-dom";
-import { MessageSquare, Cpu, BookOpen, LogOut, Menu, List } from "lucide-react";
+import {
+  MessageSquare,
+  Cpu,
+  BookOpen,
+  LogOut,
+  Menu,
+  List,
+  User,
+} from "lucide-react";
 import { supabase } from "../lib/supabaseClient";
 
 export default function Sidebar() {
@@ -26,6 +34,33 @@ export default function Sidebar() {
     await supabase.auth.signOut();
     navigate("/login");
   };
+  const goToProfile = async () => {
+    navigate("/profile");
+  };
+  const [userName, setUserName] = useState("Utilisateur");
+
+  useEffect(() => {
+    const fetchUserProfile = async () => {
+      const {
+        data: { user },
+        error: userError,
+      } = await supabase.auth.getUser();
+
+      if (userError || !user) return;
+      const { data, error } = await supabase
+        .from("profiles")
+        .select("name")
+        .eq("owner_id", user.id);
+      if (error) {
+        console.error("Erreur lors de la récupération du profil :", error);
+        return;
+      }
+
+      setUserName(data[0]?.name || "Utilisateur");
+    };
+
+    fetchUserProfile();
+  }, []);
 
   return (
     <>
@@ -60,7 +95,7 @@ export default function Sidebar() {
             <Link
               to={to}
               key={to}
-              onClick={() => setVisible(false)} // ferme après clic mobile
+              onClick={() => setVisible(false)}
               className={`flex items-center gap-4 px-4 py-3 cursor-pointer select-none transition-colors rounded-lg mx-2 my-1 ${isActive(
                 to
               )}`}
@@ -73,19 +108,37 @@ export default function Sidebar() {
           ))}
         </div>
 
-        <button
-          onClick={() => {
-            handleLogout();
-            setVisible(false);
-          }}
-          className={`flex items-center py-3 mb-4 mx-2 rounded-lg text-indigo-300 hover:bg-indigo-600 hover:text-white transition select-none cursor-pointer ${
-            expanded || visible ? "gap-4 px-6 justify-start" : "px-2 justify-center"
-          }`}
-          aria-label="Se déconnecter"
-        >
-          <LogOut className="w-6 h-6 flex-shrink-0" aria-hidden="true" />
-          {(expanded || visible) && <span>Se déconnecter</span>}
-        </button>
+        {/* ✅ Groupe Profil + Déconnexion */}
+        <div className="flex flex-col">
+          <div onClick={goToProfile}
+            className={`flex items-center py-3 mx-2 rounded-lg text-indigo-300 hover:bg-indigo-600 hover:text-white transition select-none cursor-default ${
+              expanded || visible
+                ? "gap-4 px-6 justify-start"
+                : "px-2 justify-center"
+            }`}
+          >
+            <User className="w-6 h-6 flex-shrink-0" aria-hidden="true" />
+            {(expanded || visible) && (
+              <span className="whitespace-nowrap">{userName}</span>
+            )}
+          </div>
+
+          <button
+            onClick={() => {
+              handleLogout();
+              setVisible(false);
+            }}
+            className={`flex items-center py-3 mb-4 mx-2 rounded-lg text-indigo-300 hover:bg-indigo-600 hover:text-white transition select-none cursor-pointer ${
+              expanded || visible
+                ? "gap-4 px-6 justify-start"
+                : "px-2 justify-center"
+            }`}
+            aria-label="Se déconnecter"
+          >
+            <LogOut className="w-6 h-6 flex-shrink-0" aria-hidden="true" />
+            {(expanded || visible) && <span>Se déconnecter</span>}
+          </button>
+        </div>
       </nav>
     </>
   );
