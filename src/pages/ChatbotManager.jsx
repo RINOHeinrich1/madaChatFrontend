@@ -5,9 +5,9 @@ import Swal from "sweetalert2";
 import { useNavigate } from "react-router-dom";
 import ChatbotDocumentsManager from "../components/ChatbotDocumentManager";
 import {
-  CheckCircle,
   Pencil,
   Trash,
+  Database,
   Plus,
   Table,
   LayoutGrid,
@@ -155,7 +155,7 @@ export default function ChatbotManager() {
                   >
                     <td className="px-6 py-4 font-medium">{cb.nom}</td>
                     <td className="px-6 py-4">{cb.description}</td>
-                    <td className="px-6 py-4 text-right flex justify-end gap-3">
+                    <td className="px-6 py-4 text-right flex flex-wrap justify-end gap-3">
                       <button
                         onClick={() => {
                           setEditing(cb);
@@ -185,6 +185,16 @@ export default function ChatbotManager() {
                         className="text-blue-600 hover:text-blue-800 dark:text-blue-400 dark:hover:text-blue-300 flex items-center gap-1"
                       >
                         <FileText className="w-5 h-5" />
+                      </button>
+                      <button
+                        onClick={() => {
+                          setSelectedChatbotId(cb.id);
+                          setDatabaseModalOpen(true);
+                        }}
+                        className="text-yellow-600 hover:text-yellow-800 dark:text-yellow-400 dark:hover:text-yellow-300"
+                        title="Connecter une base de données"
+                      >
+                        <Database className="w-5 h-5" />
                       </button>
                     </td>
                   </tr>
@@ -266,6 +276,16 @@ export default function ChatbotManager() {
                       className="text-blue-600 hover:text-blue-800 dark:text-blue-400 dark:hover:text-blue-300"
                     >
                       <FileText className="w-4 h-4" />
+                    </button>
+                    <button
+                      onClick={() => {
+                        setSelectedChatbotId(cb.id);
+                        setDatabaseModalOpen(true);
+                      }}
+                      className="text-yellow-600 hover:text-yellow-800 dark:text-yellow-400 dark:hover:text-yellow-300"
+                      title="Connecter une base de données"
+                    >
+                      <Database className="w-5 h-5" />
                     </button>
                   </div>
                 </div>
