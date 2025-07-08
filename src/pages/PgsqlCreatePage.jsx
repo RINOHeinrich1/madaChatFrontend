@@ -7,7 +7,7 @@ import { supabase } from "../lib/supabaseClient";
 import PgsqlVectorizerModal from "../components/pgsqlVectorizerModal";
 
 export default function PgsqlCreatePage() {
-  const [serviceUrl, setServiceUrl] = useState("https://postgresvectorizer.onirtech.com/");
+  const [serviceUrl, setServiceUrl] = useState("https://postgresvectorizer.onirtech.com");
   const [connParams, setConnParams] = useState({
     host: "localhost",
     port: 5432,

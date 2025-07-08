@@ -11,7 +11,7 @@ export default function PgsqlConnexionManager() {
   const [search, setSearch] = useState("");
   const [loading, setLoading] = useState(false);
   const [viewMode, setViewMode] = useState("table");
-  const [serviceUrl, setServiceUrl] = useState("https://postgresvectorizer.onirtech.com/");
+  const [serviceUrl, setServiceUrl] = useState("https://postgresvectorizer.onirtech.com");
 
   const fetchConnexions = async () => {
     setLoading(true);
