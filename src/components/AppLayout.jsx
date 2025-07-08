@@ -12,8 +12,9 @@ import LoginPage from "../pages/LoginPage";
 import LandingPage from "../pages/LandingPage";
 import RegisterPage from "../pages/RegisterPage";
 import ProfilePage from "../pages/ProfilePage";
-import PgsqlPage from "../pages/PgsqlPage";
 import SourcePage from "../pages/SourcePage";
+import PgsqlCreatePage from "../pages/PgsqlCreatePage";
+import PgsqlConnexionManager from "../pages/PgsqlConnexionManager";
 function PrivateRoute({ children }) {
   const { user, loading } = useAuth();
 
@@ -109,7 +110,15 @@ export default function AppLayout() {
           path="/pgsql"
           element={
             <PrivateRoute>
-              <PgsqlPage />
+              <PgsqlConnexionManager />
+            </PrivateRoute>
+          }
+        />
+        <Route
+          path="/pgsql-create"
+          element={
+            <PrivateRoute>
+              <PgsqlCreatePage />
             </PrivateRoute>
           }
         />

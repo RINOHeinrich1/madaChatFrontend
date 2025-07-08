@@ -6,8 +6,8 @@ import FormSelect from "../ui/FormSelect";
 import { supabase } from "../lib/supabaseClient";
 import PgsqlVectorizerModal from "../components/pgsqlVectorizerModal";
 
-export default function PgsqlPage() {
-  const [serviceUrl, setServiceUrl] = useState("http://localhost:7777");
+export default function PgsqlCreatePage() {
+  const [serviceUrl, setServiceUrl] = useState("https://postgresvectorizer.onirtech.com/");
   const [connParams, setConnParams] = useState({
     host: "localhost",
     port: 5432,
@@ -117,59 +117,86 @@ export default function PgsqlPage() {
     }
   };
 
-  const sendToStaticVectorizer = async () => {
-    if (!selectedTable) {
-      setMessage({ text: "Veuillez sélectionner une table.", type: "error" });
-      return;
+
+const sendToStaticVectorizer = async () => {
+  if (!selectedTable) {
+    setMessage({ text: "Veuillez sélectionner une table.", type: "error" });
+    return;
+  }
+
+  setLoading(true);
+  setMessage({ text: "", type: "" });
+
+  try {
+    // 1. Récupérer l'utilisateur connecté
+    const {
+      data: { session },
+      error: sessionError,
+    } = await supabase.auth.getSession();
+
+    if (sessionError || !session) {
+      throw new Error("Utilisateur non connecté.");
     }
 
-    setLoading(true);
-    setMessage({ text: "", type: "" });
+    const user = session.user;
 
-    try {
-      const payload = {
-        host: connParams.host,
+    // 2. Construire le payload
+    const payload = {
+      host: connParams.host,
+      port: connParams.port,
+      user: connParams.user,
+      password: connParams.password,
+      dbname: connParams.dbname,
+      table_name: selectedTable,
+      template: template,
+      page_size: 50,
+    };
+    console.log("Payload:", payload);
+
+    // 3. Envoyer la requête au microservice vectorizer
+    const token = session.access_token;
+
+    const response = await axios.post(
+      `${serviceUrl}/staticvectorizer`,
+      payload,
+      {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      }
+    );
+
+    // 4. Enregistrer dans Supabase
+    const { error: insertError } = await supabase.from("postgresql_connexions").insert([
+      {
+        host_name: connParams.host,
         port: connParams.port,
-        user: connParams.user,
-        password: connParams.password,
-        dbname: connParams.dbname,
+        database: connParams.dbname,
         table_name: selectedTable,
-        template: template,
-        page_size: 50, // valeur fixe ou paramétrable
-      };
-      console.log("Payload:", payload);
+        owner_id: user.id,
+      },
+    ]);
 
-      const {
-        data: { session },
-      } = await supabase.auth.getSession();
-      const token = session?.access_token;
-
-      const response = await axios.post(
-        `${serviceUrl}/staticvectorizer`,
-        payload,
-        {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-        }
-      );
-
-      setMessage({
-        text: `Vectorizer : ${response.data.message || "Succès"}`,
-        type: "success",
-      });
-      setModalOpen(false);
-    } catch (err) {
-      setMessage({
-        text: `Erreur vectorizer : ${
-          err.response?.data?.message || err.message
-        }`,
-        type: "error",
-      });
-    } finally {
-      setLoading(false);
+    if (insertError) {
+      console.error("Erreur insertion Supabase:", insertError);
+      throw new Error("Enregistrement Supabase échoué.");
     }
-  };
+
+    setMessage({
+      text: `Vectorizer : ${response.data.message || "Succès"}`,
+      type: "success",
+    });
+    setModalOpen(false);
+  } catch (err) {
+    setMessage({
+      text: `Erreur vectorizer : ${err.message}`,
+      type: "error",
+    });
+  } finally {
+    setLoading(false);
+  }
+};
+
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-indigo-50 via-white to-purple-50 dark:from-gray-900 dark:via-gray-800 dark:to-indigo-900 text-gray-800 dark:text-gray-100 flex items-center justify-center font-inter transition-all duration-500 px-4 py-8">

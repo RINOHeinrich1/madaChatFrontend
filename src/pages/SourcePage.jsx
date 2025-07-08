@@ -22,7 +22,7 @@ export default function SourcePage() {
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-indigo-50 via-white to-purple-50 dark:from-gray-900 dark:via-gray-800 dark:to-indigo-900 text-gray-800 dark:text-gray-100 flex items-center justify-center font-inter px-6 py-12 transition-all duration-500">
-      <div className="w-full max-w-4xl space-y-12">
+      <div className="w-full max-w-5xl space-y-6">
         {/* Header */}
         <div className="text-center animate-fade-in">
           <div className="flex items-center justify-center gap-3 mb-4">
