@@ -44,7 +44,7 @@ export default function PgsqlVectorizerModal({
           name="selectedTable"
           value={selectedTable}
           onChange={(e) => handleTableSelect(e.target.value)}
-          options={tables.map((t) => t.table_name)}
+          options={(tables || []).map((t) => t.table_name)}
           placeholder="Sélectionnez une table"
         />
 
@@ -60,7 +60,9 @@ export default function PgsqlVectorizerModal({
                     <span className="font-mono text-indigo-600 dark:text-indigo-400">
                       {col.column_name}
                     </span>{" "}
-                    <span className="text-gray-500 text-xs">({col.data_type})</span>
+                    <span className="text-gray-500 text-xs">
+                      ({col.data_type})
+                    </span>
                   </li>
                 ))}
               </ul>
