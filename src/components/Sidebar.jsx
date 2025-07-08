@@ -23,12 +23,12 @@ export default function Sidebar() {
       ? "bg-indigo-700 text-white font-semibold"
       : "text-indigo-300 hover:bg-indigo-600 hover:text-white";
 
-  const menuItems = [
-    { label: "Chatbots", icon: List, to: "/chatbots" },
-    // { label: "Chat", icon: MessageSquare, to: "/chat" },
-    { label: "Fine-Tune", icon: Cpu, to: "/finetune" },
-    { label: "Documents", icon: BookOpen, to: "/docs" },
-  ];
+const menuItems = [
+  { label: "Chatbots", icon: List, to: "/chatbots" },
+  { label: "Fine-Tune", icon: Cpu, to: "/finetune" },
+  { label: "Sources", icon: BookOpen, to: "/sources" }, 
+];
+
 
   const handleLogout = async () => {
     await supabase.auth.signOut();

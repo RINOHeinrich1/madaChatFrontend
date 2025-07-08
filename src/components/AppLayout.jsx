@@ -1,5 +1,4 @@
 // AppLayout.js
-import React from "react";
 import { Routes, Route, useLocation, Navigate } from "react-router-dom";
 import { useAuth } from "../contexts/AuthContext";
 import Sidebar from "./Sidebar";
@@ -13,6 +12,8 @@ import LoginPage from "../pages/LoginPage";
 import LandingPage from "../pages/LandingPage";
 import RegisterPage from "../pages/RegisterPage";
 import ProfilePage from "../pages/ProfilePage";
+import PgsqlPage from "../pages/PgsqlPage";
+import SourcePage from "../pages/SourcePage";
 function PrivateRoute({ children }) {
   const { user, loading } = useAuth();
 
@@ -81,6 +82,14 @@ export default function AppLayout() {
           }
         />
         <Route
+          path="/sources"
+          element={
+            <PrivateRoute>
+              <SourcePage />
+            </PrivateRoute>
+          }
+        />
+        <Route
           path="/docs"
           element={
             <PrivateRoute>
@@ -93,6 +102,14 @@ export default function AppLayout() {
           element={
             <PrivateRoute>
               <ProfilePage />
+            </PrivateRoute>
+          }
+        />
+        <Route
+          path="/pgsql"
+          element={
+            <PrivateRoute>
+              <PgsqlPage />
             </PrivateRoute>
           }
         />
