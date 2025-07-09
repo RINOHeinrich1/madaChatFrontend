@@ -30,26 +30,8 @@ export default function ChatUI({ chatbot_id }) {
     }
   }, [messages, chatbot_id]);
 
-  const [associatedDocs, setAssociatedDocs] = useState([]);
 
-  useEffect(() => {
-    const fetchAssociatedDocs = async () => {
-      if (!chatbot_id) return;
-      const { data, error } = await supabase
-        .from("chatbot_document_association")
-        .select("document_name")
-        .eq("chatbot_id", chatbot_id);
 
-      if (!error && data) {
-        const docNames = data.map((d) => d.document_name);
-        setAssociatedDocs(docNames);
-      } else {
-        console.log(error, data);
-      }
-    };
-
-    fetchAssociatedDocs();
-  }, [chatbot_id]);
 
   useEffect(() => {
     chatEndRef.current?.scrollIntoView({ behavior: "smooth" });
@@ -106,7 +88,7 @@ export default function ChatUI({ chatbot_id }) {
     setLoading(true);
 
     try {
-      const res = await askQuestion(trimmed, chatbot_id, associatedDocs);
+      const res = await askQuestion(trimmed, chatbot_id);
       setMessages((prev) => [
         ...prev,
         { id: nanoid(), type: "question", text: trimmed },

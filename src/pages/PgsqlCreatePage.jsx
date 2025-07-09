@@ -7,7 +7,9 @@ import { supabase } from "../lib/supabaseClient";
 import PgsqlVectorizerModal from "../components/pgsqlVectorizerModal";
 
 export default function PgsqlCreatePage() {
-  const [serviceUrl, setServiceUrl] = useState("https://postgresvectorizer.onirtech.com");
+  const [serviceUrl, setServiceUrl] = useState(
+    "https://postgresvectorizer.onirtech.com"
+  );
   const [connParams, setConnParams] = useState({
     host: "localhost",
     port: 5432,
@@ -18,6 +20,7 @@ export default function PgsqlCreatePage() {
   });
   const [message, setMessage] = useState({ text: "", type: "" });
   const [loading, setLoading] = useState(false);
+  const [description, setDescription] = useState("");
   const [focusedField, setFocusedField] = useState("");
 
   // Modale
@@ -117,86 +120,88 @@ export default function PgsqlCreatePage() {
     }
   };
 
-
-const sendToStaticVectorizer = async () => {
-  if (!selectedTable) {
-    setMessage({ text: "Veuillez sélectionner une table.", type: "error" });
-    return;
-  }
-
-  setLoading(true);
-  setMessage({ text: "", type: "" });
-
-  try {
-    // 1. Récupérer l'utilisateur connecté
-    const {
-      data: { session },
-      error: sessionError,
-    } = await supabase.auth.getSession();
-
-    if (sessionError || !session) {
-      throw new Error("Utilisateur non connecté.");
+  const sendToStaticVectorizer = async () => {
+    if (!selectedTable) {
+      setMessage({ text: "Veuillez sélectionner une table.", type: "error" });
+      return;
     }
 
-    const user = session.user;
+    setLoading(true);
+    setMessage({ text: "", type: "" });
 
-    // 2. Construire le payload
-    const payload = {
-      host: connParams.host,
-      port: connParams.port,
-      user: connParams.user,
-      password: connParams.password,
-      dbname: connParams.dbname,
-      table_name: selectedTable,
-      template: template,
-      page_size: 50,
-    };
-    console.log("Payload:", payload);
+    try {
+      // 1. Récupérer l'utilisateur connecté
+      const {
+        data: { session },
+        error: sessionError,
+      } = await supabase.auth.getSession();
 
-    // 3. Envoyer la requête au microservice vectorizer
-    const token = session.access_token;
-
-    const response = await axios.post(
-      `${serviceUrl}/staticvectorizer`,
-      payload,
-      {
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
+      if (sessionError || !session) {
+        throw new Error("Utilisateur non connecté.");
       }
-    );
 
-    // 4. Enregistrer dans Supabase
-    const { error: insertError } = await supabase.from("postgresql_connexions").insert([
-      {
-        host_name: connParams.host,
+      const user = session.user;
+
+      // 2. Construire le payload
+      const payload = {
+        host: connParams.host,
         port: connParams.port,
-        database: connParams.dbname,
+        user: connParams.user,
+        password: connParams.password,
+        dbname: connParams.dbname,
         table_name: selectedTable,
-        owner_id: user.id,
-      },
-    ]);
+        template: template,
+        page_size: 50,
+      };
 
-    if (insertError) {
-      console.error("Erreur insertion Supabase:", insertError);
-      throw new Error("Enregistrement Supabase échoué.");
+      console.log("Payload:", payload);
+
+      // 3. Envoyer la requête au microservice vectorizer
+      const token = session.access_token;
+
+      const response = await axios.post(
+        `${serviceUrl}/staticvectorizer`,
+        payload,
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
+
+      // 4. Enregistrer dans Supabase
+      const { error: insertError } = await supabase
+        .from("postgresql_connexions")
+        .insert([
+          {
+            host_name: connParams.host,
+            port: connParams.port,
+            database: connParams.dbname,
+            table_name: selectedTable,
+            owner_id: user.id,
+            description: description, // ✅ nouveau champ
+          },
+        ]);
+
+      if (insertError) {
+        console.error("Erreur insertion Supabase:", insertError);
+        throw new Error("Enregistrement Supabase échoué.");
+      }
+
+      setMessage({
+        text: `Vectorizer : ${response.data.message || "Succès"}`,
+        type: "success",
+      });
+      setModalOpen(false);
+    } catch (err) {
+      setMessage({
+        text: `Erreur vectorizer : ${err.message}`,
+        type: "error",
+      });
+    } finally {
+      setLoading(false);
     }
-
-    setMessage({
-      text: `Vectorizer : ${response.data.message || "Succès"}`,
-      type: "success",
-    });
-    setModalOpen(false);
-  } catch (err) {
-    setMessage({
-      text: `Erreur vectorizer : ${err.message}`,
-      type: "error",
-    });
-  } finally {
-    setLoading(false);
-  }
-};
-
+  };
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-indigo-50 via-white to-purple-50 dark:from-gray-900 dark:via-gray-800 dark:to-indigo-900 text-gray-800 dark:text-gray-100 flex items-center justify-center font-inter transition-all duration-500 px-4 py-8">
@@ -325,6 +330,8 @@ const sendToStaticVectorizer = async () => {
           setSelectedTable={setSelectedTable}
           template={template}
           setTemplate={setTemplate}
+          description={description}
+          setDescription={setDescription}
           onSend={sendToStaticVectorizer}
           loading={loading}
         />

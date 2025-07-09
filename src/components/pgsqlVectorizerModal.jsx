@@ -1,6 +1,8 @@
 import { X } from "lucide-react";
 import FormSelect from "../ui/FormSelect";
 import FormTextarea from "../ui/Formtextarea";
+import FormInput from "../ui/FormInput";
+import { useState } from "react";
 
 export default function PgsqlVectorizerModal({
   isOpen,
@@ -10,10 +12,13 @@ export default function PgsqlVectorizerModal({
   setSelectedTable,
   template,
   setTemplate,
+  description,
+  setDescription,
   onSend,
   loading,
 }) {
   if (!isOpen) return null;
+  const [focused, setFocused] = useState(""); // ✅ Ajout du state "focused"
 
   const handleTableSelect = (tableName) => {
     setSelectedTable(tableName);
@@ -78,6 +83,16 @@ export default function PgsqlVectorizerModal({
               focused={false}
               placeholder="Ex: Le produit {{productName}} possède la description {{description}}."
               rows={5}
+            />
+            <FormInput
+              label="Description (contexte d'utilisation)"
+              name="description"
+              value={description}
+              onChange={(e) => setDescription(e.target.value)}
+              placeholder="Exemple: Utilisé pour répondre aux questions sur les produits."
+              focused={focused === "description"}
+              onFocus={() => setFocused("description")}
+              onBlur={() => setFocused("")}
             />
           </>
         )}

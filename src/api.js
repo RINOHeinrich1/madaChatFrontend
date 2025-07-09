@@ -15,7 +15,6 @@ export const askQuestion = async (question, chatbot_id, document_filter = []) =>
   const response = await chatApi.post("/ask", {
     question,
     chatbot_id,
-    document_filter, // ajouté pour transmettre la liste
   });
   return response.data;
 };

@@ -16,6 +16,7 @@ import {
   MessageSquareText,
 } from "lucide-react";
 import Modal from "../ui/Modal";
+import ChatbotPostgresqlManager from "../components/ChatbotPostgresqlManager";
 export default function ChatbotManager() {
   const navigate = useNavigate();
   const [chatbots, setChatbots] = useState([]);
@@ -28,6 +29,7 @@ export default function ChatbotManager() {
   const [documentModalOpen, setDocumentModalOpen] = useState(false);
   const [selectedChatbotId, setSelectedChatbotId] = useState(null);
   const [viewMode, setViewMode] = useState("cards");
+  const [pgsqlModalOpen, setPgsqlModalOpen] = useState(false); // ✅ Nouveau
 
   useEffect(() => {
     const getUserAndChatbots = async () => {
@@ -189,7 +191,7 @@ export default function ChatbotManager() {
                       <button
                         onClick={() => {
                           setSelectedChatbotId(cb.id);
-                          setDatabaseModalOpen(true);
+                          setPgsqlModalOpen(true);
                         }}
                         className="text-yellow-600 hover:text-yellow-800 dark:text-yellow-400 dark:hover:text-yellow-300"
                         title="Connecter une base de données"
@@ -280,7 +282,7 @@ export default function ChatbotManager() {
                     <button
                       onClick={() => {
                         setSelectedChatbotId(cb.id);
-                        setDatabaseModalOpen(true);
+                        setPgsqlModalOpen(true);
                       }}
                       className="text-yellow-600 hover:text-yellow-800 dark:text-yellow-400 dark:hover:text-yellow-300"
                       title="Connecter une base de données"
@@ -321,6 +323,11 @@ export default function ChatbotManager() {
         >
           {selectedChatbotId && (
             <ChatbotDocumentsManager chatbotId={selectedChatbotId} />
+          )}
+        </Modal>
+        <Modal open={pgsqlModalOpen} onClose={() => setPgsqlModalOpen(false)}>
+          {selectedChatbotId && (
+            <ChatbotPostgresqlManager chatbotId={selectedChatbotId} />
           )}
         </Modal>
       </div>
