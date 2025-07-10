@@ -31,9 +31,9 @@ Bienvenue dans le dépôt **frontend** du projet **RAG Chatbot Builder**, une pl
 - Node.js ≥ 18
 - Supabase Project (configuré)
 - Les backend FastAPI (en fonctionnement):
-https://github.com/RINOHeinrich1/embedder-api
-https://github.com/RINOHeinrich1/chatbot-service
-https://github.com/RINOHeinrich1/backend-finetune
+https://github.com/RINOHeinrich1/embedder-api (service d'embedding)
+https://github.com/RINOHeinrich1/chatbot-service (service du chatbot)
+https://github.com/RINOHeinrich1/backend-finetune (service de finetuning et gestion des documents)
 
 ### Architecture du projet:
 - Microservice
