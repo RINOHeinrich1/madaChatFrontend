@@ -14,6 +14,8 @@ export default function PgsqlVectorizerModal({
   setTemplate,
   description,
   setDescription,
+  sqlReasoning,
+  setSqlReasoning,
   onSend,
   loading,
 }) {
@@ -94,6 +96,19 @@ export default function PgsqlVectorizerModal({
               onFocus={() => setFocused("description")}
               onBlur={() => setFocused("")}
             />
+            <div className="mt-4 flex items-center space-x-3">
+              <label className="flex items-center cursor-pointer">
+                <input
+                  type="checkbox"
+                  checked={sqlReasoning}
+                  onChange={(e) => setSqlReasoning(e.target.checked)}
+                  className="form-checkbox h-5 w-5 text-indigo-600 transition"
+                />
+                <span className="ml-2 text-sm text-gray-700 dark:text-gray-300">
+                  Activer le raisonnement SQL
+                </span>
+              </label>
+            </div>
           </>
         )}
 

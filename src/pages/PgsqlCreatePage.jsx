@@ -28,6 +28,7 @@ export default function PgsqlCreatePage() {
   const [tables, setTables] = useState([]);
   const [selectedTable, setSelectedTable] = useState("");
   const [template, setTemplate] = useState("");
+  const [sqlReasoning, setSqlReasoning] = useState(false);
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -179,7 +180,8 @@ export default function PgsqlCreatePage() {
             database: connParams.dbname,
             table_name: selectedTable,
             owner_id: user.id,
-            description: description, // ✅ nouveau champ
+            description: description, 
+            sql_reasoning: sqlReasoning,
           },
         ]);
 
@@ -332,6 +334,8 @@ export default function PgsqlCreatePage() {
           setTemplate={setTemplate}
           description={description}
           setDescription={setDescription}
+          sqlReasoning={sqlReasoning}
+          setSqlReasoning={setSqlReasoning}
           onSend={sendToStaticVectorizer}
           loading={loading}
         />
