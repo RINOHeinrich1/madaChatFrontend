@@ -6,13 +6,14 @@ export default function ChatbotDocumentsManager({ chatbotId }) {
   const [documents, setDocuments] = useState([]);
   const [allDocuments, setAllDocuments] = useState([]);
   const [newDocName, setNewDocName] = useState("");
-  const [loading, setLoading] = useState(false);
+  const [description, setDescription] = useState("");
   const [ownerId, setOwnerId] = useState(null);
+  const [loading, setLoading] = useState(false);
   const [showSuggestions, setShowSuggestions] = useState(false);
 
   useEffect(() => {
     const fetchUser = async () => {
-      const { data, error } = await supabase.auth.getUser();
+      const { data } = await supabase.auth.getUser();
       if (data?.user) setOwnerId(data.user.id);
     };
     fetchUser();
@@ -51,18 +52,22 @@ export default function ChatbotDocumentsManager({ chatbotId }) {
 
   const handleAdd = async () => {
     const docName = newDocName.trim();
-    if (!docName || !ownerId || !chatbotId) return;
+    const desc = description.trim();
+
+    if (!docName || !desc || !ownerId || !chatbotId) return;
 
     const { error } = await supabase
       .from("chatbot_document_association")
       .insert({
         chatbot_id: chatbotId,
         document_name: docName,
+        description: desc,
         owner_id: ownerId,
       });
 
     if (!error) {
       setNewDocName("");
+      setDescription("");
       fetchDocuments();
     }
   };
@@ -95,7 +100,7 @@ export default function ChatbotDocumentsManager({ chatbotId }) {
           }}
           className="w-full px-4 py-2 border rounded-lg dark:bg-gray-700 dark:text-white border-gray-300 dark:border-gray-600"
         />
-       {showSuggestions && filteredSuggestions.length > 0 && (
+        {showSuggestions && filteredSuggestions.length > 0 && (
           <ul className="absolute z-10 w-full bg-white dark:bg-gray-700 border border-gray-200 dark:border-gray-600 rounded-lg mt-1 max-h-40 overflow-y-auto shadow-lg">
             {filteredSuggestions.map((suggestion, i) => (
               <li
@@ -111,25 +116,52 @@ export default function ChatbotDocumentsManager({ chatbotId }) {
             ))}
           </ul>
         )}
-        <button
-          onClick={handleAdd}
-          className="mt-3 bg-indigo-600 hover:bg-indigo-700 text-white px-4 py-2 rounded-lg flex items-center gap-2"
-        >
-          <Plus className="w-4 h-4" />
-          Associer
-        </button>
       </div>
 
+      {/* Zone de description conditionnelle */}
+      {newDocName && (
+        <div className="mb-4">
+          <textarea
+            placeholder="Décrire à quoi va servir ce document pour le chatbot..."
+            value={description}
+            onChange={(e) => setDescription(e.target.value)}
+            rows={3}
+            required
+            className="w-full px-4 py-2 border rounded-lg dark:bg-gray-700 dark:text-white border-gray-300 dark:border-gray-600"
+          />
+        </div>
+      )}
+
+      {/* Bouton Associer désactivé si champs vides */}
+      <button
+        onClick={handleAdd}
+        disabled={!newDocName.trim() || !description.trim()}
+        className={`mt-2 px-4 py-2 rounded-lg flex items-center gap-2 ${
+          newDocName.trim() && description.trim()
+            ? "bg-indigo-600 hover:bg-indigo-700 text-white"
+            : "bg-gray-300 dark:bg-gray-600 text-gray-500 cursor-not-allowed"
+        }`}
+      >
+        <Plus className="w-4 h-4" />
+        Associer
+      </button>
+
       {loading ? (
-        <p className="text-sm text-gray-500 dark:text-gray-400">Chargement…</p>
+        <p className="text-sm text-gray-500 dark:text-gray-400 mt-4">Chargement…</p>
       ) : (
-        <ul className="divide-y divide-gray-200 dark:divide-gray-700">
+        <ul className="divide-y divide-gray-200 dark:divide-gray-700 mt-4">
           {documents.map((doc) => (
             <li
               key={doc.id}
               className="flex justify-between items-center py-3 text-sm text-gray-800 dark:text-gray-200"
             >
-              <span>{doc.document_name}</span>
+              <span>
+                <strong>{doc.document_name}</strong>
+                <br />
+                <span className="text-xs text-gray-500 dark:text-gray-400">
+                  {doc.description}
+                </span>
+              </span>
               <button
                 onClick={() => handleDelete(doc.id)}
                 className="text-red-500 hover:text-red-700 dark:hover:text-red-400"

@@ -6,6 +6,7 @@ export default function ChatbotPostgresqlManager({ chatbotId }) {
   const [connexions, setConnexions] = useState([]);
   const [allConnexions, setAllConnexions] = useState([]);
   const [newConnName, setNewConnName] = useState("");
+  const [description, setDescription] = useState("");
   const [loading, setLoading] = useState(false);
   const [ownerId, setOwnerId] = useState(null);
   const [showSuggestions, setShowSuggestions] = useState(false);
@@ -32,20 +33,18 @@ export default function ChatbotPostgresqlManager({ chatbotId }) {
     setLoading(false);
   };
 
-const fetchAllConnexions = async () => {
-  if (!ownerId) return;
+  const fetchAllConnexions = async () => {
+    if (!ownerId) return;
+    const { data, error } = await supabase
+      .from("postgresql_connexions")
+      .select("database, table_name")
+      .eq("owner_id", ownerId);
 
-  const { data, error } = await supabase
-    .from("postgresql_connexions")
-    .select("database, table_name")
-    .eq("owner_id", ownerId);
-
-  if (!error && data) {
-    // On génère connexion_name = dbname/table_name
-    const formatted = data.map((conn) => `${conn.database}/${conn.table_name}`);
-    setAllConnexions(formatted);
-  }
-};
+    if (!error && data) {
+      const formatted = data.map((conn) => `${conn.database}/${conn.table_name}`);
+      setAllConnexions(formatted);
+    }
+  };
 
   useEffect(() => {
     if (ownerId) {
@@ -56,18 +55,21 @@ const fetchAllConnexions = async () => {
 
   const handleAdd = async () => {
     const connName = newConnName.trim();
-    if (!connName || !ownerId || !chatbotId) return;
+    const desc = description.trim();
+    if (!connName || !desc || !ownerId || !chatbotId) return;
 
     const { error } = await supabase
       .from("chatbot_pgsql_connexions")
       .insert({
         chatbot_id: chatbotId,
-        connexion_name: connName, // ✅ ici on envoie connexion_name
+        connexion_name: connName,
+        description: desc,
         owner_id: ownerId,
       });
 
     if (!error) {
       setNewConnName("");
+      setDescription("");
       fetchConnexions();
     }
   };
@@ -92,7 +94,7 @@ const fetchAllConnexions = async () => {
       <div className="relative mb-4">
         <input
           type="text"
-          placeholder="Nom de la connexion..."
+          placeholder="Nom de la connexion (ex: db/table)..."
           value={newConnName}
           onChange={(e) => {
             setNewConnName(e.target.value);
@@ -116,25 +118,52 @@ const fetchAllConnexions = async () => {
             ))}
           </ul>
         )}
-        <button
-          onClick={handleAdd}
-          className="mt-3 bg-indigo-600 hover:bg-indigo-700 text-white px-4 py-2 rounded-lg flex items-center gap-2"
-        >
-          <Plus className="w-4 h-4" />
-          Associer
-        </button>
       </div>
 
+      {/* Description obligatoire seulement si une connexion est sélectionnée */}
+      {newConnName && (
+        <div className="mb-4">
+          <textarea
+            placeholder="Décrire l'usage de cette connexion pour le chatbot..."
+            value={description}
+            onChange={(e) => setDescription(e.target.value)}
+            rows={3}
+            required
+            className="w-full px-4 py-2 border rounded-lg dark:bg-gray-700 dark:text-white border-gray-300 dark:border-gray-600"
+          />
+        </div>
+      )}
+
+      {/* Bouton Associer désactivé si champs vides */}
+      <button
+        onClick={handleAdd}
+        disabled={!newConnName.trim() || !description.trim()}
+        className={`mt-2 px-4 py-2 rounded-lg flex items-center gap-2 ${
+          newConnName.trim() && description.trim()
+            ? "bg-indigo-600 hover:bg-indigo-700 text-white"
+            : "bg-gray-300 dark:bg-gray-600 text-gray-500 cursor-not-allowed"
+        }`}
+      >
+        <Plus className="w-4 h-4" />
+        Associer
+      </button>
+
       {loading ? (
-        <p className="text-sm text-gray-500 dark:text-gray-400">Chargement…</p>
+        <p className="text-sm text-gray-500 dark:text-gray-400 mt-4">Chargement…</p>
       ) : (
-        <ul className="divide-y divide-gray-200 dark:divide-gray-700">
+        <ul className="divide-y divide-gray-200 dark:divide-gray-700 mt-4">
           {connexions.map((conn) => (
             <li
               key={conn.id}
               className="flex justify-between items-center py-3 text-sm text-gray-800 dark:text-gray-200"
             >
-              <span>{conn.connexion_name}</span> {/* ✅ afficher connexion_name */}
+              <span>
+                <strong>{conn.connexion_name}</strong>
+                <br />
+                <span className="text-xs text-gray-500 dark:text-gray-400">
+                  {conn.description}
+                </span>
+              </span>
               <button
                 onClick={() => handleDelete(conn.id)}
                 className="text-red-500 hover:text-red-700 dark:hover:text-red-400"

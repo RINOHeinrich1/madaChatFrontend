@@ -4,6 +4,8 @@ import { askQuestion } from "../api";
 import { supabase } from "../lib/supabaseClient";
 import { nanoid } from "nanoid";
 import TypingIndicator from "../ui/TypingIndicator";
+import ReactMarkdown from "react-markdown";
+
 export default function ChatUI({ chatbot_id }) {
   const [question, setQuestion] = useState("");
   const [messages, setMessages] = useState(() => {
@@ -152,7 +154,8 @@ export default function ChatUI({ chatbot_id }) {
                     : "bg-gray-100 dark:bg-gray-700 mr-auto text-left"
                 }`}
               >
-                <p>{msg.text}</p>
+                <ReactMarkdown>{msg.text}</ReactMarkdown>
+
               </div>
 
               {msg.type === "question" && (
