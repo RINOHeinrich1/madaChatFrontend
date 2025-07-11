@@ -14,8 +14,6 @@ export default function PgsqlVectorizerModal({
   setTemplate,
   description,
   setDescription,
-  sqlReasoning,
-  setSqlReasoning,
   onSend,
   loading,
 }) {
@@ -59,8 +57,9 @@ export default function PgsqlVectorizerModal({
           <>
             <div className="mt-4 mb-6 border rounded-lg p-4 bg-gray-50 dark:bg-gray-900">
               <p className="font-semibold mb-2 text-gray-700 dark:text-gray-300">
-                Colonnes disponibles :
+                Schéma des données :
               </p>
+
               <ul className="list-disc pl-5 text-sm text-gray-700 dark:text-gray-300">
                 {getSelectedTableColumns().map((col) => (
                   <li key={col.column_name}>
@@ -96,19 +95,7 @@ export default function PgsqlVectorizerModal({
               onFocus={() => setFocused("description")}
               onBlur={() => setFocused("")}
             />
-            <div className="mt-4 flex items-center space-x-3">
-              <label className="flex items-center cursor-pointer">
-                <input
-                  type="checkbox"
-                  checked={sqlReasoning}
-                  onChange={(e) => setSqlReasoning(e.target.checked)}
-                  className="form-checkbox h-5 w-5 text-indigo-600 transition"
-                />
-                <span className="ml-2 text-sm text-gray-700 dark:text-gray-300">
-                  Activer le raisonnement SQL
-                </span>
-              </label>
-            </div>
+
           </>
         )}
 

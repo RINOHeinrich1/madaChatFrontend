@@ -10,6 +10,7 @@ export default function ChatbotPostgresqlManager({ chatbotId }) {
   const [loading, setLoading] = useState(false);
   const [ownerId, setOwnerId] = useState(null);
   const [showSuggestions, setShowSuggestions] = useState(false);
+  const [sqlReasoning, setSqlReasoning] = useState(false);
 
   useEffect(() => {
     const fetchUser = async () => {
@@ -41,7 +42,9 @@ export default function ChatbotPostgresqlManager({ chatbotId }) {
       .eq("owner_id", ownerId);
 
     if (!error && data) {
-      const formatted = data.map((conn) => `${conn.database}/${conn.table_name}`);
+      const formatted = data.map(
+        (conn) => `${conn.database}/${conn.table_name}`
+      );
       setAllConnexions(formatted);
     }
   };
@@ -58,14 +61,13 @@ export default function ChatbotPostgresqlManager({ chatbotId }) {
     const desc = description.trim();
     if (!connName || !desc || !ownerId || !chatbotId) return;
 
-    const { error } = await supabase
-      .from("chatbot_pgsql_connexions")
-      .insert({
-        chatbot_id: chatbotId,
-        connexion_name: connName,
-        description: desc,
-        owner_id: ownerId,
-      });
+    const { error } = await supabase.from("chatbot_pgsql_connexions").insert({
+      chatbot_id: chatbotId,
+      connexion_name: connName,
+      description: desc,
+      owner_id: ownerId,
+      sql_reasoning:sqlReasoning,
+    });
 
     if (!error) {
       setNewConnName("");
@@ -122,15 +124,30 @@ export default function ChatbotPostgresqlManager({ chatbotId }) {
 
       {/* Description obligatoire seulement si une connexion est sélectionnée */}
       {newConnName && (
-        <div className="mb-4">
-          <textarea
-            placeholder="Décrire l'usage de cette connexion pour le chatbot..."
-            value={description}
-            onChange={(e) => setDescription(e.target.value)}
-            rows={3}
-            required
-            className="w-full px-4 py-2 border rounded-lg dark:bg-gray-700 dark:text-white border-gray-300 dark:border-gray-600"
-          />
+        <div>
+          <div className="mb-4">
+            <textarea
+              placeholder="Décrire l'usage de cette connexion pour le chatbot..."
+              value={description}
+              onChange={(e) => setDescription(e.target.value)}
+              rows={3}
+              required
+              className="w-full px-4 py-2 border rounded-lg dark:bg-gray-700 dark:text-white border-gray-300 dark:border-gray-600"
+            />
+          </div>
+          <div className="mt-4 flex items-center space-x-3">
+            <label className="flex items-center cursor-pointer">
+              <input
+                type="checkbox"
+                checked={sqlReasoning}
+                onChange={(e) => setSqlReasoning(e.target.checked)}
+                className="form-checkbox h-5 w-5 text-indigo-600 transition"
+              />
+              <span className="ml-2 text-sm text-gray-700 dark:text-gray-300">
+                Activer le raisonnement SQL
+              </span>
+            </label>
+          </div>
         </div>
       )}
 
@@ -149,7 +166,9 @@ export default function ChatbotPostgresqlManager({ chatbotId }) {
       </button>
 
       {loading ? (
-        <p className="text-sm text-gray-500 dark:text-gray-400 mt-4">Chargement…</p>
+        <p className="text-sm text-gray-500 dark:text-gray-400 mt-4">
+          Chargement…
+        </p>
       ) : (
         <ul className="divide-y divide-gray-200 dark:divide-gray-700 mt-4">
           {connexions.map((conn) => (

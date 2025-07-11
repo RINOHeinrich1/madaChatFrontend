@@ -28,8 +28,6 @@ export default function PgsqlCreatePage() {
   const [tables, setTables] = useState([]);
   const [selectedTable, setSelectedTable] = useState("");
   const [template, setTemplate] = useState("");
-  const [sqlReasoning, setSqlReasoning] = useState(false);
-
   const handleChange = (e) => {
     const { name, value } = e.target;
     setConnParams((prev) => ({
@@ -72,6 +70,20 @@ export default function PgsqlCreatePage() {
     } finally {
       setLoading(false);
     }
+  };
+  const getSchemaAsPromptText = () => {
+    const table = tables.find((t) => t.table_name === selectedTable);
+    if (!table) return "";
+
+    const lines = [`Table : ${selectedTable}`, "Colonnes :"];
+    for (const col of table.columns) {
+      lines.push(
+        `- ${col.column_name} (${col.data_type}, ${
+          col.is_nullable === "NO" ? "NOT NULL" : "NULLABLE"
+        })`
+      );
+    }
+    return lines.join("\n");
   };
 
   const openTableModal = async () => {
@@ -180,8 +192,9 @@ export default function PgsqlCreatePage() {
             database: connParams.dbname,
             table_name: selectedTable,
             owner_id: user.id,
-            description: description, 
-            sql_reasoning: sqlReasoning,
+            description: description,
+            connexion_name: `${connParams.dbname}/${selectedTable}`,
+            data_schema: getSchemaAsPromptText(),
           },
         ]);
 
@@ -334,8 +347,6 @@ export default function PgsqlCreatePage() {
           setTemplate={setTemplate}
           description={description}
           setDescription={setDescription}
-          sqlReasoning={sqlReasoning}
-          setSqlReasoning={setSqlReasoning}
           onSend={sendToStaticVectorizer}
           loading={loading}
         />
