@@ -81,35 +81,64 @@ export default function ChatUI({ chatbot_id }) {
 
     setMessages(newMessages);
   };
+const getMemoireContextuelle = async (chatbot_id) => {
+  const { data, error } = await supabase
+    .from("chatbots")
+    .select("memoire_contextuelle")
+    .eq("id", chatbot_id)
+    .single();
 
-  const handleAsk = async () => {
-    const trimmed = question.trim();
-    if (!trimmed) return;
+  if (error || !data?.memoire_contextuelle) return 5; // valeur par défaut
+  return data.memoire_contextuelle;
+};
 
-    setQuestion("");
-    setLoading(true);
+const handleAsk = async () => {
+  const trimmed = question.trim();
+  if (!trimmed) return;
 
-    try {
-      const res = await askQuestion(trimmed, chatbot_id);
-      setMessages((prev) => [
-        ...prev,
-        { id: nanoid(), type: "question", text: trimmed },
-        { id: nanoid(), type: "answer", text: res.answer, docs: res.documents },
-      ]);
-    } catch (err) {
-      setMessages((prev) => [
-        ...prev,
-        { type: "question", text: trimmed },
-        {
-          type: "answer",
-          text: "❌ Une erreur est survenue lors de l'appel au modèle.",
-          docs: [],
-        },
-      ]);
-    } finally {
-      setLoading(false);
-    }
-  };
+  setQuestion("");
+  setLoading(true);
+
+  try {
+    // 🔁 1. Récupérer la limite memoire_contextuelle depuis Supabase
+    const limit = await getMemoireContextuelle(chatbot_id);
+
+    // 🧠 2. Construire l'historique formaté
+    const fullHistory = messages
+      .filter((msg) => msg.type === "question" || msg.type === "answer")
+      .map((msg) => ({
+        role: msg.type === "question" ? "user" : "assistant",
+        content: msg.text,
+      }));
+
+    // ⛔ 3. Limiter l’historique au n derniers messages
+    const limitedHistory = fullHistory.slice(-limit);
+
+    // 📡 4. Envoyer la requête avec historique
+    const res = await askQuestion(trimmed, chatbot_id, [], limitedHistory);
+
+    // ✅ 5. Ajouter les messages à l’état
+    setMessages((prev) => [
+      ...prev,
+      { id: nanoid(), type: "question", text: trimmed },
+      { id: nanoid(), type: "answer", text: res.answer, docs: res.documents },
+    ]);
+  } catch (err) {
+    setMessages((prev) => [
+      ...prev,
+      { type: "question", text: trimmed },
+      {
+        type: "answer",
+        text: "❌ Une erreur est survenue lors de l'appel au modèle.",
+        docs: [],
+      },
+    ]);
+  } finally {
+    setLoading(false);
+  }
+};
+
+
 
   const clearChat = () => {
     if (chatbot_id) {

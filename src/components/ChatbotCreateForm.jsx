@@ -11,6 +11,7 @@ export default function ChatbotFormModal({ onClose, userId, existing }) {
     nom: existing?.nom || "",
     description: existing?.description || "",
     allowed_url: existing?.allowed_url || "",
+    memoire_contextuelle: existing?.memoire_contextuelle || 5, // 👈 valeur par défaut 5
   });
 
   const [focusedField, setFocusedField] = useState("");
@@ -61,7 +62,8 @@ export default function ChatbotFormModal({ onClose, userId, existing }) {
       const payload = {
         nom: formData.nom,
         description: formData.description,
-        allowed_url: formData.allowed_url, // 👈 ajoute ici
+        allowed_url: formData.allowed_url, 
+        memoire_contextuelle: formData.memoire_contextuelle, 
       };
 
       let result;
@@ -128,6 +130,23 @@ export default function ChatbotFormModal({ onClose, userId, existing }) {
             onFocus={() => setFocusedField("nom")}
             onBlur={() => setFocusedField("")}
             placeholder="Ex: Assistant OnirTech"
+          />
+          <FormInput
+            label="Mémoire contextuelle (messages précédents)"
+            name="memoire_contextuelle"
+            type="number"
+            min="0"
+            value={formData.memoire_contextuelle}
+            onChange={(e) =>
+              setFormData((prev) => ({
+                ...prev,
+                memoire_contextuelle: parseInt(e.target.value || 0),
+              }))
+            }
+            focused={focusedField === "memoire_contextuelle"}
+            onFocus={() => setFocusedField("memoire_contextuelle")}
+            onBlur={() => setFocusedField("")}
+            placeholder="Ex: 5"
           />
 
           <FormTextarea
