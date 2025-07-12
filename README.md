@@ -1,6 +1,11 @@
 # 🤖 RAG Chatbot Builder - Frontend
 
+🎥 **Démo : un chatbot en moins de 5 minutes**  
+[![Voir la démo](https://img.icons8.com/fluency/96/video-playlist.png)](https://screenrec.com/share/hz1v6klJVi)
+
 Bienvenue dans le dépôt **frontend** du projet **RAG Chatbot Builder**, une plateforme open source permettant de créer facilement des chatbots IA alimentés par des documents personnalisés, grâce à l'architecture RAG.
+
+
 
 ---
 
