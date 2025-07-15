@@ -15,6 +15,7 @@ import ProfilePage from "../pages/ProfilePage";
 import SourcePage from "../pages/SourcePage";
 import PgsqlCreatePage from "../pages/PgsqlCreatePage";
 import PgsqlConnexionManager from "../pages/PgsqlConnexionManager";
+import PgsqlVariableManager from "../pages/PgsqlVariableForm";
 function PrivateRoute({ children }) {
   const { user, loading } = useAuth();
 
@@ -114,6 +115,15 @@ export default function AppLayout() {
             </PrivateRoute>
           }
         />
+        <Route
+          path="/pgsql-variable-form"
+          element={
+            <PrivateRoute>
+              <PgsqlVariableManager />
+            </PrivateRoute>
+          }
+        />
+
         <Route
           path="/pgsql-create"
           element={
