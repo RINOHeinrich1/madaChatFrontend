@@ -196,6 +196,7 @@ export default function PgsqlCreatePage() {
             table_name: selectedTable,
             owner_id: user.id,
             description: description,
+            postgres_service_url:serviceUrl,
             connexion_name: `${connParams.dbname}/${selectedTable}`,
             data_schema: getSchemaAsPromptText(),
           },

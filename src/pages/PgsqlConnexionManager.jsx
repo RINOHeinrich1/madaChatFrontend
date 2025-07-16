@@ -3,7 +3,7 @@ import { supabase } from "../lib/supabaseClient";
 import { useNavigate } from "react-router-dom";
 import { Trash, Plus, Search, Table, LayoutGrid } from "lucide-react";
 import axios from "axios";
-import PgsqlTemplateModal from "../components/PgsqlTemplateModal";
+import PgsqlTemplateManager from "../components/PgsqlTemplateManager";
 export default function PgsqlConnexionManager() {
   const navigate = useNavigate();
   const [connexions, setConnexions] = useState([]);
@@ -238,7 +238,9 @@ export default function PgsqlConnexionManager() {
                         </button>
 
                         <button
-                          onClick={() => openTemplateModal(item)}
+                          onClick={() => navigate("/template-manager", {
+                              state: { connexion: item },
+                            })}
                           className="text-green-600 hover:text-green-800 dark:text-green-400 dark:hover:text-green-300"
                           title="Template customiser"
                         >
@@ -313,18 +315,6 @@ export default function PgsqlConnexionManager() {
           </div>
         )}
 
-        {/* --- MODAL TEMPLATE --- */}
-        <PgsqlTemplateModal
-          isOpen={isTemplateModalOpen}
-          onClose={() => setIsTemplateModalOpen(false)}
-          connexion={selectedConnexion}
-          template={template}
-          setTemplate={setTemplate}
-          description={description}
-          setDescription={setDescription}
-          onSend={handleSaveTemplate}
-          loading={savingTemplate}
-        />
       </div>
     </div>
   );
