@@ -346,7 +346,7 @@ export default function PgsqlCreatePage() {
           onClose={() => setModalOpen(false)}
           tables={tables}
           selectedTable={selectedTable}
-          setSelectedTable={setSelectedTable}
+          setSelectedTable={setSelectedTable}sendTo
           template={template}
           setTemplate={setTemplate}
           description={description}

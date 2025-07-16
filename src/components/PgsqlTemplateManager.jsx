@@ -17,6 +17,7 @@ export default function PgsqlTemplateManager() {
   const [loading, setLoading] = useState(false);
   const [ownerId, setOwnerId] = useState(null);
   const [errorMsg, setErrorMsg] = useState("");
+  const [contextual, setContextual] = useState(false);
 
   useEffect(() => {
     const fetchData = async () => {
@@ -58,6 +59,7 @@ export default function PgsqlTemplateManager() {
     setTemplate("");
     setDescription("");
     setEditingId(null);
+    setContextual(false);
   };
 
   const handleSubmit = async (e) => {
@@ -83,6 +85,7 @@ export default function PgsqlTemplateManager() {
           text: template,
           source: connexionName,
           data_id: dataId,
+          contextual:String(contextual),
         }),
       });
 
@@ -94,10 +97,14 @@ export default function PgsqlTemplateManager() {
         template,
         description,
         data_id: dataId,
+        contextual,
       };
 
       const { error } = editingId
-        ? await supabase.from("postgresql_templates").update(payload).eq("data_id", editingId)
+        ? await supabase
+            .from("postgresql_templates")
+            .update(payload)
+            .eq("data_id", editingId)
         : await supabase.from("postgresql_templates").insert(payload);
 
       if (error) throw new Error("Erreur Supabase : " + error.message);
@@ -134,6 +141,7 @@ export default function PgsqlTemplateManager() {
 
   const handleEdit = (tpl) => {
     setTemplate(tpl.template);
+    setContextual(tpl.contextual || false);
     setDescription(tpl.description);
     setEditingId(tpl.data_id);
   };
@@ -152,7 +160,9 @@ export default function PgsqlTemplateManager() {
           <ArrowLeft className="w-4 h-4" /> Retour
         </button>
 
-        <h1 className="text-2xl font-bold mb-4">Gérer les templates PostgreSQL</h1>
+        <h1 className="text-2xl font-bold mb-4">
+          Gérer les templates PostgreSQL
+        </h1>
 
         <div className="mb-6 border rounded-lg p-4 bg-gray-50 dark:bg-gray-900">
           <p className="font-semibold mb-2 text-gray-700 dark:text-gray-300">
@@ -190,13 +200,27 @@ export default function PgsqlTemplateManager() {
           </div>
 
           <div>
-            <label className="block text-sm font-medium mb-1">Description</label>
+            <label className="block text-sm font-medium mb-1">
+              Description
+            </label>
             <input
               type="text"
               value={description}
               onChange={(e) => setDescription(e.target.value)}
               className="w-full px-4 py-2 rounded-lg bg-gray-100 dark:bg-gray-700 border"
             />
+          </div>
+          <div className="flex items-center gap-2">
+            <input
+              id="contextual"
+              type="checkbox"
+              checked={contextual}
+              onChange={() => setContextual(!contextual)}
+              className="h-4 w-4 text-indigo-600 border-gray-300 rounded focus:ring-indigo-500"
+            />
+            <label htmlFor="contextual" className="text-sm">
+              Contextuel
+            </label>
           </div>
 
           {errorMsg && <p className="text-red-500 text-sm">{errorMsg}</p>}
@@ -206,20 +230,28 @@ export default function PgsqlTemplateManager() {
             disabled={loading}
             className="bg-indigo-600 hover:bg-indigo-700 text-white px-6 py-3 rounded-xl shadow-md w-full"
           >
-            {loading ? "Enregistrement..." : editingId ? "Mettre à jour" : "Créer"}
+            {loading
+              ? "Enregistrement..."
+              : editingId
+              ? "Mettre à jour"
+              : "Créer"}
           </button>
         </form>
 
         <h2 className="text-xl font-semibold mb-3">Templates existants</h2>
         <div className="space-y-2">
-          {templates.length === 0 && <p className="text-gray-400">Aucun template trouvé.</p>}
+          {templates.length === 0 && (
+            <p className="text-gray-400">Aucun template trouvé.</p>
+          )}
           {templates.map((tpl) => (
             <div
               key={tpl.data_id}
               className="p-4 bg-gray-50 dark:bg-gray-700 rounded-lg flex justify-between items-center"
             >
               <div>
-                <p className="font-medium text-sm">{tpl.description || "(Sans description)"}</p>
+                <p className="font-medium text-sm">
+                  {tpl.description || "(Sans description)"}
+                </p>
                 <pre className="text-xs text-gray-600 dark:text-gray-300 whitespace-pre-wrap">
                   {tpl.template}
                 </pre>
@@ -228,7 +260,10 @@ export default function PgsqlTemplateManager() {
                 <button onClick={() => handleEdit(tpl)} title="Modifier">
                   <Edit className="w-5 h-5 text-yellow-500" />
                 </button>
-                <button onClick={() => handleDelete(tpl.data_id)} title="Supprimer">
+                <button
+                  onClick={() => handleDelete(tpl.data_id)}
+                  title="Supprimer"
+                >
                   <Trash2 className="w-5 h-5 text-red-500" />
                 </button>
               </div>
