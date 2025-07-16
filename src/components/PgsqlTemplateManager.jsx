@@ -72,7 +72,7 @@ export default function PgsqlTemplateManager() {
       const session = await supabase.auth.getSession();
       const accessToken = session.data.session?.access_token;
 
-      const endpoint = editingId ? "/edit" : "/insert-single";
+      const endpoint = "/upsert-single";
       const res = await fetch(`${serviceUrl}${endpoint}`, {
         method: "POST",
         headers: {
