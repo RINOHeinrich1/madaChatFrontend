@@ -36,7 +36,7 @@ export default function PgsqlConnexionManager() {
       .select("*")
       .eq("owner_id", authData.user.id)
       .order("created_at", { ascending: false });
-
+    
     if (!error) {
       setConnexions(data);
       setFiltered(data);
@@ -227,6 +227,18 @@ export default function PgsqlConnexionManager() {
                       <div className="flex justify-end gap-3">
                         <button
                           onClick={() =>
+                            navigate("/pgsql-edit", {
+                              state: { connexion: item },
+                            })
+                          }
+                          className="text-yellow-600 hover:text-yellow-800 dark:text-yellow-400 dark:hover:text-yellow-300"
+                          title="Modifier la connexion"
+                        >
+                          ✏️
+                        </button>
+
+                        <button
+                          onClick={() =>
                             navigate("/pgsql-variable-form", {
                               state: { connexion: item },
                             })
@@ -238,9 +250,11 @@ export default function PgsqlConnexionManager() {
                         </button>
 
                         <button
-                          onClick={() => navigate("/template-manager", {
+                          onClick={() =>
+                            navigate("/template-manager", {
                               state: { connexion: item },
-                            })}
+                            })
+                          }
                           className="text-green-600 hover:text-green-800 dark:text-green-400 dark:hover:text-green-300"
                           title="Template customiser"
                         >
@@ -314,7 +328,6 @@ export default function PgsqlConnexionManager() {
             )}
           </div>
         )}
-
       </div>
     </div>
   );

@@ -21,8 +21,9 @@ export default function PgsqlVectorizerModal({
   const [focused, setFocused] = useState(""); // ✅ Ajout du state "focused"
 
   const handleTableSelect = (tableName) => {
+    console.log("Existing template:", template);
+    
     setSelectedTable(tableName);
-    setTemplate(""); // Réinitialise le template
   };
 
   const getSelectedTableColumns = () => {
@@ -95,7 +96,6 @@ export default function PgsqlVectorizerModal({
               onFocus={() => setFocused("description")}
               onBlur={() => setFocused("")}
             />
-
           </>
         )}
 

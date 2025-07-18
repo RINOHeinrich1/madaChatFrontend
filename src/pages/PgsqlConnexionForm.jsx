@@ -1,12 +1,13 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { Database, PlugZap, CheckCircle, AlertCircle, X } from "lucide-react";
 import axios from "axios";
 import FormInput from "../ui/FormInput";
 import FormSelect from "../ui/FormSelect";
 import { supabase } from "../lib/supabaseClient";
 import PgsqlVectorizerModal from "../components/pgsqlVectorizerModal";
+import { useLocation, useNavigate } from "react-router-dom";
 
-export default function PgsqlCreatePage() {
+export default function PgsqlConnexionForm() {
   const [serviceUrl, setServiceUrl] = useState(
     "https://postgresvectorizer.onirtech.com"
   );
@@ -28,6 +29,26 @@ export default function PgsqlCreatePage() {
   const [tables, setTables] = useState([]);
   const [selectedTable, setSelectedTable] = useState("");
   const [template, setTemplate] = useState("");
+  const location = useLocation();
+  const existingConnexion = location.state?.connexion;
+  useEffect(() => {
+    if (existingConnexion) {
+
+      setConnParams({
+        host: existingConnexion.host_name,
+        port: existingConnexion.port,
+        user: existingConnexion.user,
+        password: existingConnexion.password,
+        dbname: existingConnexion.database,
+        sslmode: existingConnexion.ssl_mode,
+      });
+      setServiceUrl(existingConnexion.postgres_service_url);
+      setDescription(existingConnexion.description || "");
+      setSelectedTable(existingConnexion.table_name);
+      setTemplate(existingConnexion.vectorizer_template);
+    }
+  }, [existingConnexion]);
+
   const handleChange = (e) => {
     const { name, value } = e.target;
     setConnParams((prev) => ({
@@ -120,7 +141,7 @@ export default function PgsqlCreatePage() {
       setModalOpen(true);
       // NE PAS afficher de message ici
       setSelectedTable("");
-      setTemplate("");
+      //setTemplate("");
     } catch (err) {
       setMessage({
         text: `Erreur récupération tables: ${
@@ -183,28 +204,50 @@ export default function PgsqlCreatePage() {
       );
 
       // 4. Enregistrer dans Supabase
-      const { error: insertError } = await supabase
-        .from("postgresql_connexions")
-        .insert([
-          {
+      if (existingConnexion) {
+        // update
+        const { error: updateError } = await supabase
+          .from("postgresql_connexions")
+          .update({
             host_name: connParams.host,
             port: connParams.port,
             database: connParams.dbname,
-            user:connParams.user,
+            user: connParams.user,
             password: connParams.password,
-            ssl_mode:connParams.sslmode,
+            ssl_mode: connParams.sslmode,
+            vectorizer_template: template,
             table_name: selectedTable,
-            owner_id: user.id,
-            description: description,
-            postgres_service_url:serviceUrl,
+            description,
+            postgres_service_url: serviceUrl,
             connexion_name: `${connParams.dbname}/${selectedTable}`,
             data_schema: getSchemaAsPromptText(),
-          },
-        ]);
+          })
+          .eq("id", existingConnexion.id);
 
-      if (insertError) {
-        console.error("Erreur insertion Supabase:", insertError);
-        throw new Error("Enregistrement Supabase échoué.");
+        if (updateError) throw new Error("Mise à jour Supabase échouée.");
+      } else {
+        // insert (cas normal de création)
+        const { error: insertError } = await supabase
+          .from("postgresql_connexions")
+          .insert([
+            {
+              host_name: connParams.host,
+              port: connParams.port,
+              database: connParams.dbname,
+              user: connParams.user,
+              password: connParams.password,
+              ssl_mode: connParams.sslmode,
+              table_name: selectedTable,
+              owner_id: user.id,
+              vectorizer_template: template,
+              description,
+              postgres_service_url: serviceUrl,
+              connexion_name: `${connParams.dbname}/${selectedTable}`,
+              data_schema: getSchemaAsPromptText(),
+            },
+          ]);
+
+        if (insertError) throw new Error("Enregistrement Supabase échoué.");
       }
 
       setMessage({
@@ -346,7 +389,8 @@ export default function PgsqlCreatePage() {
           onClose={() => setModalOpen(false)}
           tables={tables}
           selectedTable={selectedTable}
-          setSelectedTable={setSelectedTable}sendTo
+          setSelectedTable={setSelectedTable}
+          sendTo
           template={template}
           setTemplate={setTemplate}
           description={description}
