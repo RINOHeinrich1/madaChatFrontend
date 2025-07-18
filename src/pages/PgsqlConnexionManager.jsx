@@ -1,7 +1,16 @@
 import React, { useEffect, useState } from "react";
 import { supabase } from "../lib/supabaseClient";
 import { useNavigate } from "react-router-dom";
-import { Trash, Plus, Search, Table, LayoutGrid } from "lucide-react";
+import {
+  Trash,
+  Plus,
+  Search,
+  Table,
+  LayoutGrid,
+  Variable,
+  Edit,
+  File,
+} from "lucide-react";
 import axios from "axios";
 import PgsqlTemplateManager from "../components/PgsqlTemplateManager";
 export default function PgsqlConnexionManager() {
@@ -234,7 +243,7 @@ export default function PgsqlConnexionManager() {
                           className="text-yellow-600 hover:text-yellow-800 dark:text-yellow-400 dark:hover:text-yellow-300"
                           title="Modifier la connexion"
                         >
-                          ✏️
+                          <Edit className="w-4 h-4" />
                         </button>
 
                         <button
@@ -246,7 +255,7 @@ export default function PgsqlConnexionManager() {
                           className="text-blue-600 hover:text-blue-800 dark:text-blue-400 dark:hover:text-blue-300"
                           title="Ajouter variable"
                         >
-                          ➕
+                          <Variable className="w-4 h-4" />
                         </button>
 
                         <button
@@ -258,7 +267,7 @@ export default function PgsqlConnexionManager() {
                           className="text-green-600 hover:text-green-800 dark:text-green-400 dark:hover:text-green-300"
                           title="Template customiser"
                         >
-                          📄
+                          <File className="w-4 h-4" />
                         </button>
 
                         <button
@@ -308,8 +317,9 @@ export default function PgsqlConnexionManager() {
                     className="text-yellow-600 hover:text-yellow-800 dark:text-yellow-400 dark:hover:text-yellow-300"
                     title="Modifier la connexion"
                   >
-                    ✏️
+                    <Edit className="w-4 h-4" />
                   </button>
+
                   <button
                     onClick={() =>
                       navigate("/pgsql-variable-form", {
@@ -319,8 +329,9 @@ export default function PgsqlConnexionManager() {
                     className="text-blue-600 hover:text-blue-800 dark:text-blue-400 dark:hover:text-blue-300"
                     title="Ajouter variable"
                   >
-                    ➕
+                    <Variable className="w-4 h-4" />
                   </button>
+
                   <button
                     onClick={() =>
                       navigate("/template-manager", {
@@ -330,8 +341,9 @@ export default function PgsqlConnexionManager() {
                     className="text-green-600 hover:text-green-800 dark:text-green-400 dark:hover:text-green-300"
                     title="Template customiser"
                   >
-                    📄
+                    <File className="w-4 h-4" />
                   </button>
+
                   <button
                     onClick={() => handleDelete(item)}
                     className="text-red-600 hover:text-red-800 dark:text-red-400 dark:hover:text-red-300"
