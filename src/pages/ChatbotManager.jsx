@@ -301,14 +301,7 @@ export default function ChatbotManager() {
             )}
           </div>
         )}
-        <Modal
-          open={documentModalOpen}
-          onClose={() => setDocumentModalOpen(false)}
-        >
-          {selectedChatbotId && (
-            <ChatbotDocumentsManager chatbotId={selectedChatbotId} />
-          )}
-        </Modal>
+
         {/* Modal de création / édition */}
         {modalOpen && (
           <ChatbotFormModal
