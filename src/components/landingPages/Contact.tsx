@@ -222,7 +222,7 @@ export default function Contact() {
                     Message
                   </label>
                   <textarea
-                    rows="5"
+                    rows={5}
                     value={message}
                     onChange={(e) => setMessage(e.target.value)}
                     required
