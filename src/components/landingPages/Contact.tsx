@@ -58,6 +58,24 @@ export default function Contact() {
                     </p>
                   </div>
                 </div>
+                <div className="flex items-center gap-4">
+                  <div className="w-12 h-12 bg-gradient-to-r from-green-500 to-emerald-600 rounded-xl flex items-center justify-center shadow-lg">
+                    <MessageCircle className="w-6 h-6 text-white" />
+                  </div>
+                  <div>
+                    <h4 className="font-semibold text-gray-800 dark:text-gray-200">
+                      WhatsApp
+                    </h4>
+                    <a
+                      href="https://wa.me/261349368233"
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="text-green-600 dark:text-green-400 hover:underline"
+                    >
+                      +261 34 93 682 33
+                    </a>
+                  </div>
+                </div>
 
                 <div className="flex items-center gap-4">
                   <div className="w-12 h-12 bg-gradient-to-r from-green-500 to-teal-600 rounded-xl flex items-center justify-center shadow-lg">
@@ -94,7 +112,12 @@ export default function Contact() {
                   </div>
                 </div>
 
-                <div className="flex items-center gap-3 p-4 bg-gradient-to-r from-purple-50 to-pink-50 dark:from-gray-900 dark:to-purple-900 rounded-xl">
+                <a
+                  href="https://discord.gg/JhAq8rk4MW"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="flex items-center gap-3 p-4 bg-gradient-to-r from-purple-50 to-pink-50 dark:from-gray-900 dark:to-purple-900 rounded-xl hover:bg-purple-100 dark:hover:bg-purple-800 transition-colors duration-200"
+                >
                   <MessageCircle className="w-6 h-6 text-purple-600 dark:text-purple-400" />
                   <div>
                     <h4 className="font-semibold text-gray-800 dark:text-gray-200">
@@ -104,7 +127,7 @@ export default function Contact() {
                       Échangez avec la communauté
                     </p>
                   </div>
-                </div>
+                </a>
 
                 <div className="flex items-center gap-3 p-4 bg-gradient-to-r from-green-50 to-teal-50 dark:from-gray-900 dark:to-green-900 rounded-xl">
                   <Code className="w-6 h-6 text-green-600 dark:text-green-400" />

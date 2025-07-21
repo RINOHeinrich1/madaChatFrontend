@@ -37,8 +37,7 @@ export default function Footer() {
           <div className="space-y-4">
             <h4 className="text-lg font-semibold">Communauté</h4>
             <ul className="space-y-2">
-              <li><a href="#" className="text-gray-400 hover:text-white transition-colors">Discord</a></li>
-              <li><a href="#" className="text-gray-400 hover:text-white transition-colors">Contribuer</a></li>
+              <li><a href="https://discord.gg/JhAq8rk4MW" className="text-gray-400 hover:text-white transition-colors">Discord</a></li>
               <li><a href="https://github.com/RINOHeinrich1/madaChatFrontend" target='_blank' className="text-gray-400 hover:text-white transition-colors">Github</a></li>
               <li><a href="https://blog.onirtech.com/" target='_blank' className="text-gray-400 hover:text-white transition-colors">Blog</a></li>
             </ul>

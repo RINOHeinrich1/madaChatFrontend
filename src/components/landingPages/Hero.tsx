@@ -164,32 +164,6 @@ export default function Hero() {
           </div>
         </div>
 
-        {/* Enhanced Stats Section 
-        <div className={`grid grid-cols-1 md:grid-cols-3 gap-8 transform transition-all duration-1000 delay-600 ${isVisible ? 'translate-y-0 opacity-100' : 'translate-y-10 opacity-0'}`}>
-          {[
-            { icon: Bot, number: "500+", label: "Chatbots créés", gradient: "from-indigo-500 to-purple-600", delay: "0.1s" },
-            { icon: Users, number: "150+", label: "Développeurs actifs", gradient: "from-purple-500 to-pink-600", delay: "0.2s" },
-            { icon: Zap, number: "24/7", label: "Support communautaire", gradient: "from-green-500 to-teal-600", delay: "0.3s" }
-          ].map((stat, index) => (
-            <div key={index} className="group text-center">
-              <div className="relative">
-                <div className={`absolute -inset-2 bg-gradient-to-r ${stat.gradient} rounded-3xl opacity-0 group-hover:opacity-20 blur-xl transition-all duration-500`} style={{ animationDelay: stat.delay }} />
-                
-                <div className={`relative w-20 h-20 bg-gradient-to-r ${stat.gradient} rounded-3xl flex items-center justify-center mx-auto mb-6 shadow-2xl transform group-hover:scale-110 group-hover:rotate-3 transition-all duration-300`}>
-                  <stat.icon className="w-10 h-10 text-white" />
-                </div>
-              </div>
-              
-              <h3 className="text-4xl font-black text-white mb-2 group-hover:text-transparent group-hover:bg-gradient-to-r group-hover:from-indigo-400 group-hover:to-purple-400 group-hover:bg-clip-text transition-all duration-300">
-                {stat.number}
-              </h3>
-              <p className="text-white/70 text-lg font-medium group-hover:text-white transition-colors">
-                {stat.label}
-              </p>
-            </div>
-          ))}
-        </div>
-*/}
         {/* Scroll Indicator */}
         <div className="flex justify-center mt-16">
           <button
