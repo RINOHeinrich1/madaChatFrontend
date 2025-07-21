@@ -33,21 +33,43 @@ export default function Diagram({ tables, foreignKeys }) {
       </div>
 
       {/* Relations textuelles */}
+      {/* Relations textuelles avec colonnes */}
       {foreignKeys?.length > 0 && (
         <div className="mt-8">
           <h4 className="text-xl font-semibold mb-4 text-gray-800 dark:text-white">
             Relations entre les tables
           </h4>
           <ul className="list-disc pl-5 text-sm text-gray-700 dark:text-gray-300 space-y-1">
-            {foreignKeys.map((fk, index) => (
-              <li key={index}>
-                <span className="font-mono text-indigo-600">{fk.source_table}</span>
-                {" "}
-                <span className="text-gray-500">→</span>
-                {" "}
-                <span className="font-mono text-indigo-600">{fk.target_table}</span>
-              </li>
-            ))}
+            {/* Relations textuelles regroupées */}
+            {foreignKeys?.length > 0 && (
+              <div className="mt-8">
+                <h4 className="text-xl font-semibold mb-4 text-gray-800 dark:text-white">
+                  Relations entre les tables
+                </h4>
+
+                <ul className="list-disc pl-5 text-sm text-gray-700 dark:text-gray-300 space-y-1">
+                  {Object.entries(
+                    foreignKeys.reduce((acc, fk) => {
+                      if (!acc[fk.source_table]) acc[fk.source_table] = [];
+                      acc[fk.source_table].push(
+                        `${fk.target_table} (${fk.source_column} → ${fk.target_column})`
+                      );
+                      return acc;
+                    }, {})
+                  ).map(([source, targets], index) => (
+                    <li key={index}>
+                      <span className="font-mono text-indigo-600">
+                        {source}
+                      </span>{" "}
+                      <span className="text-gray-500">→</span>{" "}
+                      <span className="font-mono text-indigo-600">
+                        {targets.join(", ")}
+                      </span>
+                    </li>
+                  ))}
+                </ul>
+              </div>
+            )}
           </ul>
         </div>
       )}
