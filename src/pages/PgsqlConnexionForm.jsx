@@ -27,13 +27,14 @@ export default function PgsqlConnexionForm() {
   // Modale
   const [modalOpen, setModalOpen] = useState(false);
   const [tables, setTables] = useState([]);
+  const [foreignKeys, setForeignKeys] = useState([]);
+
   const [selectedTable, setSelectedTable] = useState("");
   const [template, setTemplate] = useState("");
   const location = useLocation();
   const existingConnexion = location.state?.connexion;
   useEffect(() => {
     if (existingConnexion) {
-
       setConnParams({
         host: existingConnexion.host_name,
         port: existingConnexion.port,
@@ -137,7 +138,9 @@ export default function PgsqlConnexionForm() {
         }
       );
 
-      setTables(response.data);
+      setTables(response.data.tables);
+      console.log("tables:",response.data)
+      setForeignKeys(response.data.foreign_keys)
       setModalOpen(true);
       // NE PAS afficher de message ici
       setSelectedTable("");
@@ -357,7 +360,7 @@ export default function PgsqlConnexionForm() {
               className="w-full sm:w-auto bg-blue-600 hover:bg-blue-700 text-white font-semibold px-8 py-4 rounded-xl flex justify-center items-center gap-3 transition-all duration-300 shadow-lg hover:shadow-xl disabled:opacity-50 disabled:cursor-not-allowed"
             >
               <Database className="w-5 h-5" />
-              Sélectionner une table
+              Vectorisation
             </button>
           </div>
 
@@ -388,6 +391,7 @@ export default function PgsqlConnexionForm() {
           isOpen={modalOpen}
           onClose={() => setModalOpen(false)}
           tables={tables}
+          foreignKeys={foreignKeys}
           selectedTable={selectedTable}
           setSelectedTable={setSelectedTable}
           sendTo

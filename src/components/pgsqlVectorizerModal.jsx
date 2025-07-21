@@ -1,13 +1,13 @@
 import { X } from "lucide-react";
-import FormSelect from "../ui/FormSelect";
 import FormTextarea from "../ui/Formtextarea";
 import FormInput from "../ui/FormInput";
 import { useState } from "react";
-
+import Diagram from "../ui/Diagram";
 export default function PgsqlVectorizerModal({
   isOpen,
   onClose,
   tables,
+  foreignKeys,
   selectedTable,
   setSelectedTable,
   template,
@@ -17,23 +17,17 @@ export default function PgsqlVectorizerModal({
   onSend,
   loading,
 }) {
+  const [focused, setFocused] = useState("");
+
   if (!isOpen) return null;
-  const [focused, setFocused] = useState(""); // ✅ Ajout du state "focused"
 
-  const handleTableSelect = (tableName) => {
-    console.log("Existing template:", template);
-    
+  const handleTableClick = (tableName) => {
     setSelectedTable(tableName);
-  };
-
-  const getSelectedTableColumns = () => {
-    const table = tables.find((t) => t.table_name === selectedTable);
-    return table?.columns || [];
   };
 
   return (
     <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
-      <div className="bg-white dark:bg-gray-800 rounded-3xl shadow-2xl w-full max-w-3xl max-h-[90vh] overflow-auto p-6 relative">
+      <div className="bg-white dark:bg-gray-800 rounded-3xl shadow-2xl w-full max-w-5xl max-h-[90vh] overflow-auto p-6 relative">
         <button
           className="absolute top-4 right-4 text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white"
           onClick={onClose}
@@ -41,63 +35,35 @@ export default function PgsqlVectorizerModal({
         >
           <X className="w-6 h-6" />
         </button>
+
         <h2 className="text-2xl font-bold mb-6 text-gray-800 dark:text-gray-100">
-          Choisissez la table à vectoriser
+          Choisissez une table à vectoriser
         </h2>
 
-        <FormSelect
-          label="Table"
-          name="selectedTable"
-          value={selectedTable}
-          onChange={(e) => handleTableSelect(e.target.value)}
-          options={(tables || []).map((t) => t.table_name)}
-          placeholder="Sélectionnez une table"
-        />
+        {/* Diagramme visuel des tables + relations */}
+        <Diagram tables={tables} foreignKeys={foreignKeys} />
 
-        {selectedTable && (
-          <>
-            <div className="mt-4 mb-6 border rounded-lg p-4 bg-gray-50 dark:bg-gray-900">
-              <p className="font-semibold mb-2 text-gray-700 dark:text-gray-300">
-                Schéma des données :
-              </p>
-
-              <ul className="list-disc pl-5 text-sm text-gray-700 dark:text-gray-300">
-                {getSelectedTableColumns().map((col) => (
-                  <li key={col.column_name}>
-                    <span className="font-mono text-indigo-600 dark:text-indigo-400">
-                      {col.column_name}
-                    </span>{" "}
-                    <span className="text-gray-500 text-xs">
-                      ({col.data_type})
-                    </span>
-                  </li>
-                ))}
-              </ul>
-            </div>
-
-            <FormTextarea
-              label="Template (modifiable)"
-              name="template"
-              value={template}
-              onChange={(e) => setTemplate(e.target.value)}
-              onFocus={() => {}}
-              onBlur={() => {}}
-              focused={false}
-              placeholder="Ex: Le produit {{productName}} possède la description {{description}}."
-              rows={5}
-            />
-            <FormInput
-              label="Description (contexte d'utilisation)"
-              name="description"
-              value={description}
-              onChange={(e) => setDescription(e.target.value)}
-              placeholder="Exemple: Utilisé pour répondre aux questions sur les produits."
-              focused={focused === "description"}
-              onFocus={() => setFocused("description")}
-              onBlur={() => setFocused("")}
-            />
-          </>
-        )}
+        <div className="mt-6">
+          <FormTextarea
+            label="Template (modifiable)"
+            name="template"
+            value={template}
+            onChange={(e) => setTemplate(e.target.value)}
+            focused={false}
+            placeholder="Ex: Le produit {{productName}} possède la description {{description}}."
+            rows={5}
+          />
+          <FormInput
+            label="Description (contexte d'utilisation)"
+            name="description"
+            value={description}
+            onChange={(e) => setDescription(e.target.value)}
+            placeholder="Exemple: Utilisé pour répondre aux questions sur les produits."
+            focused={focused === "description"}
+            onFocus={() => setFocused("description")}
+            onBlur={() => setFocused("")}
+          />
+        </div>
 
         <div className="mt-6 flex justify-end gap-4">
           <button
