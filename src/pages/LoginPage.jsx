@@ -34,7 +34,7 @@ export default function LoginPage() {
            <span> MadaChat</span>
         </h1>
         <p className="text-center text-sm text-gray-600 dark:text-gray-400">
-          Connectez-vous pour administrer votre chatBot
+          Connectez-vous pour administrer vos Chatbots IA
         </p>
 
         <form onSubmit={handleLogin} className="space-y-5">
