@@ -63,7 +63,7 @@ export default function Footer() {
         <div className="border-t border-gray-800 mt-8 pt-8">
           <div className="flex flex-col md:flex-row justify-between items-center">
             <p className="text-gray-400 text-sm">
-              © 2024 MadaChat. Projet open source sous licence MIT.
+              © 2025 MadaChat. Projet open source sous licence Apache2.0.
             </p>
             <div className="flex items-center gap-4 mt-4 md:mt-0">
               <a href="#" className="text-gray-400 hover:text-white transition-colors">

@@ -1,7 +1,24 @@
-import React from "react";
-import { Bot, Zap, Users, ArrowRight, Github, Star } from "lucide-react";
+import React, { useEffect, useState } from "react";
+import { Bot, Zap, Users, ArrowRight, Github, Star, Sparkles, ChevronDown } from "lucide-react";
 
 export default function Hero() {
+  const [mousePosition, setMousePosition] = useState({ x: 0, y: 0 });
+  const [isVisible, setIsVisible] = useState(false);
+
+  useEffect(() => {
+    setIsVisible(true);
+    
+    const handleMouseMove = (e) => {
+      setMousePosition({
+        x: (e.clientX / window.innerWidth) * 100,
+        y: (e.clientY / window.innerHeight) * 100,
+      });
+    };
+
+    window.addEventListener('mousemove', handleMouseMove);
+    return () => window.removeEventListener('mousemove', handleMouseMove);
+  }, []);
+
   const scrollToFeatures = () => {
     const element = document.getElementById("features");
     if (element) {
@@ -9,108 +26,180 @@ export default function Hero() {
     }
   };
 
+  const FloatingOrb = ({ size, color, delay, duration }) => (
+    <div
+      className={`absolute rounded-full ${size} ${color} opacity-20 blur-xl animate-pulse`}
+      style={{
+        animationDelay: delay,
+        animationDuration: duration,
+        left: `${Math.random() * 100}%`,
+        top: `${Math.random() * 100}%`,
+      }}
+    />
+  );
+
   return (
-    <section className="pt-20 pb-16 bg-gradient-to-br from-indigo-50 via-white to-purple-50 dark:from-gray-900 dark:via-gray-800 dark:to-indigo-900">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="text-center mb-16">
-          {/* Badge */}
-          <div className="inline-flex items-center gap-2 bg-white/80 dark:bg-gray-800/80 backdrop-blur-xl rounded-full px-4 py-2 border border-white/20 dark:border-gray-700/50 shadow-lg mb-8 animate-fade-in">
-            <Github className="w-4 h-4 text-indigo-600" />
-            <span className="text-sm font-medium text-gray-700 dark:text-gray-300">
-              Projet Open Source
-            </span>
-            <div className="flex items-center gap-1 text-yellow-500">
-              <Star className="w-4 h-4 fill-current" />
-              <span className="text-sm font-semibold">250+</span>
+    <section className="relative min-h-screen overflow-hidden bg-gradient-to-br from-slate-900 via-purple-900 to-slate-900">
+      {/* Background Pattern */}
+      <div className="absolute inset-0 opacity-30">
+        <div className="absolute inset-0" style={{
+          backgroundImage: `radial-gradient(circle at ${mousePosition.x}% ${mousePosition.y}%, rgba(120, 119, 198, 0.3) 0%, transparent 50%)`
+        }} />
+        <div className="absolute inset-0" style={{
+          backgroundImage: 'radial-gradient(circle at 20% 50%, rgba(120, 119, 198, 0.2) 0%, transparent 50%), radial-gradient(circle at 80% 20%, rgba(255, 105, 180, 0.2) 0%, transparent 50%), radial-gradient(circle at 40% 80%, rgba(139, 92, 246, 0.2) 0%, transparent 50%)'
+        }} />
+      </div>
+
+      {/* Floating Orbs */}
+      <FloatingOrb size="w-32 h-32" color="bg-indigo-500" delay="0s" duration="6s" />
+      <FloatingOrb size="w-24 h-24" color="bg-purple-500" delay="2s" duration="8s" />
+      <FloatingOrb size="w-16 h-16" color="bg-pink-500" delay="4s" duration="7s" />
+      <FloatingOrb size="w-20 h-20" color="bg-blue-500" delay="1s" duration="9s" />
+
+      <div className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-20 pb-16">
+        {/* Main Hero Content */}
+        <div className="flex flex-col lg:flex-row items-center justify-between gap-16 mb-20">
+          {/* Left: Enhanced Text Content */}
+          <div className={`flex-1 text-center lg:text-left transform transition-all duration-1000 ${isVisible ? 'translate-y-0 opacity-100' : 'translate-y-10 opacity-0'}`}>
+            {/* Floating Badge */}
+            <div className="inline-flex items-center gap-3 bg-white/10 backdrop-blur-xl rounded-full px-6 py-3 border border-white/20 shadow-2xl mb-8 hover:bg-white/20 transition-all duration-300 group">
+              <div className="relative">
+                <Github className="w-5 h-5 text-white" />
+                <div className="absolute -top-1 -right-1 w-3 h-3 bg-green-400 rounded-full animate-ping" />
+              </div>
+              <span className="text-white/90 font-medium">
+                Projet Open Source
+              </span>
+              <div className="flex items-center gap-2 text-yellow-400 group-hover:scale-110 transition-transform">
+                <Star className="w-4 h-4 fill-current" />
+                <span className="font-bold">250+</span>
+              </div>
+              <Sparkles className="w-4 h-4 text-purple-300 animate-spin" />
+            </div>
+
+            {/* Main Heading with Enhanced Typography */}
+            <h1 className="text-5xl md:text-6xl lg:text-7xl font-black mb-6 leading-tight">
+              <span className="block bg-gradient-to-r from-white via-purple-200 to-white bg-clip-text text-transparent animate-gradient-x mb-2">
+                MadaChat
+              </span>
+              <span className="block text-2xl md:text-3xl lg:text-4xl font-light text-white/80 tracking-wide">
+                Chatbots IA{' '}
+                <span className="bg-gradient-to-r from-indigo-400 via-purple-400 to-pink-400 bg-clip-text text-transparent font-semibold">
+                  Naturels
+                </span>
+              </span>
+            </h1>
+
+            {/* Enhanced Subtitle */}
+            <p className="text-xl md:text-2xl text-white/70 mb-10 leading-relaxed max-w-2xl mx-auto lg:mx-0">
+              Créez des chatbots{' '}
+              <span className="text-transparent bg-gradient-to-r from-indigo-400 to-purple-400 bg-clip-text font-semibold relative">
+                qui raisonnent sur vos données
+                <div className="absolute bottom-0 left-0 right-0 h-0.5 bg-gradient-to-r from-indigo-400 to-purple-400 transform scale-x-0 group-hover:scale-x-100 transition-transform duration-300" />
+              </span>{' '}
+              et parlent comme des humains en quelques clics.
+            </p>
+
+            {/* Enhanced CTA Buttons */}
+            <div className="flex flex-col sm:flex-row gap-4 justify-center lg:justify-start mb-12">
+              <button
+                onClick={scrollToFeatures}
+                className="group relative bg-gradient-to-r from-indigo-600 via-purple-600 to-pink-600 hover:from-indigo-700 hover:via-purple-700 hover:to-pink-700 text-white px-10 py-5 rounded-2xl flex items-center gap-4 transition-all duration-500 shadow-2xl hover:shadow-purple-500/25 hover:scale-105 font-bold text-lg overflow-hidden"
+              >
+                <div className="absolute inset-0 bg-gradient-to-r from-white/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
+                <Zap className="w-6 h-6 group-hover:animate-bounce" />
+                Les fonctionnalités
+                <ArrowRight className="w-5 h-5 group-hover:translate-x-1 transition-transform" />
+              </button>
+              
+              <a
+                href="https://github.com/RINOHeinrich1/madaChatFrontend"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="group"
+              >
+                <button className="w-full bg-white/10 backdrop-blur-xl hover:bg-white/20 text-white px-10 py-5 rounded-2xl flex items-center gap-4 transition-all duration-300 shadow-xl hover:shadow-2xl border border-white/20 hover:border-white/40 font-bold text-lg">
+                  <Github className="w-6 h-6 group-hover:rotate-12 transition-transform" />
+                   GitHub
+                </button>
+              </a>
+            </div>
+
+            {/* Trust Indicators */}
+            <div className="flex items-center justify-center lg:justify-start gap-8 text-white/60 text-sm">
+              <div className="flex items-center gap-2">
+                <div className="w-2 h-2 bg-green-400 rounded-full animate-pulse" />
+                <span>Temps réel</span>
+              </div>
+              <div className="flex items-center gap-2">
+                <div className="w-2 h-2 bg-blue-400 rounded-full animate-pulse" />
+                <span>Sécurisé</span>
+              </div>
+              <div className="flex items-center gap-2">
+                <div className="w-2 h-2 bg-purple-400 rounded-full animate-pulse" />
+                <span>Évolutif</span>
+              </div>
             </div>
           </div>
 
-          {/* Main Heading */}
-          <h1 className="text-5xl md:text-7xl font-bold mb-6 animate-slide-up">
-            <span className="bg-gradient-to-r from-indigo-600 to-purple-600 bg-clip-text text-transparent">
-              MadaChat
-            </span>
-            <br />
-            <span className="text-gray-800 dark:text-gray-200 text-3xl md:text-5xl">
-              Chatbots IA Naturels
-            </span>
-          </h1>
-
-          {/* Subtitle */}
-          <p
-            className="text-xl md:text-2xl text-gray-600 dark:text-gray-400 mb-12 max-w-3xl mx-auto leading-relaxed animate-fade-in"
-            style={{ animationDelay: "0.2s" }}
-          >
-            Créez des chatbots{" "}
-            <span className="text-indigo-600 dark:text-indigo-400 font-semibold">
-              RAG intelligents
-            </span>{" "}
-            qui parlent comme des humains en quelques clics. Rejoignez notre
-            communauté de développeurs passionnés.
-          </p>
-
-          {/* CTA Buttons */}
-          <div
-            className="flex flex-col sm:flex-row gap-4 justify-center mb-16 animate-fade-in"
-            style={{ animationDelay: "0.4s" }}
-          >
-            <button
-              onClick={scrollToFeatures}
-              className="bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-700 hover:to-purple-700 text-white px-8 py-4 rounded-xl flex items-center gap-3 transition-all duration-300 shadow-lg hover:shadow-xl hover:scale-105 font-semibold text-lg"
-            >
-              <Zap className="w-6 h-6" />
-              Découvrir les fonctionnalités
-              <ArrowRight className="w-5 h-5" />
-            </button>
-            <a
-              href="https://github.com/RINOHeinrich1/madaChatFrontend"
-              target="_blank"
-              rel="noopener noreferrer"
-            >
-              <button className="bg-white/80 dark:bg-gray-800/80 backdrop-blur-xl hover:bg-white dark:hover:bg-gray-800 text-gray-800 dark:text-gray-200 px-8 py-4 rounded-xl flex items-center gap-3 transition-all duration-300 shadow-lg hover:shadow-xl border border-white/20 dark:border-gray-700/50 font-semibold text-lg">
-                <Github className="w-6 h-6" />
-                Voir sur GitHub
-              </button>
-            </a>
+          {/* Right: Enhanced Iframe Container */}
+          <div className={`flex-1 flex justify-center transform transition-all duration-1000 delay-300 ${isVisible ? 'translate-y-0 opacity-100' : 'translate-y-10 opacity-0'}`}>
+            <div className="relative group">
+              {/* Glowing Border */}
+              <div className="absolute -inset-4 bg-gradient-to-r from-indigo-500 via-purple-500 to-pink-500 rounded-3xl opacity-75 blur-lg group-hover:opacity-100 transition duration-1000 group-hover:duration-200 animate-tilt" />
+              
+              {/* Iframe Container */}
+              <div className="relative bg-white/10 backdrop-blur-xl rounded-2xl overflow-hidden border border-white/20 shadow-2xl">
+                <iframe
+                  src="https://www.linkedin.com/embed/feed/update/urn:li:ugcPost:7349838454752485376?compact=1"
+                  height="399"
+                  width="504"
+                  frameBorder="0"
+                  allowFullScreen
+                  title="Post intégré"
+                  className="max-w-full"
+                />
+              </div>
+            </div>
           </div>
         </div>
 
-        {/* Stats */}
-        <div
-          className="grid grid-cols-1 md:grid-cols-3 gap-8 animate-fade-in"
-          style={{ animationDelay: "0.6s" }}
-        >
-          <div className="text-center">
-            <div className="w-16 h-16 bg-gradient-to-r from-indigo-500 to-purple-600 rounded-2xl flex items-center justify-center mx-auto mb-4 shadow-lg">
-              <Bot className="w-8 h-8 text-white" />
+        {/* Enhanced Stats Section */}
+        <div className={`grid grid-cols-1 md:grid-cols-3 gap-8 transform transition-all duration-1000 delay-600 ${isVisible ? 'translate-y-0 opacity-100' : 'translate-y-10 opacity-0'}`}>
+          {[
+            { icon: Bot, number: "500+", label: "Chatbots créés", gradient: "from-indigo-500 to-purple-600", delay: "0.1s" },
+            { icon: Users, number: "150+", label: "Développeurs actifs", gradient: "from-purple-500 to-pink-600", delay: "0.2s" },
+            { icon: Zap, number: "24/7", label: "Support communautaire", gradient: "from-green-500 to-teal-600", delay: "0.3s" }
+          ].map((stat, index) => (
+            <div key={index} className="group text-center">
+              <div className="relative">
+                {/* Background Glow */}
+                <div className={`absolute -inset-2 bg-gradient-to-r ${stat.gradient} rounded-3xl opacity-0 group-hover:opacity-20 blur-xl transition-all duration-500`} style={{ animationDelay: stat.delay }} />
+                
+                {/* Icon Container */}
+                <div className={`relative w-20 h-20 bg-gradient-to-r ${stat.gradient} rounded-3xl flex items-center justify-center mx-auto mb-6 shadow-2xl transform group-hover:scale-110 group-hover:rotate-3 transition-all duration-300`}>
+                  <stat.icon className="w-10 h-10 text-white" />
+                </div>
+              </div>
+              
+              <h3 className="text-4xl font-black text-white mb-2 group-hover:text-transparent group-hover:bg-gradient-to-r group-hover:from-indigo-400 group-hover:to-purple-400 group-hover:bg-clip-text transition-all duration-300">
+                {stat.number}
+              </h3>
+              <p className="text-white/70 text-lg font-medium group-hover:text-white transition-colors">
+                {stat.label}
+              </p>
             </div>
-            <h3 className="text-3xl font-bold text-gray-800 dark:text-gray-200 mb-2">
-              500+
-            </h3>
-            <p className="text-gray-600 dark:text-gray-400">Chatbots créés</p>
-          </div>
-          <div className="text-center">
-            <div className="w-16 h-16 bg-gradient-to-r from-purple-500 to-pink-600 rounded-2xl flex items-center justify-center mx-auto mb-4 shadow-lg">
-              <Users className="w-8 h-8 text-white" />
-            </div>
-            <h3 className="text-3xl font-bold text-gray-800 dark:text-gray-200 mb-2">
-              150+
-            </h3>
-            <p className="text-gray-600 dark:text-gray-400">
-              Développeurs actifs
-            </p>
-          </div>
-          <div className="text-center">
-            <div className="w-16 h-16 bg-gradient-to-r from-green-500 to-teal-600 rounded-2xl flex items-center justify-center mx-auto mb-4 shadow-lg">
-              <Zap className="w-8 h-8 text-white" />
-            </div>
-            <h3 className="text-3xl font-bold text-gray-800 dark:text-gray-200 mb-2">
-              24/7
-            </h3>
-            <p className="text-gray-600 dark:text-gray-400">
-              Support communautaire
-            </p>
-          </div>
+          ))}
+        </div>
+
+        {/* Scroll Indicator */}
+        <div className="flex justify-center mt-16">
+          <button
+            onClick={scrollToFeatures}
+            className="animate-bounce text-white/50 hover:text-white transition-colors"
+          >
+            <ChevronDown className="w-8 h-8" />
+          </button>
         </div>
       </div>
     </section>
