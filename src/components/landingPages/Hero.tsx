@@ -164,7 +164,7 @@ export default function Hero() {
           </div>
         </div>
 
-        {/* Enhanced Stats Section */}
+        {/* Enhanced Stats Section 
         <div className={`grid grid-cols-1 md:grid-cols-3 gap-8 transform transition-all duration-1000 delay-600 ${isVisible ? 'translate-y-0 opacity-100' : 'translate-y-10 opacity-0'}`}>
           {[
             { icon: Bot, number: "500+", label: "Chatbots créés", gradient: "from-indigo-500 to-purple-600", delay: "0.1s" },
@@ -173,10 +173,8 @@ export default function Hero() {
           ].map((stat, index) => (
             <div key={index} className="group text-center">
               <div className="relative">
-                {/* Background Glow */}
                 <div className={`absolute -inset-2 bg-gradient-to-r ${stat.gradient} rounded-3xl opacity-0 group-hover:opacity-20 blur-xl transition-all duration-500`} style={{ animationDelay: stat.delay }} />
                 
-                {/* Icon Container */}
                 <div className={`relative w-20 h-20 bg-gradient-to-r ${stat.gradient} rounded-3xl flex items-center justify-center mx-auto mb-6 shadow-2xl transform group-hover:scale-110 group-hover:rotate-3 transition-all duration-300`}>
                   <stat.icon className="w-10 h-10 text-white" />
                 </div>
@@ -191,7 +189,7 @@ export default function Hero() {
             </div>
           ))}
         </div>
-
+*/}
         {/* Scroll Indicator */}
         <div className="flex justify-center mt-16">
           <button
