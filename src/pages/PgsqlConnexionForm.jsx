@@ -253,7 +253,7 @@ export default function PgsqlConnexionForm() {
               vectorizer_template: template,
               description,
               postgres_service_url: serviceUrl,
-              connexion_name: `${connParams.dbname}/${selectedTable}`,
+              connexion_name: `${connParams.dbname}`,
               data_schema: getSchemaAsPromptText(),
             },
           ]);
