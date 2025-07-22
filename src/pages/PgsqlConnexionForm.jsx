@@ -230,7 +230,7 @@ export default function PgsqlConnexionForm() {
             table_name: selectedTable,
             description,
             postgres_service_url: serviceUrl,
-            connexion_name: `${connParams.dbname}/${selectedTable}`,
+            connexion_name: `${connParams.dbname}`,
             data_schema: getSchemaAsPromptText(),
           })
           .eq("id", existingConnexion.id);
