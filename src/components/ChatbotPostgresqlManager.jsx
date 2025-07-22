@@ -38,12 +38,12 @@ export default function ChatbotPostgresqlManager({ chatbotId }) {
     if (!ownerId) return;
     const { data, error } = await supabase
       .from("postgresql_connexions")
-      .select("database, table_name")
+      .select("database")
       .eq("owner_id", ownerId);
 
     if (!error && data) {
       const formatted = data.map(
-        (conn) => `${conn.database}/${conn.table_name}`
+        (conn) => `${conn.database}`
       );
       setAllConnexions(formatted);
     }

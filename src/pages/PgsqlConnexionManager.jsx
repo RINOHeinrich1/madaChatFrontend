@@ -85,45 +85,9 @@ export default function PgsqlConnexionManager() {
     }
   };
 
-  // Ouvre le modal template, charge variables
-  const openTemplateModal = async (item) => {
-    setSelectedConnexion(item);
-    await fetchVariables(item.table_name);
-    setTemplate(""); // reset template
-    setDescription("");
-    setIsTemplateModalOpen(true);
-  };
+  
 
-  // Enregistre le template dans Supabase
-  const handleSaveTemplate = async () => {
-    if (!selectedConnexion) return;
-    setSavingTemplate(true);
-
-    const {
-      data: { user },
-    } = await supabase.auth.getUser();
-    if (!user) {
-      alert("Utilisateur non connecté.");
-      setSavingTemplate(false);
-      return;
-    }
-
-    const { error } = await supabase.from("templates").insert({
-      owner_id: user.id,
-      connexion_name: selectedConnexion.table_name,
-      template,
-      description,
-    });
-
-    if (error) {
-      alert("Erreur lors de l'enregistrement : " + error.message);
-    } else {
-      alert("Template enregistré avec succès !");
-      setIsTemplateModalOpen(false);
-    }
-    setSavingTemplate(false);
-  };
-
+  
   const handleDelete = async (item) => {
     const confirm = window.confirm(
       `Supprimer la table vectorisée "${item.table_name}" sur ${item.database}@${item.host_name} ?`
@@ -138,7 +102,7 @@ export default function PgsqlConnexionManager() {
       await axios.post(
         `${serviceUrl}/deletevectorizeddata`,
         {
-          source: `${item.database}/${item.table_name}`,
+          source: `${item.database}`,
           conn_id: item.id.toString(),
         },
         {

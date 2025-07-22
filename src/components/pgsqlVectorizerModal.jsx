@@ -21,10 +21,6 @@ export default function PgsqlVectorizerModal({
 
   if (!isOpen) return null;
 
-  const handleTableClick = (tableName) => {
-    setSelectedTable(tableName);
-  };
-
   return (
     <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
       <div className="bg-white dark:bg-gray-800 rounded-3xl shadow-2xl w-full max-w-5xl max-h-[90vh] overflow-auto p-6 relative">
@@ -73,8 +69,10 @@ export default function PgsqlVectorizerModal({
             Annuler
           </button>
           <button
-            onClick={onSend}
-            disabled={loading || !selectedTable}
+            onClick={async () => {
+              await onSend(); // ← On attend bien la mise à jour
+            }}
+            disabled={loading}
             className="px-6 py-3 rounded-xl bg-indigo-600 hover:bg-indigo-700 text-white font-semibold transition disabled:opacity-50 disabled:cursor-not-allowed"
           >
             {loading ? "Envoi en cours..." : "Vectoriser"}

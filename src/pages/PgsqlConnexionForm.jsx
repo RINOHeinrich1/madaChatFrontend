@@ -94,17 +94,30 @@ export default function PgsqlConnexionForm() {
     }
   };
   const getSchemaAsPromptText = () => {
-    const table = tables.find((t) => t.table_name === selectedTable);
-    if (!table) return "";
+    const lines = [];
 
-    const lines = [`Table : ${selectedTable}`, "Colonnes :"];
-    for (const col of table.columns) {
-      lines.push(
-        `- ${col.column_name} (${col.data_type}, ${
-          col.is_nullable === "NO" ? "NOT NULL" : "NULLABLE"
-        })`
-      );
+    for (const table of tables) {
+      lines.push(`Table : ${table.table_name}`);
+      lines.push("Colonnes :");
+      for (const col of table.columns) {
+        lines.push(
+          `- ${col.column_name} (${col.data_type}, ${
+            col.is_nullable === "NO" ? "NOT NULL" : "NULLABLE"
+          })`
+        );
+      }
+      lines.push(""); // séparation
     }
+
+    if (foreignKeys && foreignKeys.length > 0) {
+      lines.push("Relations :");
+      for (const fk of foreignKeys) {
+        lines.push(
+          `- ${fk.source_table}.${fk.source_column} REFERENCES ${fk.target_table}.${fk.target_column}`
+        );
+      }
+    }
+    console.log("SCHEMA DE LA TABLE:",lines.join("\n"))
     return lines.join("\n");
   };
 
@@ -115,6 +128,7 @@ export default function PgsqlConnexionForm() {
     }
     setLoading(true);
     setMessage({ text: "", type: "" });
+    console.log(getSchemaAsPromptText())
     try {
       const params = new URLSearchParams({
         host: connParams.host,
@@ -139,8 +153,8 @@ export default function PgsqlConnexionForm() {
       );
 
       setTables(response.data.tables);
-      console.log("tables:",response.data)
-      setForeignKeys(response.data.foreign_keys)
+      console.log("tables:", response.data);
+      setForeignKeys(response.data.foreign_keys);
       setModalOpen(true);
       // NE PAS afficher de message ici
       setSelectedTable("");
@@ -158,10 +172,6 @@ export default function PgsqlConnexionForm() {
   };
 
   const sendToStaticVectorizer = async () => {
-    if (!selectedTable) {
-      setMessage({ text: "Veuillez sélectionner une table.", type: "error" });
-      return;
-    }
 
     setLoading(true);
     setMessage({ text: "", type: "" });
@@ -190,8 +200,6 @@ export default function PgsqlConnexionForm() {
         template: template,
         page_size: 50,
       };
-
-      console.log("Payload:", payload);
 
       // 3. Envoyer la requête au microservice vectorizer
       const token = session.access_token;
@@ -252,7 +260,7 @@ export default function PgsqlConnexionForm() {
 
         if (insertError) throw new Error("Enregistrement Supabase échoué.");
       }
-
+      console.log("vectorisation réussie")
       setMessage({
         text: `Vectorizer : ${response.data.message || "Succès"}`,
         type: "success",
