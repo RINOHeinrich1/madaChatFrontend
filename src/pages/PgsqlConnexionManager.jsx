@@ -178,7 +178,6 @@ export default function PgsqlConnexionManager() {
                   <th className="px-6 py-3">Hôte</th>
                   <th className="px-6 py-3">Port</th>
                   <th className="px-6 py-3">Base</th>
-                  <th className="px-6 py-3">Table</th>
                   <th className="px-6 py-3">Date</th>
                   <th className="px-6 py-3 text-right">Actions</th>
                 </tr>
@@ -192,7 +191,6 @@ export default function PgsqlConnexionManager() {
                     <td className="px-6 py-4">{item.host_name}</td>
                     <td className="px-6 py-4">{item.port}</td>
                     <td className="px-6 py-4">{item.database}</td>
-                    <td className="px-6 py-4">{item.table_name}</td>
                     <td className="px-6 py-4">
                       {new Date(item.created_at).toLocaleString()}
                     </td>
@@ -265,9 +263,6 @@ export default function PgsqlConnexionManager() {
                 <h3 className="text-lg font-semibold text-indigo-600 dark:text-indigo-400">
                   {item.database}@{item.host_name}
                 </h3>
-                <p className="text-sm text-gray-600 dark:text-gray-300">
-                  Table : <strong>{item.table_name}</strong>
-                </p>
                 <p className="text-xs text-gray-400">
                   {new Date(item.created_at).toLocaleString()}
                 </p>

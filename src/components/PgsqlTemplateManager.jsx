@@ -27,7 +27,7 @@ export default function PgsqlTemplateManager() {
 
       if (!user || !connexion) return;
 
-      const connexionName = `${connexion.database}/${connexion.table_name}`;
+      const connexionName = `${connexion.database}`;
       setOwnerId(user.id);
 
       const { data: tplData, error: tplError } = await supabase
@@ -67,7 +67,7 @@ export default function PgsqlTemplateManager() {
     setLoading(true);
     setErrorMsg("");
 
-    const connexionName = `${connexion.database}/${connexion.table_name}`;
+    const connexionName = `${connexion.database}`;
     const dataId = editingId || Date.now().toString();
 
     try {

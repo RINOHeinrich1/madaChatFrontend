@@ -27,7 +27,7 @@ export default function PgsqlVariableManager() {
           .from("variables")
           .select("*")
           .eq("owner_id", user.id)
-          .eq("connexion_name", `${connexion.database}/${connexion.table_name}`);
+          .eq("connexion_name", `${connexion.database}`);
         if (!error) setVariables(data);
       }
     };
@@ -52,7 +52,7 @@ export default function PgsqlVariableManager() {
     }
 
     const payload = {
-      connexion_name: `${connexion.database}/${connexion.table_name}`,
+      connexion_name: `${connexion.database}`,
       owner_id: ownerId,
       variable_name: variableName,
       request: requestSQL,
