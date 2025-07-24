@@ -18,6 +18,9 @@ export default function ChatbotFormModal({ onClose, userId, existing }) {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
   const [newUrl, setNewUrl] = useState("");
+  const [avatarFile, setAvatarFile] = useState(null);
+  const [signedAvatarUrl, setSignedAvatarUrl] = useState(null);
+
   const urls = formData.allowed_url
     ? formData.allowed_url
         .split(",")
@@ -59,11 +62,35 @@ export default function ChatbotFormModal({ onClose, userId, existing }) {
     try {
       if (!userId) throw new Error("Utilisateur non authentifié");
 
+      let avatarUrl = existing?.avatar || null;
+
+      if (avatarFile) {
+        const fileExt = avatarFile.name.split(".").pop();
+        const fileName = `${Date.now()}.${fileExt}`;
+        const filePath = `${userId}/${fileName}`;
+
+        const { data, error: uploadError } = await supabase.storage
+          .from("avatars")
+          .upload(filePath, avatarFile, {
+            upsert: true,
+            cacheControl: "3600",
+          });
+
+        if (uploadError) throw uploadError;
+
+        const { data: publicUrlData } = supabase.storage
+          .from("avatars")
+          .getPublicUrl(filePath);
+
+        avatarUrl = publicUrlData.publicUrl;
+      }
+
       const payload = {
         nom: formData.nom,
         description: formData.description,
-        allowed_url: formData.allowed_url, 
-        memoire_contextuelle: formData.memoire_contextuelle, 
+        allowed_url: formData.allowed_url,
+        memoire_contextuelle: formData.memoire_contextuelle,
+        avatar: avatarUrl,
       };
 
       let result;
@@ -97,10 +124,46 @@ export default function ChatbotFormModal({ onClose, userId, existing }) {
       setLoading(false);
     }
   };
+  useEffect(() => {
+    const generateSignedAvatarUrl = async () => {
+      if (existing?.avatar) {
+        try {
+          // Extraire le chemin relatif du fichier depuis l'URL publique
+          const match = existing.avatar.match(/avatars\/(.+)$/);
+          const filePath = match ? match[1] : null;
+
+          if (!filePath) {
+            console.error(
+              "Impossible d'extraire le chemin du fichier depuis l'URL :",
+              existing.avatar
+            );
+            return;
+          }
+
+          const { data, error } = await supabase.storage
+            .from("avatars")
+            .createSignedUrl(filePath, 60); // 60 secondes
+
+          if (error) {
+            console.error("Erreur Supabase:", error.message);
+          } else {
+            setSignedAvatarUrl(data?.signedUrl);
+          }
+        } catch (err) {
+          console.error(
+            "Erreur lors de la génération de l'URL signée :",
+            err.message
+          );
+        }
+      }
+    };
+
+    generateSignedAvatarUrl();
+  }, [existing?.avatar]);
 
   return (
     <div className="fixed inset-0 z-50 bg-black/40 flex items-center justify-center px-4">
-      <div className="bg-white dark:bg-gray-900 text-gray-800 dark:text-gray-100 w-full max-w-xl rounded-3xl shadow-2xl border border-white/20 dark:border-gray-700 p-8 relative animate-fade-in-up">
+      <div className="bg-white dark:bg-gray-900 text-gray-800 dark:text-gray-100 w-full max-w-xl max-h-screen overflow-y-auto rounded-3xl shadow-2xl border border-white/20 dark:border-gray-700 p-8 relative animate-fade-in-up">
         <button
           onClick={onClose}
           className="absolute top-4 right-4 text-gray-400 hover:text-gray-700 dark:hover:text-gray-100 transition"
@@ -108,6 +171,47 @@ export default function ChatbotFormModal({ onClose, userId, existing }) {
           <X className="w-5 h-5" />
         </button>
 
+        {/* Avatar cliquable en haut */}
+        <div className="flex flex-col items-center justify-center mt-2 mb-6">
+          <label htmlFor="avatar-upload" className="cursor-pointer group">
+            {signedAvatarUrl || avatarFile ? (
+              <img
+                src={
+                  avatarFile ? URL.createObjectURL(avatarFile) : signedAvatarUrl
+                }
+                alt="Avatar"
+                className="w-24 h-24 object-cover rounded-full border-4 border-indigo-500 shadow-lg group-hover:opacity-80 transition"
+              />
+            ) : (
+              <div className="w-24 h-24 rounded-full bg-gray-200 dark:bg-gray-800 flex items-center justify-center text-gray-400 group-hover:opacity-80 transition border-2 border-dashed border-gray-400">
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  className="w-10 h-10"
+                  fill="none"
+                  viewBox="0 0 24 24"
+                  stroke="currentColor"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth={2}
+                    d="M5.121 17.804A13.937 13.937 0 0112 15c2.477 0 4.779.676 6.879 1.804M15 11a3 3 0 11-6 0 3 3 0 016 0z"
+                  />
+                </svg>
+              </div>
+            )}
+          </label>
+          <input
+            id="avatar-upload"
+            type="file"
+            accept="image/*"
+            onChange={(e) => setAvatarFile(e.target.files[0])}
+            className="hidden"
+          />
+          <p className="text-sm text-gray-500 dark:text-gray-400 mt-2">
+            Cliquez sur l'image pour modifier l'avatar
+          </p>
+        </div>
         <div className="text-center mb-6">
           <div className="flex items-center justify-center gap-3 mb-4">
             <div className="w-12 h-12 bg-gradient-to-r from-indigo-500 to-purple-600 rounded-xl flex items-center justify-center shadow-lg">
