@@ -19,7 +19,7 @@ export default function PgsqlConnexionManager() {
   const [filtered, setFiltered] = useState([]);
   const [search, setSearch] = useState("");
   const [loading, setLoading] = useState(false);
-  const [viewMode, setViewMode] = useState("table");
+  const [viewMode, setViewMode] = useState("cards");
   const [serviceUrl, setServiceUrl] = useState(
     "https://postgresvectorizer.onirtech.com"
   );
