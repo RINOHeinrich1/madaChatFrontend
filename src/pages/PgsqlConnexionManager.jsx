@@ -12,7 +12,7 @@ import {
   File,
 } from "lucide-react";
 import axios from "axios";
-import PgsqlTemplateManager from "../components/PgsqlTemplateManager";
+import { Loader2 } from "lucide-react";
 export default function PgsqlConnexionManager() {
   const navigate = useNavigate();
   const [connexions, setConnexions] = useState([]);
@@ -85,9 +85,6 @@ export default function PgsqlConnexionManager() {
     }
   };
 
-  
-
-  
   const handleDelete = async (item) => {
     const confirm = window.confirm(
       `Supprimer la table vectorisée "${item.table_name}" sur ${item.database}@${item.host_name} ?`
@@ -170,7 +167,11 @@ export default function PgsqlConnexionManager() {
         </div>
 
         {/* --- Table ou cartes --- */}
-        {viewMode === "table" ? (
+        {loading ? (
+          <div className="flex justify-center items-center py-20">
+            <Loader2 className="w-10 h-10 animate-spin text-indigo-600" />
+          </div>
+        ) : viewMode === "table" ? (
           <div className="overflow-x-auto bg-white dark:bg-gray-800 rounded-xl shadow-lg">
             <table className="min-w-full table-auto text-sm text-left text-gray-700 dark:text-gray-200">
               <thead className="bg-indigo-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300 uppercase text-xs">
