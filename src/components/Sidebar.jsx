@@ -32,7 +32,7 @@ const menuItems = [
 
   const handleLogout = async () => {
     await supabase.auth.signOut();
-    navigate("/login");
+    navigate("/");
   };
   const goToProfile = async () => {
     navigate("/profile");
