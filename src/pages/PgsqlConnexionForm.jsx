@@ -6,6 +6,8 @@ import FormSelect from "../ui/FormSelect";
 import { supabase } from "../lib/supabaseClient";
 import PgsqlVectorizerModal from "../components/pgsqlVectorizerModal";
 import { useLocation, useNavigate } from "react-router-dom";
+import Swal from "sweetalert2";
+import "sweetalert2/dist/sweetalert2.min.css";
 
 export default function PgsqlConnexionForm() {
   const [serviceUrl, setServiceUrl] = useState(
@@ -78,16 +80,20 @@ export default function PgsqlConnexionForm() {
         },
       });
 
-      setMessage({
-        text: `Connexion réussie : ${response.data.message || "OK"}`,
-        type: "success",
+      Swal.fire({
+        icon: "success",
+        title: "Connexion réussie",
+        text: response.data.message || "Connexion établie avec succès.",
+        background: "#f0fdf4",
+        color: "#166534",
       });
     } catch (err) {
-      setMessage({
-        text: `Erreur connexion : ${
-          err.response?.data?.message || err.message
-        }`,
-        type: "error",
+      Swal.fire({
+        icon: "error",
+        title: "Erreur de connexion",
+        text: err.response?.data?.message || err.message,
+        background: "#fef2f2",
+        color: "#991b1b",
       });
     } finally {
       setLoading(false);
@@ -117,7 +123,7 @@ export default function PgsqlConnexionForm() {
         );
       }
     }
-    console.log("SCHEMA DE LA TABLE:",lines.join("\n"))
+    console.log("SCHEMA DE LA TABLE:", lines.join("\n"));
     return lines.join("\n");
   };
 
@@ -128,7 +134,7 @@ export default function PgsqlConnexionForm() {
     }
     setLoading(true);
     setMessage({ text: "", type: "" });
-    console.log(getSchemaAsPromptText())
+    console.log(getSchemaAsPromptText());
     try {
       const params = new URLSearchParams({
         host: connParams.host,
@@ -153,18 +159,18 @@ export default function PgsqlConnexionForm() {
       );
 
       setTables(response.data.tables);
-      console.log("tables:", response.data);
       setForeignKeys(response.data.foreign_keys);
       setModalOpen(true);
       // NE PAS afficher de message ici
       setSelectedTable("");
       //setTemplate("");
     } catch (err) {
-      setMessage({
-        text: `Erreur récupération tables: ${
-          err.response?.data?.message || err.message
-        }`,
-        type: "error",
+      Swal.fire({
+        icon: "error",
+        title: "Erreur récupération tables",
+        text: err.response?.data?.message || err.message,
+        background: "#fef2f2",
+        color: "#991b1b",
       });
     } finally {
       setLoading(false);
@@ -172,7 +178,6 @@ export default function PgsqlConnexionForm() {
   };
 
   const sendToStaticVectorizer = async () => {
-
     setLoading(true);
     setMessage({ text: "", type: "" });
 
@@ -200,8 +205,25 @@ export default function PgsqlConnexionForm() {
         template: template,
         page_size: 50,
       };
+      // 3. Si le template est vide confirmer
+      if (!template || template.trim() === "") {
+        const result = await Swal.fire({
+          icon: "warning",
+          title: "Template vide",
+          text: "Le template est vide, cela implique la suppression des vecteurs rattachés à cette connexion. Voulez-vous continuer ?",
+          showCancelButton: true,
+          confirmButtonText: "Oui, continuer",
+          cancelButtonText: "Annuler",
+          background: "#fff7ed",
+          color: "#7c2d12",
+        });
 
-      // 3. Envoyer la requête au microservice vectorizer
+        if (!result.isConfirmed) {
+          setLoading(false);
+          return; 
+        }
+      }
+      // 4. Envoyer la requête au microservice vectorizer
       const token = session.access_token;
 
       const response = await axios.post(
@@ -214,7 +236,7 @@ export default function PgsqlConnexionForm() {
         }
       );
 
-      // 4. Enregistrer dans Supabase
+      // 5. Enregistrer dans Supabase
       if (existingConnexion) {
         // update
         const { error: updateError } = await supabase
@@ -260,16 +282,22 @@ export default function PgsqlConnexionForm() {
 
         if (insertError) throw new Error("Enregistrement Supabase échoué.");
       }
-      console.log("vectorisation réussie")
-      setMessage({
-        text: `Vectorizer : ${response.data.message || "Succès"}`,
-        type: "success",
+      Swal.fire({
+        icon: "success",
+        title: "Vectorisation réussie",
+        text: response.data.message || "Données vectorisées avec succès.",
+        background: "#f0fdf4",
+        color: "#166534",
       });
+
       setModalOpen(false);
     } catch (err) {
-      setMessage({
-        text: `Erreur vectorizer : ${err.message}`,
-        type: "error",
+      Swal.fire({
+        icon: "error",
+        title: "Erreur vectorizer",
+        text: err.message,
+        background: "#fef2f2",
+        color: "#991b1b",
       });
     } finally {
       setLoading(false);

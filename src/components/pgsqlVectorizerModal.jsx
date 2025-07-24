@@ -46,7 +46,7 @@ export default function PgsqlVectorizerModal({
             value={template}
             onChange={(e) => setTemplate(e.target.value)}
             focused={false}
-            placeholder="Ex: Le produit {{productName}} possède la description {{description}}."
+            placeholder="Ex: Le produit {{produits.productName}} possède la description {{produits.description}}."
             rows={5}
           />
           <FormInput
