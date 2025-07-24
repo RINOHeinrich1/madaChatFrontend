@@ -11,6 +11,7 @@ import {
   Clipboard,
   CheckCircle,
   FileText,
+  Info,
 } from "lucide-react";
 import Swal from "sweetalert2";
 import "sweetalert2/dist/sweetalert2.min.css";
@@ -24,6 +25,7 @@ export default function FineTunePage() {
   const [showAllDocs, setShowAllDocs] = useState(false);
   const [allDocs, setAllDocs] = useState([]);
   const [selectedAllDocs, setSelectedAllDocs] = useState([]);
+  const [showFineTuneInfo, setShowFineTuneInfo] = useState(false);
 
   const askQuestion = async () => {
     Swal.fire({ title: "Recherche...", didOpen: () => Swal.showLoading() });
@@ -202,16 +204,38 @@ export default function FineTunePage() {
       <div className="w-full max-w-5xl space-y-10 bg-white dark:bg-gray-800 p-8 rounded-2xl shadow-md">
         {/* En-tête */}
         <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-4">
-          <h1 className="text-3xl sm:text-4xl font-bold text-indigo-600 dark:text-indigo-400 flex items-center gap-2">
-            <GraduationCap className="w-8 h-8" />
-            Fine-tunne
-          </h1>
+          <div className="mb-4">
+            <div className="flex items-center gap-2">
+              <div className="w-12 h-12 bg-gradient-to-r from-indigo-500 to-purple-600 rounded-xl flex items-center justify-center shadow-lg">
+                <GraduationCap className="w-6 h-6 text-white" />
+              </div>
+              <h1 className="text-4xl font-bold bg-gradient-to-r from-indigo-600 to-purple-600 bg-clip-text text-transparent">
+                Fine-tunne
+              </h1>
+              <button
+                onClick={() => setShowFineTuneInfo(!showFineTuneInfo)}
+                className="text-indigo-500 hover:text-indigo-700"
+                title="À propos"
+              >
+                <Info className="w-5 h-5" />
+              </button>
+            </div>
+
+            {showFineTuneInfo && (
+              <div className="mt-2 text-sm text-gray-700 dark:text-gray-300 bg-indigo-50 dark:bg-indigo-900 p-3 rounded-lg border border-indigo-200 dark:border-indigo-700">
+                Le fine-tuning consiste à adapter un modèle de langage à des
+                données spécifiques afin d'améliorer sa pertinence pour une
+                tâche ciblée.
+              </div>
+            )}
+          </div>
+
           <button
             onClick={deployModel}
             className="bg-indigo-600 hover:bg-indigo-700 text-white px-5 py-2.5 rounded-xl shadow transition flex items-center gap-2"
           >
             <Rocket className="w-5 h-5" />
-            Déployer 
+            Déployer
           </button>
         </div>
 

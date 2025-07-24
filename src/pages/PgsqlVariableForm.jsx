@@ -1,14 +1,14 @@
 import React, { useState, useEffect } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 import { supabase } from "../lib/supabaseClient";
-import { ArrowLeft, Trash2, Edit, Plus } from "lucide-react";
+import { ArrowLeft, Trash2, Edit, Plus,Info } from "lucide-react";
 import Swal from "sweetalert2";
 
 export default function PgsqlVariableManager() {
   const navigate = useNavigate();
   const location = useLocation();
   const connexion = location.state?.connexion;
-
+  const [showInfo, setShowInfo] = useState(false);
   const [variables, setVariables] = useState([]);
   const [variableName, setVariableName] = useState("");
   const [requestSQL, setRequestSQL] = useState("");
@@ -122,7 +122,22 @@ export default function PgsqlVariableManager() {
           <ArrowLeft className="w-4 h-4" /> Retour
         </button>
 
-        <h1 className="text-2xl font-bold mb-6">Gérer les requêtes</h1>
+        <div className="flex items-center gap-2 mb-4">
+          <h1 className="text-2xl font-bold">Gérer les requêtes</h1>
+          <button
+            onClick={() => setShowInfo(!showInfo)}
+            className="text-indigo-500 hover:text-indigo-700"
+            title="À propos"
+          >
+            <Info className="w-5 h-5" />
+          </button>
+        </div>
+        {showInfo && (
+          <div className="mb-4 text-sm text-gray-700 dark:text-gray-300 bg-indigo-50 dark:bg-indigo-900 p-3 rounded-lg border border-indigo-200 dark:border-indigo-700">
+            Les requêtes permettent de définir des requêtes SQL à exécuter lors
+            de la résolution des données dynamiques.
+          </div>
+        )}
 
         <form onSubmit={handleSubmit} className="space-y-4 mb-8">
           <div>

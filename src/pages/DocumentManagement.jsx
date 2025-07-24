@@ -12,6 +12,7 @@ import {
 
 import Swal from "sweetalert2";
 import "sweetalert2/dist/sweetalert2.min.css";
+import { Loader2 } from "lucide-react";
 
 const API_URL = import.meta.env.VITE_TUNE_API_URL;
 const SUPABASE_URL = import.meta.env.VITE_SUPABASE_URL;
@@ -20,7 +21,7 @@ function DocumentManager() {
   const [results, setResults] = useState([]);
   const [uploading, setUploading] = useState(false);
   const [documents, setDocuments] = useState([]);
-
+  const [loadingDocs, setLoadingDocs] = useState(false);
   const handleSearch = async () => {
     if (!query.trim()) return;
 
@@ -54,6 +55,7 @@ function DocumentManager() {
     }
   };
   const fetchDocuments = async () => {
+    setLoadingDocs(true);
     try {
       const {
         data: { session },
@@ -75,8 +77,11 @@ function DocumentManager() {
         title: "Erreur",
         text: "Impossible de charger les documents.",
       });
+    } finally {
+      setLoadingDocs(false);
     }
   };
+
   const handleFileUpload = async (e) => {
     const file = e.target.files[0];
     if (!file) return;
@@ -164,7 +169,7 @@ function DocumentManager() {
   };
   const handleDownload = async (filePath) => {
     try {
-      console.log("FILE PATH: ",filePath)
+      console.log("FILE PATH: ", filePath);
       const { data, error } = await supabase.storage
         .from("documents")
         .createSignedUrl(filePath, 60); // 60 secondes de validité
@@ -262,40 +267,49 @@ function DocumentManager() {
                 </tr>
               </thead>
               <tbody>
-                {documents.map((doc, idx) => (
-                  <tr
-                    key={idx}
-                    className="bg-white dark:bg-gray-800 border-b border-gray-200 dark:border-gray-700"
-                  >
-                    <td className="px-6 py-4">{doc.name || "N/A"}</td>
-                    <td className="px-6 py-4">
-                      {new Date(doc.created_at).toLocaleString()}
-                    </td>
-                    <td className="px-6 py-4">{doc.owner_id}</td>
-                    <td className="px-6 py-4 flex gap-3 items-center justify-end">
-                      {/* Bouton de téléchargement */}
-                      <button
-                        onClick={() => handleDownload(doc.url)} // doc.url est le chemin dans le storage
-                        className="text-blue-600 hover:text-blue-800"
-                        title="Télécharger"
-                      >
-                        <Download className="w-5 h-5" />
-                      </button>
-
-                      {/* Bouton de suppression */}
-                      <button
-                        onClick={() => handleDelete(doc.name)}
-                        className="text-red-600 hover:text-red-800"
-                        title="Supprimer"
-                      >
-                        <Trash2 className="w-5 h-5" />
-                      </button>
+                {loadingDocs ? (
+                  <tr>
+                    <td colSpan="4" className="text-center py-8">
+                      <div className="flex justify-center items-center gap-2 text-indigo-600 dark:text-indigo-400">
+                        <Loader2 className="animate-spin w-6 h-6" />
+                        <span className="text-sm">
+                          Chargement des documents...
+                        </span>
+                      </div>
                     </td>
                   </tr>
-                ))}
-                {documents.length === 0 && (
+                ) : documents.length > 0 ? (
+                  documents.map((doc, idx) => (
+                    <tr
+                      key={idx}
+                      className="bg-white dark:bg-gray-800 border-b border-gray-200 dark:border-gray-700"
+                    >
+                      <td className="px-6 py-4">{doc.name || "N/A"}</td>
+                      <td className="px-6 py-4">
+                        {new Date(doc.created_at).toLocaleString()}
+                      </td>
+                      <td className="px-6 py-4">{doc.owner_id}</td>
+                      <td className="px-6 py-4 flex gap-3 items-center justify-end">
+                        <button
+                          onClick={() => handleDownload(doc.url)}
+                          className="text-blue-600 hover:text-blue-800"
+                          title="Télécharger"
+                        >
+                          <Download className="w-5 h-5" />
+                        </button>
+                        <button
+                          onClick={() => handleDelete(doc.name)}
+                          className="text-red-600 hover:text-red-800"
+                          title="Supprimer"
+                        >
+                          <Trash2 className="w-5 h-5" />
+                        </button>
+                      </td>
+                    </tr>
+                  ))
+                ) : (
                   <tr>
-                    <td colSpan="3" className="px-6 py-4 text-center italic">
+                    <td colSpan="4" className="px-6 py-4 text-center italic">
                       Aucun document trouvé.
                     </td>
                   </tr>
