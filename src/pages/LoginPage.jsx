@@ -56,8 +56,6 @@ export default function LoginPage() {
         />
       </div>
 
- 
-
       {/* Form Container */}
       <div className="relative z-10 w-full max-w-md bg-white/10 backdrop-blur-xl border border-white/20 text-white rounded-2xl shadow-2xl p-8 space-y-6 animate-fade-in">
         <h1 className="text-4xl font-black text-center bg-gradient-to-r from-indigo-400 via-purple-400 to-pink-400 bg-clip-text text-transparent">
@@ -67,20 +65,7 @@ export default function LoginPage() {
           Connectez-vous pour administrer vos Chatbots IA
         </p>
 
-        <form
-          onSubmit={async (e) => {
-            e.preventDefault();
-            setLoading(true);
-            try {
-              await handleLogin(email, password);
-            } catch (err) {
-              setError("Échec de la connexion. Vérifiez vos identifiants.");
-            } finally {
-              setLoading(false);
-            }
-          }}
-          className="space-y-5"
-        >
+        <form onSubmit={handleLogin} className="space-y-5">
           <div>
             <label htmlFor="email" className="block mb-1 font-medium">
               Adresse email
@@ -122,7 +107,9 @@ export default function LoginPage() {
             disabled={loading}
             className="w-full bg-gradient-to-r from-indigo-600 via-purple-600 to-pink-600 hover:from-indigo-700 hover:to-pink-700 text-white font-semibold px-5 py-3 rounded-xl flex justify-center items-center gap-2 transition-all duration-500 shadow-lg hover:shadow-pink-500/30"
           >
-            {loading ? "Connexion..." : (
+            {loading ? (
+              "Connexion..."
+            ) : (
               <>
                 <LogIn className="w-5 h-5" />
                 Se connecter
@@ -144,4 +131,3 @@ export default function LoginPage() {
     </section>
   );
 }
-

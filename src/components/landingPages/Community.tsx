@@ -1,7 +1,20 @@
-import React from "react";
+import { useState, useEffect } from "react";
 import { Users, Globe, Heart, Cpu, Star, MessageCircle } from "lucide-react";
+import FloatingOrb from "../../ui/FloatingOrb";
 
 export default function Community() {
+  const [mousePosition, setMousePosition] = useState({ x: 0, y: 0 });
+  useEffect(() => {
+    const handleMouseMove = (e) => {
+      setMousePosition({
+        x: (e.clientX / window.innerWidth) * 100,
+        y: (e.clientY / window.innerHeight) * 100,
+      });
+    };
+
+    window.addEventListener("mousemove", handleMouseMove);
+    return () => window.removeEventListener("mousemove", handleMouseMove);
+  }, []);
   const stats = [
     {
       icon: <Users className="w-8 h-8" />,
@@ -76,6 +89,30 @@ export default function Community() {
         {/* Community Values */}
         <div className="bg-white/80 dark:bg-gray-800/80 backdrop-blur-xl rounded-3xl p-12 border border-white/20 dark:border-gray-700/50 shadow-lg">
           <div className="grid grid-cols-1 md:grid-cols-3 gap-8 text-center">
+            <FloatingOrb
+              size="w-32 h-32"
+              color="bg-indigo-500"
+              delay="0s"
+              duration="6s"
+            />
+            <FloatingOrb
+              size="w-24 h-24"
+              color="bg-purple-500"
+              delay="2s"
+              duration="8s"
+            />
+            <FloatingOrb
+              size="w-16 h-16"
+              color="bg-pink-500"
+              delay="4s"
+              duration="7s"
+            />
+            <FloatingOrb
+              size="w-20 h-20"
+              color="bg-blue-500"
+              delay="1s"
+              duration="9s"
+            />
             <div>
               <div className="w-16 h-16 bg-gradient-to-r from-indigo-500 to-purple-600 rounded-2xl flex items-center justify-center mx-auto mb-4 shadow-lg">
                 <Heart className="w-8 h-8 text-white" />

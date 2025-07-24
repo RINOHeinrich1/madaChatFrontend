@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { Bot, Zap, Users, ArrowRight, Github, Star, Sparkles, ChevronDown } from "lucide-react";
-
+import FloatingOrb from "../../ui/FloatingOrb";
 export default function Hero() {
   const [mousePosition, setMousePosition] = useState({ x: 0, y: 0 });
   const [isVisible, setIsVisible] = useState(false);
@@ -26,17 +26,7 @@ export default function Hero() {
     }
   };
 
-  const FloatingOrb = ({ size, color, delay, duration }) => (
-    <div
-      className={`absolute rounded-full ${size} ${color} opacity-20 blur-xl animate-pulse`}
-      style={{
-        animationDelay: delay,
-        animationDuration: duration,
-        left: `${Math.random() * 100}%`,
-        top: `${Math.random() * 100}%`,
-      }}
-    />
-  );
+
 
   return (
     <section className="relative min-h-screen overflow-hidden bg-gradient-to-br from-slate-900 via-purple-900 to-slate-900">
