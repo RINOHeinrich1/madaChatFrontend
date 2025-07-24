@@ -256,7 +256,8 @@ return (
               key={cb.id}
               className="bg-white dark:bg-gray-800 rounded-xl shadow p-5 space-y-3 transition hover:shadow-lg"
             >
-              <h3 className="text-lg font-semibold text-indigo-600 dark:text-indigo-400">
+              <h3  onClick={() => navigate(`/chat/${cb.id}`)} className="text-lg font-semibold text-indigo-600 dark:text-indigo-400">
+
                 {cb.nom}
               </h3>
               <p className="text-sm text-gray-600 dark:text-gray-300 line-clamp-3">

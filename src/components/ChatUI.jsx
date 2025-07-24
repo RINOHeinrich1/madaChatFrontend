@@ -32,9 +32,6 @@ export default function ChatUI({ chatbot_id }) {
     }
   }, [messages, chatbot_id]);
 
-
-
-
   useEffect(() => {
     chatEndRef.current?.scrollIntoView({ behavior: "smooth" });
   }, [messages]);
@@ -81,64 +78,62 @@ export default function ChatUI({ chatbot_id }) {
 
     setMessages(newMessages);
   };
-const getMemoireContextuelle = async (chatbot_id) => {
-  const { data, error } = await supabase
-    .from("chatbots")
-    .select("memoire_contextuelle")
-    .eq("id", chatbot_id)
-    .single();
+  const getMemoireContextuelle = async (chatbot_id) => {
+    const { data, error } = await supabase
+      .from("chatbots")
+      .select("memoire_contextuelle")
+      .eq("id", chatbot_id)
+      .single();
 
-  if (error || !data?.memoire_contextuelle) return 5; // valeur par défaut
-  return data.memoire_contextuelle;
-};
+    if (error || !data?.memoire_contextuelle) return 5; // valeur par défaut
+    return data.memoire_contextuelle;
+  };
 
-const handleAsk = async () => {
-  const trimmed = question.trim();
-  if (!trimmed) return;
+  const handleAsk = async () => {
+    const trimmed = question.trim();
+    if (!trimmed) return;
 
-  setQuestion("");
-  setLoading(true);
+    setQuestion("");
+    setLoading(true);
 
-  try {
-    // 🔁 1. Récupérer la limite memoire_contextuelle depuis Supabase
-    const limit = await getMemoireContextuelle(chatbot_id);
+    try {
+      // 🔁 1. Récupérer la limite memoire_contextuelle depuis Supabase
+      const limit = await getMemoireContextuelle(chatbot_id);
 
-    // 🧠 2. Construire l'historique formaté
-    const fullHistory = messages
-      .filter((msg) => msg.type === "question" || msg.type === "answer")
-      .map((msg) => ({
-        role: msg.type === "question" ? "user" : "assistant",
-        content: msg.text,
-      }));
+      // 🧠 2. Construire l'historique formaté
+      const fullHistory = messages
+        .filter((msg) => msg.type === "question" || msg.type === "answer")
+        .map((msg) => ({
+          role: msg.type === "question" ? "user" : "assistant",
+          content: msg.text,
+        }));
 
-    // ⛔ 3. Limiter l’historique au n derniers messages
-    const limitedHistory = fullHistory.slice(-limit);
+      // ⛔ 3. Limiter l’historique au n derniers messages
+      const limitedHistory = fullHistory.slice(-limit);
 
-    // 📡 4. Envoyer la requête avec historique
-    const res = await askQuestion(trimmed, chatbot_id, [], limitedHistory);
+      // 📡 4. Envoyer la requête avec historique
+      const res = await askQuestion(trimmed, chatbot_id, [], limitedHistory);
 
-    // ✅ 5. Ajouter les messages à l’état
-    setMessages((prev) => [
-      ...prev,
-      { id: nanoid(), type: "question", text: trimmed },
-      { id: nanoid(), type: "answer", text: res.answer, docs: res.documents },
-    ]);
-  } catch (err) {
-    setMessages((prev) => [
-      ...prev,
-      { type: "question", text: trimmed },
-      {
-        type: "answer",
-        text: "❌ Une erreur est survenue lors de l'appel au modèle.",
-        docs: [],
-      },
-    ]);
-  } finally {
-    setLoading(false);
-  }
-};
-
-
+      // ✅ 5. Ajouter les messages à l’état
+      setMessages((prev) => [
+        ...prev,
+        { id: nanoid(), type: "question", text: trimmed },
+        { id: nanoid(), type: "answer", text: res.answer, docs: res.documents },
+      ]);
+    } catch (err) {
+      setMessages((prev) => [
+        ...prev,
+        { type: "question", text: trimmed },
+        {
+          type: "answer",
+          text: "❌ Une erreur est survenue lors de l'appel au modèle.",
+          docs: [],
+        },
+      ]);
+    } finally {
+      setLoading(false);
+    }
+  };
 
   const clearChat = () => {
     if (chatbot_id) {
@@ -155,7 +150,7 @@ const handleAsk = async () => {
 
   return (
     <div className="min-h-screen bg-gray-100 dark:bg-gray-900 text-gray-800 dark:text-gray-100 transition-colors duration-300 font-inter p-2 sm:p-5 flex justify-center">
-      <div className="w-full max-w-3xl bg-white dark:bg-gray-800 shadow-lg rounded-2xl p-4 sm:p-6 flex flex-col gap-4 sm:gap-5">
+      <div className="w-full max-w-3xl bg-white dark:bg-gray-800 shadow-lg rounded-2xl p-4 sm:p-6 flex flex-col justify-between h-[90vh] sm:h-auto">
         {/* Header */}
         <div className="flex justify-between items-center">
           <h1 className="text-xl sm:text-2xl font-bold flex items-center gap-2 text-indigo-600 dark:text-indigo-400">
@@ -184,7 +179,6 @@ const handleAsk = async () => {
                 }`}
               >
                 <ReactMarkdown>{msg.text}</ReactMarkdown>
-
               </div>
 
               {msg.type === "question" && (
