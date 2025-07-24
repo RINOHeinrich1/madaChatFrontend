@@ -227,7 +227,7 @@ export default function PgsqlConnexionManager() {
                             })
                           }
                           className="text-green-600 hover:text-green-800 dark:text-green-400 dark:hover:text-green-300"
-                          title="Template customiser"
+                          title="Document dynamique"
                         >
                           <File className="w-4 h-4" />
                         </button>
@@ -298,7 +298,7 @@ export default function PgsqlConnexionManager() {
                       })
                     }
                     className="text-green-600 hover:text-green-800 dark:text-green-400 dark:hover:text-green-300"
-                    title="Template customiser"
+                    title="Document dynamique"
                   >
                     <File className="w-4 h-4" />
                   </button>

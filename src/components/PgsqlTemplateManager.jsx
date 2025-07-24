@@ -1,13 +1,14 @@
 import React, { useState, useEffect } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 import { supabase } from "../lib/supabaseClient";
-import { ArrowLeft, Trash2, Edit } from "lucide-react";
+import { ArrowLeft, Trash2, Edit, Info } from "lucide-react";
+import Swal from "sweetalert2";
 
 export default function PgsqlTemplateManager() {
   const navigate = useNavigate();
   const location = useLocation();
   const connexion = location.state?.connexion;
-
+  const [showInfo, setShowInfo] = useState(false);
   const [templates, setTemplates] = useState([]);
   const [template, setTemplate] = useState("");
   const [description, setDescription] = useState("");
@@ -85,7 +86,7 @@ export default function PgsqlTemplateManager() {
           text: template,
           source: connexionName,
           data_id: dataId,
-          contextual:String(contextual),
+          contextual: String(contextual),
         }),
       });
 
@@ -109,7 +110,13 @@ export default function PgsqlTemplateManager() {
 
       if (error) throw new Error("Erreur Supabase : " + error.message);
 
-      alert(`Template ${editingId ? "modifié" : "créé"} avec succès.`);
+      Swal.fire({
+        icon: "success",
+        title: "Succès",
+        text: `Template ${editingId ? "modifié" : "créé"} avec succès.`,
+        background: "#f0fdf4",
+        color: "#166534",
+      });
       window.location.reload();
     } catch (err) {
       setErrorMsg(err.message);
@@ -160,9 +167,23 @@ export default function PgsqlTemplateManager() {
           <ArrowLeft className="w-4 h-4" /> Retour
         </button>
 
-        <h1 className="text-2xl font-bold mb-4">
-          Gérer les templates PostgreSQL
-        </h1>
+        <div className="flex items-center gap-2 mb-4">
+          <h1 className="text-2xl font-bold">Document dynamique PostgreSQL</h1>
+          <button
+            onClick={() => setShowInfo(!showInfo)}
+            className="text-indigo-500 hover:text-indigo-700"
+            title="À propos"
+          >
+            <Info className="w-5 h-5" />
+          </button>
+        </div>
+        {showInfo && (
+          <div className="mb-4 text-sm text-gray-700 dark:text-gray-300 bg-indigo-50 dark:bg-indigo-900 p-3 rounded-lg border border-indigo-200 dark:border-indigo-700">
+            Les documents dynamiques PostgreSQL sont des documents dont certains
+            contenus peuvent changer dynamiquement en fonction des résultats
+            d'une requête SQL.
+          </div>
+        )}
 
         <div className="mb-6 border rounded-lg p-4 bg-gray-50 dark:bg-gray-900">
           <p className="font-semibold mb-2 text-gray-700 dark:text-gray-300">
@@ -189,7 +210,7 @@ export default function PgsqlTemplateManager() {
 
         <form onSubmit={handleSubmit} className="space-y-4 mb-8">
           <div>
-            <label className="block text-sm font-medium mb-1">Template</label>
+            <label className="block text-sm font-medium mb-1">Document</label>
             <textarea
               value={template}
               onChange={(e) => setTemplate(e.target.value)}
@@ -238,10 +259,12 @@ export default function PgsqlTemplateManager() {
           </button>
         </form>
 
-        <h2 className="text-xl font-semibold mb-3">Templates existants</h2>
+        <h2 className="text-xl font-semibold mb-3">
+          Documents dynamiques existants
+        </h2>
         <div className="space-y-2">
           {templates.length === 0 && (
-            <p className="text-gray-400">Aucun template trouvé.</p>
+            <p className="text-gray-400">Aucun document trouvé.</p>
           )}
           {templates.map((tpl) => (
             <div
