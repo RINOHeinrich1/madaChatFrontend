@@ -126,6 +126,14 @@ export default function LoginPage() {
               Créer un compte
             </a>
           </p>
+          <p className="text-center text-sm">
+            <a
+              href="/"
+              className="inline-block mt-2 text-white/70 hover:text-white underline transition duration-300"
+            >
+              ← Retour à l’accueil
+            </a>
+          </p>
         </form>
       </div>
     </section>
