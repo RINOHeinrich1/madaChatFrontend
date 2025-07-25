@@ -95,38 +95,38 @@ export default function ChatUI({ chatbot_id }) {
     const trimmed = question.trim();
     if (!trimmed) return;
 
+    // 1. Vider l’input immédiatement
     setQuestion("");
+
+    // 2. Ajouter la question tout de suite
+    const questionMsg = { id: nanoid(), type: "question", text: trimmed };
+    setMessages((prev) => [...prev, questionMsg]);
+
     setLoading(true);
 
     try {
-      // 🔁 1. Récupérer la limite memoire_contextuelle depuis Supabase
       const limit = await getMemoireContextuelle(chatbot_id);
 
-      // 🧠 2. Construire l'historique formaté
-      const fullHistory = messages
+      const fullHistory = [...messages, questionMsg] // inclut la question fraîchement ajoutée
         .filter((msg) => msg.type === "question" || msg.type === "answer")
         .map((msg) => ({
           role: msg.type === "question" ? "user" : "assistant",
           content: msg.text,
         }));
 
-      // ⛔ 3. Limiter l’historique au n derniers messages
       const limitedHistory = fullHistory.slice(-limit);
 
-      // 📡 4. Envoyer la requête avec historique
       const res = await askQuestion(trimmed, chatbot_id, [], limitedHistory);
 
-      // ✅ 5. Ajouter les messages à l’état
       setMessages((prev) => [
         ...prev,
-        { id: nanoid(), type: "question", text: trimmed },
         { id: nanoid(), type: "answer", text: res.answer, docs: res.documents },
       ]);
     } catch (err) {
       setMessages((prev) => [
         ...prev,
-        { type: "question", text: trimmed },
         {
+          id: nanoid(),
           type: "answer",
           text: "❌ Une erreur est survenue lors de l'appel au modèle.",
           docs: [],
