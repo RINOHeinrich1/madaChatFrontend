@@ -43,28 +43,30 @@ export default function ChatUI({ chatbot_id }) {
     setMessages(messages.slice(0, index)); // supprime tous les messages à partir de cette question
   };
   const [chatbotName, setChatbotName] = useState("ONIR Chat");
+  const [chatbotAvatar, setChatbotAvatar] = useState(null); // 👈 ajout
+
   useEffect(() => {
-    const fetchChatbotName = async () => {
+    const fetchChatbotInfo = async () => {
       if (!chatbot_id) return;
       const { data, error } = await supabase
         .from("public_chatbots")
-        .select("nom")
+        .select("nom, avatar")
         .eq("id", chatbot_id)
         .single();
 
       if (!error && data) {
         setChatbotName(data.nom);
+        if (data.avatar) setChatbotAvatar(data.avatar);
       } else {
         console.error(
-          "Erreur lors de la récupération du nom du chatbot:",
+          "Erreur lors de la récupération des infos du chatbot:",
           error
         );
       }
     };
 
-    fetchChatbotName();
+    fetchChatbotInfo();
   }, [chatbot_id]);
-
   const handleDeleteMessage = (index) => {
     const newMessages = [...messages];
 
@@ -153,8 +155,16 @@ export default function ChatUI({ chatbot_id }) {
       <div className="w-full max-w-3xl bg-white dark:bg-gray-800 shadow-lg rounded-2xl p-4 sm:p-6 flex flex-col justify-between h-[90vh] sm:h-auto">
         {/* Header */}
         <div className="flex justify-between items-center">
-          <h1 className="text-xl sm:text-2xl font-bold flex items-center gap-2 text-indigo-600 dark:text-indigo-400">
-            <MessageSquareText className="w-6 h-6" />
+          <h1 className="text-xl sm:text-2xl font-bold flex items-center gap-3 text-indigo-600 dark:text-indigo-400">
+            {chatbotAvatar ? (
+              <img
+                src={chatbotAvatar}
+                alt="Avatar"
+                className="w-8 h-8 sm:w-10 sm:h-10 rounded-full object-cover border-2 border-indigo-500"
+              />
+            ) : (
+              <MessageSquareText className="w-6 h-6" />
+            )}
             {chatbotName}
           </h1>
 
@@ -172,13 +182,28 @@ export default function ChatUI({ chatbot_id }) {
           {messages.map((msg, idx) => (
             <div key={idx} className="space-y-1">
               <div
-                className={`inline-block max-w-[80%] p-3 rounded-xl shadow-sm text-sm break-words ${
-                  msg.type === "question"
-                    ? "bg-indigo-100 dark:bg-indigo-500/20 ml-auto text-right"
-                    : "bg-gray-100 dark:bg-gray-700 mr-auto text-left"
+                className={`flex items-start gap-2 ${
+                  msg.type === "question" ? "justify-end" : "justify-start"
                 }`}
               >
-                <ReactMarkdown>{msg.text}</ReactMarkdown>
+                {/* Avatar du bot à gauche des réponses */}
+                {msg.type === "answer" && chatbotAvatar && (
+                  <img
+                    src={chatbotAvatar}
+                    alt="Avatar bot"
+                    className="w-8 h-8 rounded-full object-cover border border-indigo-500"
+                  />
+                )}
+
+                <div
+                  className={`inline-block max-w-[80%] p-3 rounded-xl shadow-sm text-sm break-words ${
+                    msg.type === "question"
+                      ? "bg-indigo-100 dark:bg-indigo-500/20 text-right"
+                      : "bg-gray-100 dark:bg-gray-700 text-left"
+                  }`}
+                >
+                  <ReactMarkdown>{msg.text}</ReactMarkdown>
+                </div>
               </div>
 
               {msg.type === "question" && (
@@ -199,8 +224,16 @@ export default function ChatUI({ chatbot_id }) {
               )}
             </div>
           ))}
+
           {loading && (
-            <div className="flex items-center space-x-2">
+            <div className="flex items-start gap-2">
+              {chatbotAvatar && (
+                <img
+                  src={chatbotAvatar}
+                  alt="Avatar bot"
+                  className="w-8 h-8 rounded-full object-cover border border-indigo-500"
+                />
+              )}
               <div className="bg-gray-100 dark:bg-gray-700 text-sm p-3 rounded-xl shadow-sm max-w-[85%]">
                 <TypingIndicator />
               </div>
