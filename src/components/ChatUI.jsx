@@ -5,6 +5,7 @@ import { supabase } from "../lib/supabaseClient";
 import { nanoid } from "nanoid";
 import TypingIndicator from "../ui/TypingIndicator";
 import ReactMarkdown from "react-markdown";
+import { Eye } from "lucide-react"; // ajoute l'import
 
 export default function ChatUI({ chatbot_id }) {
   const [question, setQuestion] = useState("");
@@ -16,6 +17,7 @@ export default function ChatUI({ chatbot_id }) {
         type: "answer",
         text: "Comment puis-je vous assister aujourd'hui ? N'hésitez pas à poser votre question.",
         docs: [],
+        reasoning: null,
       },
     ];
   });
@@ -24,6 +26,9 @@ export default function ChatUI({ chatbot_id }) {
   const chatEndRef = useRef(null);
   const [previousMessages, setPreviousMessages] = useState(null);
   const [isEditing, setIsEditing] = useState(false);
+
+  // État pour gérer quel message montre le détail du raisonnement
+  const [showReasoningIndex, setShowReasoningIndex] = useState(null);
 
   useEffect(() => {
     if (chatbot_id) {
@@ -37,14 +42,15 @@ export default function ChatUI({ chatbot_id }) {
   useEffect(() => {
     chatEndRef.current?.scrollIntoView({ behavior: "smooth" });
   }, [messages]);
+
   const handleEditMessage = (index) => {
     const msg = messages[index];
     if (msg.type !== "question") return;
 
-    setPreviousMessages(messages); // 🧠 sauvegarde
-    setIsEditing(true); // 🎯 édition active
+    setPreviousMessages(messages); // sauvegarde
+    setIsEditing(true); // édition active
 
-    setQuestion(msg.text); // remet la question dans l'input
+    setQuestion(msg.text); // remet la question dans l’input
     setMessages(messages.slice(0, index)); // supprime les messages suivants
   };
   const cancelEdit = () => {
@@ -57,7 +63,7 @@ export default function ChatUI({ chatbot_id }) {
   };
 
   const [chatbotName, setChatbotName] = useState("ONIR Chat");
-  const [chatbotAvatar, setChatbotAvatar] = useState(null); // 👈 ajout
+  const [chatbotAvatar, setChatbotAvatar] = useState(null);
 
   useEffect(() => {
     const fetchChatbotInfo = async () => {
@@ -81,19 +87,18 @@ export default function ChatUI({ chatbot_id }) {
 
     fetchChatbotInfo();
   }, [chatbot_id]);
+
   const handleDeleteMessage = (index) => {
     const newMessages = [...messages];
 
-    // Supprime la question
     newMessages.splice(index, 1);
-
-    // Supprime la réponse juste après si elle existe
     if (newMessages[index] && newMessages[index].type === "answer") {
       newMessages.splice(index, 1);
     }
 
     setMessages(newMessages);
   };
+
   const getMemoireContextuelle = async (chatbot_id) => {
     const { data, error } = await supabase
       .from("chatbots")
@@ -101,7 +106,7 @@ export default function ChatUI({ chatbot_id }) {
       .eq("id", chatbot_id)
       .single();
 
-    if (error || !data?.memoire_contextuelle) return 5; // valeur par défaut
+    if (error || !data?.memoire_contextuelle) return 5;
     return data.memoire_contextuelle;
   };
 
@@ -109,10 +114,7 @@ export default function ChatUI({ chatbot_id }) {
     const trimmed = question.trim();
     if (!trimmed) return;
 
-    // 1. Vider l’input immédiatement
     setQuestion("");
-
-    // 2. Ajouter la question tout de suite
     const questionMsg = { id: nanoid(), type: "question", text: trimmed };
     setMessages((prev) => [...prev, questionMsg]);
 
@@ -121,7 +123,7 @@ export default function ChatUI({ chatbot_id }) {
     try {
       const limit = await getMemoireContextuelle(chatbot_id);
 
-      const fullHistory = [...messages, questionMsg] // inclut la question fraîchement ajoutée
+      const fullHistory = [...messages, questionMsg]
         .filter((msg) => msg.type === "question" || msg.type === "answer")
         .map((msg) => ({
           role: msg.type === "question" ? "user" : "assistant",
@@ -134,8 +136,16 @@ export default function ChatUI({ chatbot_id }) {
 
       setMessages((prev) => [
         ...prev,
-        { id: nanoid(), type: "answer", text: res.answer, docs: res.documents },
+        {
+          id: nanoid(),
+          type: "answer",
+          text: res.answer,
+          docs: res.documents,
+          reasoning: res.reasoning || null,
+        },
       ]);
+
+      setShowReasoningIndex(null); // ferme l'affichage détaillé par défaut après nouvelle réponse
     } catch (err) {
       setMessages((prev) => [
         ...prev,
@@ -144,10 +154,12 @@ export default function ChatUI({ chatbot_id }) {
           type: "answer",
           text: "❌ Une erreur est survenue lors de l'appel au modèle.",
           docs: [],
+          reasoning: null,
         },
       ]);
     } finally {
       setLoading(false);
+      setIsEditing(false);
     }
   };
 
@@ -160,55 +172,57 @@ export default function ChatUI({ chatbot_id }) {
         type: "answer",
         text: "Bonjour, comment puis-je vous assister aujourd'hui ? N'hésitez pas à poser votre question.",
         docs: [],
+        reasoning: null,
       },
     ]);
+    setShowReasoningIndex(null);
   };
 
+  const toggleReasoning = (index) => {
+    if (showReasoningIndex === index) {
+      setShowReasoningIndex(null);
+    } else {
+      setShowReasoningIndex(index);
+    }
+  };
   return (
     <div className="min-h-screen bg-gray-100 dark:bg-gray-900 text-gray-800 dark:text-gray-100 transition-colors duration-300 font-inter p-2 sm:p-5 flex justify-center">
-      <div className="w-full max-w-3xl bg-white dark:bg-gray-800 shadow-lg rounded-2xl p-4 sm:p-6 flex flex-col justify-between h-[90vh] sm:h-auto">
-        {/* Header */}
-        <div className="flex justify-between items-center">
-          <h1 className="text-xl sm:text-2xl font-bold flex items-center gap-3 text-indigo-600 dark:text-indigo-400">
-            {chatbotAvatar ? (
-              <img
-                src={chatbotAvatar}
-                alt="Avatar"
-                className="w-8 h-8 sm:w-10 sm:h-10 rounded-full object-cover border-2 border-indigo-500"
-              />
-            ) : (
-              <MessageSquareText className="w-6 h-6" />
-            )}
-            {chatbotName}
-          </h1>
+      <div className="w-full max-w-7xl flex justify-center">
+        {" "}
+        {/* center le conteneur chat */}
+        {/* Chat principal */}
+        <div className="flex-1 max-w-3xl bg-white dark:bg-gray-800 shadow-lg rounded-2xl p-4 sm:p-6 flex flex-col justify-between h-[90vh] sm:h-auto">
+          {/* Header */}
+          <div className="flex justify-between items-center">
+            <h1 className="text-xl sm:text-2xl font-bold flex items-center gap-3 text-indigo-600 dark:text-indigo-400">
+              {chatbotAvatar ? (
+                <img
+                  src={chatbotAvatar}
+                  alt="Avatar"
+                  className="w-8 h-8 sm:w-10 sm:h-10 rounded-full object-cover border-2 border-indigo-500"
+                />
+              ) : (
+                <MessageSquareText className="w-6 h-6" />
+              )}
+              {chatbotName}
+            </h1>
 
-          <button
-            onClick={clearChat}
-            className="text-sm flex items-center gap-1 text-red-500 hover:text-red-700 transition"
-          >
-            <Trash2 className="w-4 h-4" />
-            <span className="hidden sm:inline">Vider</span>
-          </button>
-        </div>
-
-        {/* Messages */}
-        <div className="flex-1 overflow-y-auto max-h-[60vh] space-y-4 p-2 rounded-lg bg-gray-50 dark:bg-gray-700">
-          {messages.map((msg, idx) => (
-            <div key={idx} className="space-y-1">
-              <div
-                className={`flex items-start gap-2 ${
-                  msg.type === "question" ? "justify-end" : "justify-start"
-                }`}
+            <div className="flex items-center gap-4">
+              <button
+                onClick={clearChat}
+                className="text-sm flex items-center gap-1 text-red-500 hover:text-red-700 transition"
+                aria-label="Vider la conversation"
               >
-                {/* Avatar du bot à gauche des réponses */}
-                {msg.type === "answer" && chatbotAvatar && (
-                  <img
-                    src={chatbotAvatar}
-                    alt="Avatar bot"
-                    className="w-8 h-8 rounded-full object-cover border border-indigo-500"
-                  />
-                )}
+                <Trash2 className="w-4 h-4" />
+                <span className="hidden sm:inline">Vider</span>
+              </button>
+            </div>
+          </div>
 
+          {/* Messages */}
+          <div className="flex-1 overflow-y-auto max-h-[60vh] space-y-4 p-2 rounded-lg bg-gray-50 dark:bg-gray-700">
+            {messages.map((msg, idx) => (
+              <div key={idx} className="message-block space-y-1">
                 <div
                   className={`inline-block max-w-[80%] p-3 rounded-xl shadow-sm text-sm break-words ${
                     msg.type === "question"
@@ -218,78 +232,127 @@ export default function ChatUI({ chatbot_id }) {
                 >
                   <ReactMarkdown>{msg.text}</ReactMarkdown>
                 </div>
-              </div>
 
-              {msg.type === "question" && (
-                <div className="flex justify-end pr-2 space-x-2 text-xs text-gray-500">
-                  <button
-                    onClick={() => handleEditMessage(idx)}
-                    className="hover:text-indigo-600 transition flex items-center gap-1"
-                  >
-                    <Pencil className="w-4 h-4" />
-                  </button>
-                  <button
-                    onClick={() => handleDeleteMessage(idx)}
-                    className="hover:text-red-600 transition flex items-center gap-1"
-                  >
-                    <Trash2 className="w-4 h-4" />
-                  </button>
+                {msg.type === "question" && (
+                  <div className="flex justify-end pr-2 space-x-2 text-xs text-gray-500 items-center">
+                    <button
+                      onClick={() => handleEditMessage(idx)}
+                      disabled={loading}
+                      className={`transition flex items-center gap-1 ${
+                        loading
+                          ? "opacity-50 cursor-not-allowed"
+                          : "hover:text-indigo-600"
+                      }`}
+                      aria-label="Modifier la question"
+                    >
+                      <Pencil className="w-4 h-4" />
+                    </button>
+
+                    <button
+                      onClick={() => handleDeleteMessage(idx)}
+                      className="hover:text-red-600 transition flex items-center gap-1"
+                      aria-label="Supprimer la question"
+                    >
+                      <Trash2 className="w-4 h-4" />
+                    </button>
+
+                    {/* Bouton œil pour voir le raisonnement (si réponse qui suit a reasoning) */}
+                    <button
+                      onClick={() => toggleReasoning(idx + 1)}
+                      className="hover:text-indigo-600 transition flex items-center"
+                      aria-label="Afficher le raisonnement"
+                    >
+                      <Eye className="w-4 h-4" />
+                    </button>
+                  </div>
+                )}
+
+                {/* Détail raisonnement sous la réponse (on regarde showReasoningIndex) */}
+                {msg.type === "answer" &&
+                  showReasoningIndex === idx &&
+                  msg.reasoning && (
+                    <div className="mt-2 p-2 border rounded bg-gray-200 dark:bg-gray-700 text-xs text-gray-800 dark:text-gray-200 whitespace-pre-wrap max-w-[80%]">
+                      <h4 className="font-semibold">Sources :</h4>
+                      <ul className="list-disc list-inside mb-2">
+                        {msg.reasoning.sources.length > 0 ? (
+                          msg.reasoning.sources.map((s, i) => (
+                            <li key={i} className="break-words">
+                              {typeof s === "string" ? s : JSON.stringify(s)}
+                            </li>
+                          ))
+                        ) : (
+                          <li className="italic text-gray-500">
+                            Aucune source.
+                          </li>
+                        )}
+                      </ul>
+                      <h4 className="font-semibold">Requête SQL :</h4>
+                      {msg.reasoning.sql ? (
+                        <pre className="bg-gray-300 dark:bg-gray-800 rounded p-2 break-words max-w-full max-h-64 overflow-auto">
+                          {msg.reasoning.sql}
+                        </pre>
+                      ) : (
+                        <p className="italic text-gray-500">
+                          Aucune requête SQL générée.
+                        </p>
+                      )}
+                    </div>
+                  )}
+              </div>
+            ))}
+
+            {loading && (
+              <div className="flex items-start gap-2">
+                {chatbotAvatar && (
+                  <img
+                    src={chatbotAvatar}
+                    alt="Avatar bot"
+                    className="w-8 h-8 rounded-full object-cover border border-indigo-500"
+                  />
+                )}
+                <div className="bg-gray-100 dark:bg-gray-700 text-sm p-3 rounded-xl shadow-sm max-w-[85%]">
+                  <TypingIndicator />
                 </div>
-              )}
-            </div>
-          ))}
-
-          {loading && (
-            <div className="flex items-start gap-2">
-              {chatbotAvatar && (
-                <img
-                  src={chatbotAvatar}
-                  alt="Avatar bot"
-                  className="w-8 h-8 rounded-full object-cover border border-indigo-500"
-                />
-              )}
-              <div className="bg-gray-100 dark:bg-gray-700 text-sm p-3 rounded-xl shadow-sm max-w-[85%]">
-                <TypingIndicator />
               </div>
-            </div>
-          )}
-          <div ref={chatEndRef} />
-        </div>
-
-        {/* Input */}
-        <div className="flex flex-wrap gap-2 mt-2">
-          <input
-            type="text"
-            placeholder="Pose ta question..."
-            value={question}
-            onChange={(e) => setQuestion(e.target.value)}
-            onKeyDown={(e) => e.key === "Enter" && handleAsk()}
-            className="flex-1 min-w-0 px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-xl bg-white dark:bg-gray-700 text-gray-800 dark:text-gray-100 focus:outline-none focus:ring-2 focus:ring-indigo-500"
-          />
-
-          {isEditing && (
-            <button
-              onClick={cancelEdit}
-              className="bg-gray-300 hover:bg-gray-400 dark:bg-gray-600 dark:hover:bg-gray-500 text-gray-800 dark:text-white px-4 py-2.5 rounded-xl transition"
-            >
-              Annuler
-            </button>
-          )}
-
-          <button
-            onClick={handleAsk}
-            disabled={loading}
-            className="bg-indigo-600 hover:bg-indigo-700 disabled:opacity-50 text-white px-4 sm:px-5 py-2.5 sm:py-3 text-sm sm:text-base rounded-xl transition shadow flex items-center gap-2"
-          >
-            {loading ? (
-              "..."
-            ) : (
-              <>
-                <Send className="w-5 h-5" />
-                <span className="hidden sm:inline">Envoyer</span>
-              </>
             )}
-          </button>
+            <div ref={chatEndRef} />
+          </div>
+
+          {/* Input */}
+          <div className="flex flex-wrap gap-2 mt-2 justify-center max-w-3xl w-full mx-auto">
+            <input
+              type="text"
+              placeholder="Pose ta question..."
+              value={question}
+              onChange={(e) => setQuestion(e.target.value)}
+              onKeyDown={(e) => e.key === "Enter" && handleAsk()}
+              className="flex-grow min-w-[250px] px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-xl bg-white dark:bg-gray-700 text-gray-800 dark:text-gray-100 focus:outline-none focus:ring-2 focus:ring-indigo-500"
+            />
+
+            {isEditing && (
+              <button
+                onClick={cancelEdit}
+                className="bg-gray-300 hover:bg-gray-400 dark:bg-gray-600 dark:hover:bg-gray-500 text-gray-800 dark:text-white px-4 py-2.5 rounded-xl transition"
+              >
+                Annuler
+              </button>
+            )}
+
+            <button
+              onClick={handleAsk}
+              disabled={loading}
+              className="bg-indigo-600 hover:bg-indigo-700 disabled:opacity-50 text-white px-4 sm:px-5 py-2.5 sm:py-3 text-sm sm:text-base rounded-xl transition shadow flex items-center gap-2"
+            >
+              {loading ? (
+                "..."
+              ) : (
+                <>
+                  <Send className="w-5 h-5" />
+                  <span className="hidden sm:inline">Envoyer</span>
+                </>
+              )}
+            </button>
+          </div>
         </div>
       </div>
     </div>
