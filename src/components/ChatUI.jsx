@@ -177,6 +177,30 @@ export default function ChatUI({ chatbot_id }) {
     ]);
     setShowLogIndex(null);
   };
+  function decodeHTMLEntities(str) {
+    const parser = new DOMParser();
+    const decoded = parser.parseFromString(
+      `<!doctype html><body>${str}`,
+      "text/html"
+    );
+    return decoded.body.textContent;
+  }
+  function decodeUnicode(str) {
+    let decoded = str;
+    try {
+      // Répéter le parse tant qu'on a des séquences \uXXXX
+      while (/\\u[0-9a-fA-F]{4}/.test(decoded)) {
+        decoded = JSON.parse(`"${decoded}"`);
+      }
+    } catch {
+      // Ignore les erreurs de parsing
+    }
+    return decoded;
+  }
+
+  function cleanText(str) {
+    return decodeUnicode(decodeHTMLEntities(str));
+  }
 
   const toggleLogs = (index) => {
     if (showLogIndex === index) {
@@ -277,7 +301,7 @@ export default function ChatUI({ chatbot_id }) {
                       <ul className="list-disc list-inside space-y-1">
                         {msg.logs.map((log, i) => (
                           <li key={i} className="break-words">
-                            {log}
+                            {cleanText(log)}
                           </li>
                         ))}
                       </ul>
