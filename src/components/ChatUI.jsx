@@ -28,7 +28,7 @@ export default function ChatUI({ chatbot_id }) {
   const [isEditing, setIsEditing] = useState(false);
 
   // État pour gérer quel message montre le détail du raisonnement
-  const [showReasoningIndex, setShowReasoningIndex] = useState(null);
+  const [showLogIndex, setShowLogIndex] = useState(null);
 
   useEffect(() => {
     if (chatbot_id) {
@@ -141,11 +141,11 @@ export default function ChatUI({ chatbot_id }) {
           type: "answer",
           text: res.answer,
           docs: res.documents,
-          reasoning: res.reasoning || null,
+          logs: res.logs || [],
         },
       ]);
 
-      setShowReasoningIndex(null); // ferme l'affichage détaillé par défaut après nouvelle réponse
+      setShowLogIndex(null); // ferme l'affichage détaillé par défaut après nouvelle réponse
     } catch (err) {
       setMessages((prev) => [
         ...prev,
@@ -175,14 +175,14 @@ export default function ChatUI({ chatbot_id }) {
         reasoning: null,
       },
     ]);
-    setShowReasoningIndex(null);
+    setShowLogIndex(null);
   };
 
-  const toggleReasoning = (index) => {
-    if (showReasoningIndex === index) {
-      setShowReasoningIndex(null);
+  const toggleLogs = (index) => {
+    if (showLogIndex === index) {
+      setShowLogIndex(null);
     } else {
-      setShowReasoningIndex(index);
+      setShowLogIndex(index);
     }
   };
   return (
@@ -258,44 +258,29 @@ export default function ChatUI({ chatbot_id }) {
 
                     {/* Bouton œil pour voir le raisonnement (si réponse qui suit a reasoning) */}
                     <button
-                      onClick={() => toggleReasoning(idx + 1)}
+                      onClick={() => toggleLogs(idx + 1)}
                       className="hover:text-indigo-600 transition flex items-center"
-                      aria-label="Afficher le raisonnement"
+                      aria-label="Afficher les logs de raisonnement"
                     >
                       <Eye className="w-4 h-4" />
                     </button>
                   </div>
                 )}
 
-                {/* Détail raisonnement sous la réponse (on regarde showReasoningIndex) */}
+                {/* Détail raisonnement sous la réponse  */}
                 {msg.type === "answer" &&
-                  showReasoningIndex === idx &&
-                  msg.reasoning && (
+                  showLogIndex === idx &&
+                  msg.logs &&
+                  msg.logs.length > 0 && (
                     <div className="mt-2 p-2 border rounded bg-gray-200 dark:bg-gray-700 text-xs text-gray-800 dark:text-gray-200 whitespace-pre-wrap max-w-[80%]">
-                      <h4 className="font-semibold">Sources :</h4>
-                      <ul className="list-disc list-inside mb-2">
-                        {msg.reasoning.sources.length > 0 ? (
-                          msg.reasoning.sources.map((s, i) => (
-                            <li key={i} className="break-words">
-                              {typeof s === "string" ? s : JSON.stringify(s)}
-                            </li>
-                          ))
-                        ) : (
-                          <li className="italic text-gray-500">
-                            Aucune source.
+                      <h4 className="font-semibold mb-1">Logs :</h4>
+                      <ul className="list-disc list-inside space-y-1">
+                        {msg.logs.map((log, i) => (
+                          <li key={i} className="break-words">
+                            {log}
                           </li>
-                        )}
+                        ))}
                       </ul>
-                      <h4 className="font-semibold">Requête SQL :</h4>
-                      {msg.reasoning.sql ? (
-                        <pre className="bg-gray-300 dark:bg-gray-800 rounded p-2 break-words max-w-full max-h-64 overflow-auto">
-                          {msg.reasoning.sql}
-                        </pre>
-                      ) : (
-                        <p className="italic text-gray-500">
-                          Aucune requête SQL générée.
-                        </p>
-                      )}
                     </div>
                   )}
               </div>
