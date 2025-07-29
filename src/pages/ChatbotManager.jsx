@@ -314,7 +314,7 @@ export default function ChatbotManager() {
                   )}
                 </div>
 
-                <p className="text-sm text-gray-600 dark:text-gray-300 line-clamp-3">
+                <p className="text-sm text-gray-600 dark:text-gray-300 line-clamp-1">
                   {cb.description || "Aucune description"}
                 </p>
                 <div className="flex justify-between items-center pt-3 border-t border-gray-200 dark:border-gray-700">

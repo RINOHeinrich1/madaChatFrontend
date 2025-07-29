@@ -7,14 +7,14 @@ const sources = [
   {
     title: "Documents",
     description:
-      "Fichiers texte, PDF, etc. utilisés comme sources d’entraînement.",
+      "Fichiers texte, PDF, etc. utilisés comme sources de réponses.",
     icon: FileText,
     path: "/docs",
   },
   {
     title: "Base de données PostgreSQL",
     description:
-      "Connexion à une base de données PostgreSQL pour extraire des données en temps réel.",
+      "Connexion à une base de données PostgreSQL pour extraire des réponses",
     icon: Database,
     path: "/pgsql",
   },
