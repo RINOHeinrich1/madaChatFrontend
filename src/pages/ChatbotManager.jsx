@@ -15,9 +15,18 @@ import {
   FileText,
   Search,
   MessageSquareText,
+  Filter,
+  SortDesc,
+  MoreVertical,
+  Eye,
+  Settings,
+  Calendar,
+  Users,
+  Activity,
 } from "lucide-react";
 import Modal from "../ui/Modal";
 import ChatbotPostgresqlManager from "../components/ChatbotPostgresqlManager";
+
 export default function ChatbotManager() {
   const navigate = useNavigate();
   const [chatbots, setChatbots] = useState([]);
@@ -30,8 +39,10 @@ export default function ChatbotManager() {
   const [documentModalOpen, setDocumentModalOpen] = useState(false);
   const [selectedChatbotId, setSelectedChatbotId] = useState(null);
   const [viewMode, setViewMode] = useState("cards");
-  const [pgsqlModalOpen, setPgsqlModalOpen] = useState(false); // ✅ Nouveau
+  const [pgsqlModalOpen, setPgsqlModalOpen] = useState(false);
   const [loading, setLoading] = useState(false);
+  const [activeDropdown, setActiveDropdown] = useState(null);
+
   useEffect(() => {
     const getUserAndChatbots = async () => {
       setLoading(true);
@@ -76,10 +87,15 @@ export default function ChatbotManager() {
       text: "Cette action est irréversible.",
       icon: "warning",
       showCancelButton: true,
-      confirmButtonColor: "#e11d48", // rouge
+      confirmButtonColor: "#e11d48",
       cancelButtonColor: "#6b7280",
       confirmButtonText: "Supprimer",
       cancelButtonText: "Annuler",
+      customClass: {
+        popup: 'rounded-2xl',
+        confirmButton: 'rounded-xl',
+        cancelButton: 'rounded-xl'
+      }
     });
 
     if (confirm.isConfirmed) {
@@ -87,286 +103,436 @@ export default function ChatbotManager() {
       if (!error) {
         setChatbots((prev) => prev.filter((cb) => cb.id !== id));
         setFiltered((prev) => prev.filter((cb) => cb.id !== id));
-        Swal.fire("Supprimé", "Le chatbot a été supprimé.", "success");
+        Swal.fire({
+          title: "Supprimé",
+          text: "Le chatbot a été supprimé.",
+          icon: "success",
+          customClass: {
+            popup: 'rounded-2xl',
+            confirmButton: 'rounded-xl'
+          }
+        });
       }
     }
   };
 
+  const ActionButton = ({ onClick, className, children, tooltip }) => (
+    <button
+      onClick={onClick}
+      className={`p-2 rounded-xl transition-all duration-200 hover:scale-110 hover:shadow-md active:scale-95 ${className}`}
+      title={tooltip}
+    >
+      {children}
+    </button>
+  );
+
+  const DropdownMenu = ({ chatbot, onClose }) => (
+    <div className="absolute right-0 top-12 z-50 bg-white dark:bg-gray-800 rounded-2xl shadow-xl border border-gray-200 dark:border-gray-700 py-2 min-w-[200px] animate-in fade-in-0 zoom-in-95 duration-200">
+      <button
+        onClick={() => {
+          navigate(`/chat/${chatbot.id}`);
+          onClose();
+        }}
+        className="w-full flex items-center gap-3 px-4 py-3 text-sm text-gray-700 dark:text-gray-300 hover:bg-indigo-50 dark:hover:bg-indigo-900/30 transition-colors"
+      >
+        <MessageSquareText className="w-4 h-4 text-green-500" />
+        Ouvrir le chat
+      </button>
+      
+      <button
+        onClick={() => {
+          setSelectedChatbotId(chatbot.id);
+          setDocumentModalOpen(true);
+          onClose();
+        }}
+        className="w-full flex items-center gap-3 px-4 py-3 text-sm text-gray-700 dark:text-gray-300 hover:bg-blue-50 dark:hover:bg-blue-900/30 transition-colors"
+      >
+        <FileText className="w-4 h-4 text-blue-500" />
+        Gérer les documents
+      </button>
+      
+      <button
+        onClick={() => {
+          setSelectedChatbotId(chatbot.id);
+          setPgsqlModalOpen(true);
+          onClose();
+        }}
+        className="w-full flex items-center gap-3 px-4 py-3 text-sm text-gray-700 dark:text-gray-300 hover:bg-yellow-50 dark:hover:bg-yellow-900/30 transition-colors"
+      >
+        <Database className="w-4 h-4 text-yellow-500" />
+        Base de données
+      </button>
+      
+      <div className="border-t border-gray-200 dark:border-gray-600 my-2"></div>
+      
+      <button
+        onClick={() => {
+          setEditing(chatbot);
+          setModalOpen(true);
+          onClose();
+        }}
+        className="w-full flex items-center gap-3 px-4 py-3 text-sm text-gray-700 dark:text-gray-300 hover:bg-indigo-50 dark:hover:bg-indigo-900/30 transition-colors"
+      >
+        <Pencil className="w-4 h-4 text-indigo-500" />
+        Modifier
+      </button>
+      
+      <button
+        onClick={() => {
+          handleDelete(chatbot.id);
+          onClose();
+        }}
+        className="w-full flex items-center gap-3 px-4 py-3 text-sm text-red-600 dark:text-red-400 hover:bg-red-50 dark:hover:bg-red-900/30 transition-colors"
+      >
+        <Trash className="w-4 h-4" />
+        Supprimer
+      </button>
+    </div>
+  );
+
+  // Close dropdown when clicking outside
+  useEffect(() => {
+    const handleClickOutside = () => setActiveDropdown(null);
+    document.addEventListener('click', handleClickOutside);
+    return () => document.removeEventListener('click', handleClickOutside);
+  }, []);
+
   return (
-    <div className="min-h-screen bg-gradient-to-br from-indigo-50 via-white to-purple-50 dark:from-gray-900 dark:via-gray-800 dark:to-indigo-900 text-gray-800 dark:text-gray-100 flex justify-center px-4 py-8 transition-all duration-500">
-      <div className="w-full max-w-5xl space-y-6">
-        {/* Haut de page : recherche et actions */}
-        <div className="flex flex-col lg:flex-row lg:justify-between lg:items-center gap-4 mb-6">
-          {/* Zone de recherche */}
-          <div className="flex items-center gap-2 bg-white dark:bg-gray-700 px-4 py-2 rounded-xl shadow-sm w-full max-w-sm">
-            <Search className="w-4 h-4 text-gray-500" />
-            <input
-              value={search}
-              onChange={handleSearch}
-              placeholder="Rechercher..."
-              className="w-full bg-transparent outline-none text-gray-800 dark:text-white"
-            />
-          </div>
-
-          {/* Boutons vue & ajout */}
-          <div className="flex flex-col sm:flex-row lg:items-center gap-2 w-full lg:w-auto">
-            <div className="flex gap-2">
-              <button
-                onClick={() => setViewMode("table")}
-                className={`px-4 py-2 rounded-xl text-sm shadow flex items-center justify-center ${
-                  viewMode === "table"
-                    ? "bg-indigo-600 text-white"
-                    : "bg-gray-100 dark:bg-gray-700 dark:text-white"
-                }`}
-              >
-                <Table className="w-5 h-5" />
-              </button>
-              <button
-                onClick={() => setViewMode("cards")}
-                className={`px-4 py-2 rounded-xl text-sm shadow flex items-center justify-center ${
-                  viewMode === "cards"
-                    ? "bg-indigo-600 text-white"
-                    : "bg-gray-100 dark:bg-gray-700 dark:text-white"
-                }`}
-              >
-                <LayoutGrid className="w-5 h-5" />
-              </button>
+    <div className="min-h-screen bg-gradient-to-br from-indigo-50 via-white to-purple-50 dark:from-gray-900 dark:via-gray-800 dark:to-indigo-900 text-gray-800 dark:text-gray-100 transition-all duration-500">
+      <div className="container mx-auto px-4 py-8 max-w-7xl">
+        {/* Header avec statistiques */}
+        <div className="mb-8">
+          <div className="flex flex-col lg:flex-row lg:justify-between lg:items-start gap-6">
+            <div className="space-y-2">
+              <h1 className="text-4xl font-bold bg-gradient-to-r from-indigo-600 to-purple-600 bg-clip-text text-transparent">
+                Mes Chatbots
+              </h1>
+              <p className="text-gray-600 dark:text-gray-400 text-lg">
+                Gérez et configurez vos assistants intelligents
+              </p>
             </div>
-
-            <button
-              onClick={() => {
-                setEditing(null);
-                setModalOpen(true);
-              }}
-              className="bg-gradient-to-r from-indigo-600 to-purple-600 hover:scale-105 text-white font-semibold px-5 py-3 rounded-xl shadow-lg flex items-center justify-center gap-2 transition-all w-full sm:w-auto"
-            >
-              <Plus className="w-5 h-5 sm:w-4 sm:h-4" />
-              <span className="hidden sm:inline">Ajouter un chatbot</span>
-            </button>
+            
+            {/* Statistiques rapides */}
+            <div className="flex gap-4">
+              <div className="bg-white dark:bg-gray-800 rounded-2xl p-4 shadow-sm border border-gray-200 dark:border-gray-700">
+                <div className="flex items-center gap-3">
+                  <div className="p-2 bg-indigo-100 dark:bg-indigo-900/30 rounded-xl">
+                    <Users className="w-5 h-5 text-indigo-600 dark:text-indigo-400" />
+                  </div>
+                  <div>
+                    <p className="text-2xl font-bold text-gray-900 dark:text-white">{chatbots.length}</p>
+                    <p className="text-sm text-gray-500 dark:text-gray-400">Chatbots</p>
+                  </div>
+                </div>
+              </div>
+            </div>
           </div>
         </div>
 
-        {/* 🔄 Affichage loader ou contenu */}
+        {/* Barre d'outils améliorée */}
+        <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-sm border border-gray-200 dark:border-gray-700 p-6 mb-8">
+          <div className="flex flex-col lg:flex-row lg:justify-between lg:items-center gap-4">
+            {/* Recherche améliorée */}
+            <div className="relative flex-1 max-w-md">
+              <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
+                <Search className="w-5 h-5 text-gray-400" />
+              </div>
+              <input
+                value={search}
+                onChange={handleSearch}
+                placeholder="Rechercher un chatbot..."
+                className="w-full pl-12 pr-4 py-3 bg-gray-50 dark:bg-gray-700 border border-gray-200 dark:border-gray-600 rounded-xl focus:ring-2 focus:ring-indigo-500 focus:border-transparent outline-none transition-all duration-200 text-gray-900 dark:text-white placeholder-gray-500 dark:placeholder-gray-400"
+              />
+            </div>
+
+            {/* Actions */}
+            <div className="flex items-center gap-3">
+              {/* Boutons de vue */}
+              <div className="flex bg-gray-100 dark:bg-gray-700 rounded-xl p-1">
+                <button
+                  onClick={() => setViewMode("cards")}
+                  className={`px-4 py-2 rounded-lg text-sm font-medium transition-all duration-200 flex items-center gap-2 ${
+                    viewMode === "cards"
+                      ? "bg-white dark:bg-gray-600 text-indigo-600 dark:text-indigo-400 shadow-sm"
+                      : "text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white"
+                  }`}
+                >
+                  <LayoutGrid className="w-4 h-4" />
+                  <span className="hidden sm:inline">Cartes</span>
+                </button>
+                <button
+                  onClick={() => setViewMode("table")}
+                  className={`px-4 py-2 rounded-lg text-sm font-medium transition-all duration-200 flex items-center gap-2 ${
+                    viewMode === "table"
+                      ? "bg-white dark:bg-gray-600 text-indigo-600 dark:text-indigo-400 shadow-sm"
+                      : "text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white"
+                  }`}
+                >
+                  <Table className="w-4 h-4" />
+                  <span className="hidden sm:inline">Tableau</span>
+                </button>
+              </div>
+
+              {/* Bouton d'ajout */}
+              <button
+                onClick={() => {
+                  setEditing(null);
+                  setModalOpen(true);
+                }}
+                className="bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-700 hover:to-purple-700 text-white font-semibold px-6 py-3 rounded-xl shadow-lg hover:shadow-xl transform hover:scale-105 active:scale-95 transition-all duration-200 flex items-center gap-2"
+              >
+                <Plus className="w-5 h-5" />
+                <span className="hidden sm:inline">Nouveau chatbot</span>
+              </button>
+            </div>
+          </div>
+        </div>
+
+        {/* Contenu principal */}
         {loading ? (
-          <div className="flex justify-center items-center py-20">
-            <Loader2 className="w-10 h-10 animate-spin text-indigo-500" />
+          <div className="flex flex-col justify-center items-center py-20 space-y-4">
+            <div className="relative">
+              <div className="w-16 h-16 border-4 border-indigo-200 dark:border-indigo-800 rounded-full animate-pulse"></div>
+              <Loader2 className="w-8 h-8 text-indigo-600 absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 animate-spin" />
+            </div>
+            <p className="text-gray-600 dark:text-gray-400 text-lg">Chargement de vos chatbots...</p>
           </div>
         ) : viewMode === "table" ? (
-          // 📄 TABLE VIEW
-          <div className="overflow-x-auto bg-white dark:bg-gray-800 rounded-xl shadow-lg">
-            <table className="min-w-full table-auto text-sm text-left text-gray-700 dark:text-gray-200">
-              <thead className="bg-indigo-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300 uppercase text-xs">
-                <tr>
-                  <th className="px-6 py-3">Nom</th>
-                  <th className="px-6 py-3">Description</th>
-                  <th className="px-6 py-3 text-right">Actions</th>
-                </tr>
-              </thead>
-              <tbody>
-                {filtered.map((cb) => (
-                  <tr
-                    key={cb.id}
-                    className="border-b dark:border-gray-700 hover:bg-indigo-50 dark:hover:bg-gray-700/50 transition"
-                  >
-                    <td className="px-6 py-4 font-medium">
-                      <div className="flex items-center gap-2">
+          // Vue tableau améliorée
+          <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-sm border border-gray-200 dark:border-gray-700 overflow-hidden">
+            <div className="overflow-x-auto">
+              <table className="w-full">
+                <thead className="bg-gradient-to-r from-indigo-50 to-purple-50 dark:from-gray-700 dark:to-indigo-900/30">
+                  <tr>
+                    <th className="px-6 py-4 text-left text-sm font-semibold text-gray-900 dark:text-white">Chatbot</th>
+                    <th className="px-6 py-4 text-left text-sm font-semibold text-gray-900 dark:text-white">Description</th>
+                    <th className="px-6 py-4 text-left text-sm font-semibold text-gray-900 dark:text-white">Créé le</th>
+                    <th className="px-6 py-4 text-right text-sm font-semibold text-gray-900 dark:text-white">Actions</th>
+                  </tr>
+                </thead>
+                <tbody className="divide-y divide-gray-200 dark:divide-gray-700">
+                  {filtered.map((cb, index) => (
+                    <tr
+                      key={cb.id}
+                      className="hover:bg-gray-50 dark:hover:bg-gray-700/50 transition-all duration-200 group"
+                      style={{ animationDelay: `${index * 50}ms` }}
+                    >
+                      <td className="px-6 py-4">
+                        <div className="flex items-center gap-4">
+                          <div className="relative">
+                            {cb.avatar ? (
+                              <img
+                                src={cb.avatar}
+                                alt="avatar"
+                                className="w-12 h-12 rounded-xl object-cover shadow-sm ring-2 ring-gray-100 dark:ring-gray-700"
+                              />
+                            ) : (
+                              <div className="w-12 h-12 bg-gradient-to-br from-indigo-100 to-purple-100 dark:from-indigo-900/30 dark:to-purple-900/30 rounded-xl flex items-center justify-center">
+                                <Users className="w-6 h-6 text-indigo-600 dark:text-indigo-400" />
+                              </div>
+                            )}
+                            <div className="absolute -bottom-1 -right-1 w-4 h-4 bg-green-500 rounded-full border-2 border-white dark:border-gray-800"></div>
+                          </div>
+                          <div>
+                            <h3 className="font-semibold text-gray-900 dark:text-white text-lg">{cb.nom}</h3>
+                            <p className="text-sm text-gray-500 dark:text-gray-400">  ID: {cb.id}</p>
+                          </div>
+                        </div>
+                      </td>
+                      <td className="px-6 py-4">
+                        <p className="text-gray-700 dark:text-gray-300 max-w-xs truncate">
+                          {cb.description || "Aucune description"}
+                        </p>
+                      </td>
+                      <td className="px-6 py-4">
+                        <div className="flex items-center gap-2 text-sm text-gray-500 dark:text-gray-400">
+                          <Calendar className="w-4 h-4" />
+                          {new Date(cb.created_at).toLocaleDateString('fr-FR')}
+                        </div>
+                      </td>
+                      <td className="px-6 py-4">
+                        <div className="relative flex justify-end">
+                          <button
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              setActiveDropdown(activeDropdown === cb.id ? null : cb.id);
+                            }}
+                            className="p-2 text-gray-400 hover:text-gray-600 dark:hover:text-gray-300 rounded-xl hover:bg-gray-100 dark:hover:bg-gray-700 transition-all duration-200"
+                          >
+                            <MoreVertical className="w-5 h-5" />
+                          </button>
+                          {activeDropdown === cb.id && (
+                            <DropdownMenu 
+                              chatbot={cb} 
+                              onClose={() => setActiveDropdown(null)} 
+                            />
+                          )}
+                        </div>
+                      </td>
+                    </tr>
+                  ))}
+                  {filtered.length === 0 && (
+                    <tr>
+                      <td colSpan="4" className="px-6 py-12 text-center">
+                        <div className="space-y-3">
+                          <div className="w-16 h-16 bg-gray-100 dark:bg-gray-700 rounded-full flex items-center justify-center mx-auto">
+                            <Search className="w-8 h-8 text-gray-400" />
+                          </div>
+                          <p className="text-gray-500 dark:text-gray-400 text-lg">Aucun chatbot trouvé</p>
+                          <p className="text-sm text-gray-400 dark:text-gray-500">
+                            {search ? "Essayez un autre terme de recherche" : "Créez votre premier chatbot"}
+                          </p>
+                        </div>
+                      </td>
+                    </tr>
+                  )}
+                </tbody>
+              </table>
+            </div>
+          </div>
+        ) : (
+          // Vue cartes améliorée
+          <div className="space-y-6">
+            <div className="grid gap-6 grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
+              {filtered.map((cb, index) => (
+                <div
+                  key={cb.id}
+                  className="group bg-white dark:bg-gray-800 rounded-2xl shadow-sm hover:shadow-xl border border-gray-200 dark:border-gray-700  transform hover:scale-[1.02] transition-all duration-300"
+                  style={{ animationDelay: `${index * 100}ms` }}
+                >
+                  {/* Header de la carte */}
+                  <div className="relative p-6 pb-4">
+                    <div className="flex items-start justify-between mb-4">
+                      <div className="relative">
                         {cb.avatar ? (
                           <img
                             src={cb.avatar}
                             alt="avatar"
-                            className="w-8 h-8 rounded-full object-cover"
+                            className="w-16 h-16 rounded-2xl object-cover shadow-lg ring-4 ring-gray-100 dark:ring-gray-700"
                           />
                         ) : (
-                          <svg
-                            xmlns="http://www.w3.org/2000/svg"
-                            className="w-8 h-8 text-gray-400"
-                            fill="none"
-                            viewBox="0 0 24 24"
-                            stroke="currentColor"
-                          >
-                            <path
-                              strokeLinecap="round"
-                              strokeLinejoin="round"
-                              strokeWidth={2}
-                              d="M5.121 17.804A13.937 13.937 0 0112 15c2.477 0 4.779.676 6.879 1.804M15 11a3 3 0 11-6 0 3 3 0 016 0z"
-                            />
-                          </svg>
+                          <div className="w-16 h-16 bg-gradient-to-br from-indigo-100 to-purple-100 dark:from-indigo-900/30 dark:to-purple-900/30 rounded-2xl flex items-center justify-center shadow-lg">
+                            <Users className="w-8 h-8 text-indigo-600 dark:text-indigo-400" />
+                          </div>
                         )}
-                        <span>{cb.nom}</span>
+                        <div className="absolute -bottom-2 -right-2 w-6 h-6 bg-green-500 rounded-full border-3 border-white dark:border-gray-800 flex items-center justify-center">
+                          <Activity className="w-3 h-3 text-white" />
+                        </div>
                       </div>
-                    </td>
-                    <td className="px-6 py-4">{cb.description}</td>
-                    <td className="px-6 py-4 text-right flex flex-wrap justify-end gap-3">
-                      {/* boutons */}
-                      <button
-                        onClick={() => {
-                          setEditing(cb);
-                          setModalOpen(true);
-                        }}
-                        className="text-indigo-600 hover:text-indigo-800 dark:text-indigo-400 dark:hover:text-indigo-300"
-                      >
-                        <Pencil className="w-4 h-4" />
-                      </button>
-                      <button
-                        onClick={() => handleDelete(cb.id)}
-                        className="text-red-600 hover:text-red-800 dark:text-red-400 dark:hover:text-red-300"
-                      >
-                        <Trash className="w-4 h-4" />
-                      </button>
-                      <button
-                        onClick={() => navigate(`/chat/${cb.id}`)}
-                        className="text-green-600 hover:text-green-800 dark:text-green-400 dark:hover:text-green-300"
-                      >
-                        <MessageSquareText className="w-4 h-4" />
-                      </button>
-                      <button
-                        onClick={() => {
-                          setSelectedChatbotId(cb.id);
-                          setDocumentModalOpen(true);
-                        }}
-                        className="text-blue-600 hover:text-blue-800 dark:text-blue-400 dark:hover:text-blue-300 flex items-center gap-1"
-                      >
-                        <FileText className="w-5 h-5" />
-                      </button>
-                      <button
-                        onClick={() => {
-                          setSelectedChatbotId(cb.id);
-                          setPgsqlModalOpen(true);
-                        }}
-                        className="text-yellow-600 hover:text-yellow-800 dark:text-yellow-400 dark:hover:text-yellow-300"
-                        title="Connecter une base de données"
-                      >
-                        <Database className="w-5 h-5" />
-                      </button>
-                    </td>
-                  </tr>
-                ))}
-                {filtered.length === 0 && (
-                  <tr>
-                    <td
-                      colSpan="3"
-                      className="px-6 py-4 text-center text-gray-500"
-                    >
-                      Aucun chatbot trouvé.
-                    </td>
-                  </tr>
-                )}
-                {selectedForDocs && (
-                  <div className="mt-8">
-                    <div className="flex justify-between items-center mb-4">
-                      <h2 className="text-lg font-semibold text-indigo-600 dark:text-indigo-400">
-                        Documents liés à :{" "}
-                        <span className="italic">{selectedForDocs.nom}</span>
-                      </h2>
-                      <button
-                        onClick={() => setSelectedForDocs(null)}
-                        className="text-sm text-gray-600 dark:text-gray-300 hover:underline"
-                      >
-                        Fermer
-                      </button>
+                      
+                      <div className="relative">
+                        <button
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            setActiveDropdown(activeDropdown === cb.id ? null : cb.id);
+                          }}
+                          className="p-2 text-gray-400 hover:text-gray-600 dark:hover:text-gray-300 rounded-xl hover:bg-gray-100 dark:hover:bg-gray-700 transition-all duration-200 opacity-0 group-hover:opacity-100"
+                        >
+                          <MoreVertical className="w-5 h-5" />
+                        </button>
+                        {activeDropdown === cb.id && (
+                          <DropdownMenu 
+                            chatbot={cb} 
+                            onClose={() => setActiveDropdown(null)} 
+                          />
+                        )}
+                      </div>
                     </div>
-                    <ChatbotDocumentsManager
-                      chatbotId={selectedForDocs.id}
-                      ownerId={userId}
-                    />
-                  </div>
-                )}
-              </tbody>
-            </table>
-          </div>
-        ) : (
-          // 📦 CARDS VIEW
-          <div className="grid gap-4 grid-cols-1 sm:grid-cols-2 md:grid-cols-3">
-            {filtered.map((cb) => (
-              <div
-                key={cb.id}
-                className="bg-white dark:bg-gray-800 rounded-xl shadow p-5 space-y-3 transition hover:shadow-lg"
-              >
-                <div className="flex items-center justify-between">
-                  <h3
-                    onClick={() => navigate(`/chat/${cb.id}`)}
-                    className="text-lg font-semibold text-indigo-600 dark:text-indigo-400 cursor-pointer"
-                  >
-                    {cb.nom}
-                  </h3>
 
-                  {cb.avatar ? (
-                    <img
-                      src={cb.avatar}
-                      alt="avatar"
-                      className="w-10 h-10 rounded-full object-cover"
-                    />
-                  ) : (
-                    <svg
-                      xmlns="http://www.w3.org/2000/svg"
-                      className="w-10 h-10 text-gray-400"
-                      fill="none"
-                      viewBox="0 0 24 24"
-                      stroke="currentColor"
+                    <div 
+                      onClick={() => navigate(`/chat/${cb.id}`)}
+                      className="cursor-pointer space-y-2"
                     >
-                      <path
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
-                        strokeWidth={2}
-                        d="M5.121 17.804A13.937 13.937 0 0112 15c2.477 0 4.779.676 6.879 1.804M15 11a3 3 0 11-6 0 3 3 0 016 0z"
-                      />
-                    </svg>
-                  )}
-                </div>
+                      <h3 className="text-xl font-bold text-gray-900 dark:text-white group-hover:text-indigo-600 dark:group-hover:text-indigo-400 transition-colors line-clamp-1">
+                        {cb.nom}
+                      </h3>
+                      <p className="text-gray-600 dark:text-gray-400 text-sm line-clamp-2 leading-relaxed">
+                        {cb.description || "Aucune description disponible"}
+                      </p>
+                    </div>
+                  </div>
 
-                <p className="text-sm text-gray-600 dark:text-gray-300 line-clamp-1">
-                  {cb.description || "Aucune description"}
-                </p>
-                <div className="flex justify-between items-center pt-3 border-t border-gray-200 dark:border-gray-700">
-                  <div className="flex gap-2">
-                    {/* mêmes boutons */}
+                  {/* Footer de la carte */}
+                  <div className="px-6 pb-6">
+                    <div className="flex items-center justify-between pt-4 border-t border-gray-200 dark:border-gray-700">
+                      <div className="flex items-center gap-2 text-xs text-gray-500 dark:text-gray-400">
+                        <Calendar className="w-3 h-3" />
+                        {new Date(cb.created_at).toLocaleDateString('fr-FR')}
+                      </div>
+                      
+                      {/* Actions rapides */}
+                      <div className="flex gap-1 opacity-0 group-hover:opacity-100 transition-opacity duration-200">
+                        <ActionButton
+                          onClick={() => navigate(`/chat/${cb.id}`)}
+                          className="bg-green-100 hover:bg-green-200 dark:bg-green-900/30 dark:hover:bg-green-900/50 text-green-600 dark:text-green-400"
+                          tooltip="Ouvrir le chat"
+                        >
+                          <MessageSquareText className="w-4 h-4" />
+                        </ActionButton>
+                        
+                        <ActionButton
+                          onClick={() => {
+                            setSelectedChatbotId(cb.id);
+                            setDocumentModalOpen(true);
+                          }}
+                          className="bg-blue-100 hover:bg-blue-200 dark:bg-blue-900/30 dark:hover:bg-blue-900/50 text-blue-600 dark:text-blue-400"
+                          tooltip="Documents"
+                        >
+                          <FileText className="w-4 h-4" />
+                        </ActionButton>
+                        
+                        <ActionButton
+                          onClick={() => {
+                            setSelectedChatbotId(cb.id);
+                            setPgsqlModalOpen(true);
+                          }}
+                          className="bg-yellow-100 hover:bg-yellow-200 dark:bg-yellow-900/30 dark:hover:bg-yellow-900/50 text-yellow-600 dark:text-yellow-400"
+                          tooltip="Base de données"
+                        >
+                          <Database className="w-4 h-4" />
+                        </ActionButton>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              ))}
+            </div>
+
+            {/* État vide amélioré */}
+            {filtered.length === 0 && (
+              <div className="text-center py-16">
+                <div className="space-y-4">
+                  <div className="w-24 h-24 bg-gradient-to-br from-indigo-100 to-purple-100 dark:from-indigo-900/30 dark:to-purple-900/30 rounded-3xl flex items-center justify-center mx-auto">
+                    {search ? (
+                      <Search className="w-12 h-12 text-indigo-600 dark:text-indigo-400" />
+                    ) : (
+                      <Users className="w-12 h-12 text-indigo-600 dark:text-indigo-400" />
+                    )}
+                  </div>
+                  <div className="space-y-2">
+                    <h3 className="text-2xl font-bold text-gray-900 dark:text-white">
+                      {search ? "Aucun résultat" : "Aucun chatbot"}
+                    </h3>
+                    <p className="text-gray-600 dark:text-gray-400 max-w-md mx-auto">
+                      {search 
+                        ? "Essayez un autre terme de recherche ou créez un nouveau chatbot"
+                        : "Commencez par créer votre premier chatbot intelligent"
+                      }
+                    </p>
+                  </div>
+                  {!search && (
                     <button
                       onClick={() => {
-                        setEditing(cb);
+                        setEditing(null);
                         setModalOpen(true);
                       }}
-                      className="text-indigo-600 hover:text-indigo-800 dark:text-indigo-400 dark:hover:text-indigo-300"
+                      className="bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-700 hover:to-purple-700 text-white font-semibold px-8 py-4 rounded-xl shadow-lg hover:shadow-xl transform hover:scale-105 transition-all duration-200 inline-flex items-center gap-3"
                     >
-                      <Pencil className="w-4 h-4" />
+                      <Plus className="w-5 h-5" />
+                      Créer mon premier chatbot
                     </button>
-                    <button
-                      onClick={() => handleDelete(cb.id)}
-                      className="text-red-600 hover:text-red-800 dark:text-red-400 dark:hover:text-red-300"
-                    >
-                      <Trash className="w-4 h-4" />
-                    </button>
-                    <button
-                      onClick={() => navigate(`/chat/${cb.id}`)}
-                      className="text-green-600 hover:text-green-800 dark:text-green-400 dark:hover:text-green-300"
-                    >
-                      <MessageSquareText className="w-4 h-4" />
-                    </button>
-                    <button
-                      onClick={() => {
-                        setSelectedChatbotId(cb.id);
-                        setDocumentModalOpen(true);
-                      }}
-                      className="text-blue-600 hover:text-blue-800 dark:text-blue-400 dark:hover:text-blue-300"
-                    >
-                      <FileText className="w-4 h-4" />
-                    </button>
-                    <button
-                      onClick={() => {
-                        setSelectedChatbotId(cb.id);
-                        setPgsqlModalOpen(true);
-                      }}
-                      className="text-yellow-600 hover:text-yellow-800 dark:text-yellow-400 dark:hover:text-yellow-300"
-                      title="Connecter une base de données"
-                    >
-                      <Database className="w-5 h-5" />
-                    </button>
-                  </div>
+                  )}
                 </div>
-              </div>
-            ))}
-            {filtered.length === 0 && (
-              <div className="text-center col-span-full text-gray-500 dark:text-gray-300">
-                Aucun chatbot trouvé.
               </div>
             )}
           </div>
@@ -380,6 +546,7 @@ export default function ChatbotManager() {
             existing={editing}
           />
         )}
+        
         <Modal
           open={documentModalOpen}
           onClose={() => setDocumentModalOpen(false)}
@@ -388,6 +555,7 @@ export default function ChatbotManager() {
             <ChatbotDocumentsManager chatbotId={selectedChatbotId} />
           )}
         </Modal>
+        
         <Modal open={pgsqlModalOpen} onClose={() => setPgsqlModalOpen(false)}>
           {selectedChatbotId && (
             <ChatbotPostgresqlManager chatbotId={selectedChatbotId} />
