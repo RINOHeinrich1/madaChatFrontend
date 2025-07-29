@@ -396,7 +396,7 @@ export default function PgsqlConnexionForm() {
               className="w-full sm:w-auto bg-blue-600 hover:bg-blue-700 text-white font-semibold px-8 py-4 rounded-xl flex justify-center items-center gap-3 transition-all duration-300 shadow-lg hover:shadow-xl disabled:opacity-50 disabled:cursor-not-allowed"
             >
               <Database className="w-5 h-5" />
-              Vectorisation
+              Intégration
             </button>
           </div>
 

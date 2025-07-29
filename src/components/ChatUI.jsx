@@ -6,6 +6,7 @@ import { nanoid } from "nanoid";
 import TypingIndicator from "../ui/TypingIndicator";
 import ReactMarkdown from "react-markdown";
 import { Eye } from "lucide-react"; // ajoute l'import
+import LogsDisplay from "../ui/LogDisplay";
 
 export default function ChatUI({ chatbot_id }) {
   const [question, setQuestion] = useState("");
@@ -296,15 +297,8 @@ export default function ChatUI({ chatbot_id }) {
                   showLogIndex === idx &&
                   msg.logs &&
                   msg.logs.length > 0 && (
-                    <div className="mt-2 p-2 border rounded bg-gray-200 dark:bg-gray-700 text-xs text-gray-800 dark:text-gray-200 whitespace-pre-wrap max-w-[80%]">
-                      <h4 className="font-semibold mb-1">Logs :</h4>
-                      <ul className="list-disc list-inside space-y-1">
-                        {msg.logs.map((log, i) => (
-                          <li key={i} className="break-words">
-                            {cleanText(log)}
-                          </li>
-                        ))}
-                      </ul>
+                    <div className="mt-2 max-w-[80%]">
+                      <LogsDisplay logs={msg.logs} />
                     </div>
                   )}
               </div>
