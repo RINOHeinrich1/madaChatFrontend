@@ -490,7 +490,7 @@ export default function ChatbotManager() {
                       </div>
 
                       {/* Actions rapides */}
-                      <div className="flex gap-1 opacity-0 group-hover:opacity-100 transition-opacity duration-200">
+                      <div className="flex gap-1 opacity-100 sm:opacity-0 sm:group-hover:opacity-100 transition-opacity duration-200">
                         <ActionButton
                           onClick={() => navigate(`/chat/${cb.id}`)}
                           className="bg-green-100 hover:bg-green-200 dark:bg-green-900/30 dark:hover:bg-green-900/50 text-green-600 dark:text-green-400"
