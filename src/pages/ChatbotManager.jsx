@@ -205,7 +205,7 @@ export default function ChatbotManager() {
           <div className="flex flex-col lg:flex-row lg:justify-between lg:items-start gap-6">
             <div className="space-y-2">
               <h1 className="text-4xl font-bold bg-gradient-to-r from-indigo-600 to-purple-600 bg-clip-text text-transparent">
-                Mes Chatbots
+                Vos Chatbots
               </h1>
               <p className="text-gray-600 dark:text-gray-400 text-lg">
                 Gérez et configurez vos assistants intelligents
