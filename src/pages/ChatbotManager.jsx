@@ -92,10 +92,10 @@ export default function ChatbotManager() {
       confirmButtonText: "Supprimer",
       cancelButtonText: "Annuler",
       customClass: {
-        popup: 'rounded-2xl',
-        confirmButton: 'rounded-xl',
-        cancelButton: 'rounded-xl'
-      }
+        popup: "rounded-2xl",
+        confirmButton: "rounded-xl",
+        cancelButton: "rounded-xl",
+      },
     });
 
     if (confirm.isConfirmed) {
@@ -108,9 +108,9 @@ export default function ChatbotManager() {
           text: "Le chatbot a été supprimé.",
           icon: "success",
           customClass: {
-            popup: 'rounded-2xl',
-            confirmButton: 'rounded-xl'
-          }
+            popup: "rounded-2xl",
+            confirmButton: "rounded-xl",
+          },
         });
       }
     }
@@ -138,7 +138,7 @@ export default function ChatbotManager() {
         <MessageSquareText className="w-4 h-4 text-green-500" />
         Ouvrir le chat
       </button>
-      
+
       <button
         onClick={() => {
           setSelectedChatbotId(chatbot.id);
@@ -150,7 +150,7 @@ export default function ChatbotManager() {
         <FileText className="w-4 h-4 text-blue-500" />
         Gérer les documents
       </button>
-      
+
       <button
         onClick={() => {
           setSelectedChatbotId(chatbot.id);
@@ -162,9 +162,9 @@ export default function ChatbotManager() {
         <Database className="w-4 h-4 text-yellow-500" />
         Base de données
       </button>
-      
+
       <div className="border-t border-gray-200 dark:border-gray-600 my-2"></div>
-      
+
       <button
         onClick={() => {
           setEditing(chatbot);
@@ -176,7 +176,7 @@ export default function ChatbotManager() {
         <Pencil className="w-4 h-4 text-indigo-500" />
         Modifier
       </button>
-      
+
       <button
         onClick={() => {
           handleDelete(chatbot.id);
@@ -193,8 +193,8 @@ export default function ChatbotManager() {
   // Close dropdown when clicking outside
   useEffect(() => {
     const handleClickOutside = () => setActiveDropdown(null);
-    document.addEventListener('click', handleClickOutside);
-    return () => document.removeEventListener('click', handleClickOutside);
+    document.addEventListener("click", handleClickOutside);
+    return () => document.removeEventListener("click", handleClickOutside);
   }, []);
 
   return (
@@ -211,7 +211,7 @@ export default function ChatbotManager() {
                 Gérez et configurez vos assistants intelligents
               </p>
             </div>
-            
+
             {/* Statistiques rapides */}
             <div className="flex gap-4">
               <div className="bg-white dark:bg-gray-800 rounded-2xl p-4 shadow-sm border border-gray-200 dark:border-gray-700">
@@ -220,8 +220,12 @@ export default function ChatbotManager() {
                     <Users className="w-5 h-5 text-indigo-600 dark:text-indigo-400" />
                   </div>
                   <div>
-                    <p className="text-2xl font-bold text-gray-900 dark:text-white">{chatbots.length}</p>
-                    <p className="text-sm text-gray-500 dark:text-gray-400">Chatbots</p>
+                    <p className="text-2xl font-bold text-gray-900 dark:text-white">
+                      {chatbots.length}
+                    </p>
+                    <p className="text-sm text-gray-500 dark:text-gray-400">
+                      Chatbots
+                    </p>
                   </div>
                 </div>
               </div>
@@ -295,7 +299,9 @@ export default function ChatbotManager() {
               <div className="w-16 h-16 border-4 border-indigo-200 dark:border-indigo-800 rounded-full animate-pulse"></div>
               <Loader2 className="w-8 h-8 text-indigo-600 absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 animate-spin" />
             </div>
-            <p className="text-gray-600 dark:text-gray-400 text-lg">Chargement de vos chatbots...</p>
+            <p className="text-gray-600 dark:text-gray-400 text-lg">
+              Chargement de vos chatbots...
+            </p>
           </div>
         ) : viewMode === "table" ? (
           // Vue tableau améliorée
@@ -304,10 +310,18 @@ export default function ChatbotManager() {
               <table className="w-full">
                 <thead className="bg-gradient-to-r from-indigo-50 to-purple-50 dark:from-gray-700 dark:to-indigo-900/30">
                   <tr>
-                    <th className="px-6 py-4 text-left text-sm font-semibold text-gray-900 dark:text-white">Chatbot</th>
-                    <th className="px-6 py-4 text-left text-sm font-semibold text-gray-900 dark:text-white">Description</th>
-                    <th className="px-6 py-4 text-left text-sm font-semibold text-gray-900 dark:text-white">Créé le</th>
-                    <th className="px-6 py-4 text-right text-sm font-semibold text-gray-900 dark:text-white">Actions</th>
+                    <th className="px-6 py-4 text-left text-sm font-semibold text-gray-900 dark:text-white">
+                      Chatbot
+                    </th>
+                    <th className="px-6 py-4 text-left text-sm font-semibold text-gray-900 dark:text-white">
+                      Description
+                    </th>
+                    <th className="px-6 py-4 text-left text-sm font-semibold text-gray-900 dark:text-white">
+                      Créé le
+                    </th>
+                    <th className="px-6 py-4 text-right text-sm font-semibold text-gray-900 dark:text-white">
+                      Actions
+                    </th>
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-gray-200 dark:divide-gray-700">
@@ -334,8 +348,13 @@ export default function ChatbotManager() {
                             <div className="absolute -bottom-1 -right-1 w-4 h-4 bg-green-500 rounded-full border-2 border-white dark:border-gray-800"></div>
                           </div>
                           <div>
-                            <h3 className="font-semibold text-gray-900 dark:text-white text-lg">{cb.nom}</h3>
-                            <p className="text-sm text-gray-500 dark:text-gray-400">  ID: {cb.id}</p>
+                            <h3 className="font-semibold text-gray-900 dark:text-white text-lg">
+                              {cb.nom}
+                            </h3>
+                            <p className="text-sm text-gray-500 dark:text-gray-400">
+                              {" "}
+                              ID: {cb.id}
+                            </p>
                           </div>
                         </div>
                       </td>
@@ -347,7 +366,7 @@ export default function ChatbotManager() {
                       <td className="px-6 py-4">
                         <div className="flex items-center gap-2 text-sm text-gray-500 dark:text-gray-400">
                           <Calendar className="w-4 h-4" />
-                          {new Date(cb.created_at).toLocaleDateString('fr-FR')}
+                          {new Date(cb.created_at).toLocaleDateString("fr-FR")}
                         </div>
                       </td>
                       <td className="px-6 py-4">
@@ -355,16 +374,18 @@ export default function ChatbotManager() {
                           <button
                             onClick={(e) => {
                               e.stopPropagation();
-                              setActiveDropdown(activeDropdown === cb.id ? null : cb.id);
+                              setActiveDropdown(
+                                activeDropdown === cb.id ? null : cb.id
+                              );
                             }}
                             className="p-2 text-gray-400 hover:text-gray-600 dark:hover:text-gray-300 rounded-xl hover:bg-gray-100 dark:hover:bg-gray-700 transition-all duration-200"
                           >
                             <MoreVertical className="w-5 h-5" />
                           </button>
                           {activeDropdown === cb.id && (
-                            <DropdownMenu 
-                              chatbot={cb} 
-                              onClose={() => setActiveDropdown(null)} 
+                            <DropdownMenu
+                              chatbot={cb}
+                              onClose={() => setActiveDropdown(null)}
                             />
                           )}
                         </div>
@@ -378,9 +399,13 @@ export default function ChatbotManager() {
                           <div className="w-16 h-16 bg-gray-100 dark:bg-gray-700 rounded-full flex items-center justify-center mx-auto">
                             <Search className="w-8 h-8 text-gray-400" />
                           </div>
-                          <p className="text-gray-500 dark:text-gray-400 text-lg">Aucun chatbot trouvé</p>
+                          <p className="text-gray-500 dark:text-gray-400 text-lg">
+                            Aucun chatbot trouvé
+                          </p>
                           <p className="text-sm text-gray-400 dark:text-gray-500">
-                            {search ? "Essayez un autre terme de recherche" : "Créez votre premier chatbot"}
+                            {search
+                              ? "Essayez un autre terme de recherche"
+                              : "Créez votre premier chatbot"}
                           </p>
                         </div>
                       </td>
@@ -419,27 +444,31 @@ export default function ChatbotManager() {
                           <Activity className="w-3 h-3 text-white" />
                         </div>
                       </div>
-                      
+
                       <div className="relative">
                         <button
                           onClick={(e) => {
                             e.stopPropagation();
-                            setActiveDropdown(activeDropdown === cb.id ? null : cb.id);
+                            setActiveDropdown(
+                              activeDropdown === cb.id ? null : cb.id
+                            );
                           }}
-                          className="p-2 text-gray-400 hover:text-gray-600 dark:hover:text-gray-300 rounded-xl hover:bg-gray-100 dark:hover:bg-gray-700 transition-all duration-200 opacity-0 group-hover:opacity-100"
+                          className="p-2 text-gray-400 hover:text-gray-600 dark:hover:text-gray-300 rounded-xl hover:bg-gray-100 dark:hover:bg-gray-700 transition-all duration-200 
+  opacity-100 sm:opacity-0 sm:group-hover:opacity-100"
                         >
                           <MoreVertical className="w-5 h-5" />
                         </button>
+
                         {activeDropdown === cb.id && (
-                          <DropdownMenu 
-                            chatbot={cb} 
-                            onClose={() => setActiveDropdown(null)} 
+                          <DropdownMenu
+                            chatbot={cb}
+                            onClose={() => setActiveDropdown(null)}
                           />
                         )}
                       </div>
                     </div>
 
-                    <div 
+                    <div
                       onClick={() => navigate(`/chat/${cb.id}`)}
                       className="cursor-pointer space-y-2"
                     >
@@ -457,9 +486,9 @@ export default function ChatbotManager() {
                     <div className="flex items-center justify-between pt-4 border-t border-gray-200 dark:border-gray-700">
                       <div className="flex items-center gap-2 text-xs text-gray-500 dark:text-gray-400">
                         <Calendar className="w-3 h-3" />
-                        {new Date(cb.created_at).toLocaleDateString('fr-FR')}
+                        {new Date(cb.created_at).toLocaleDateString("fr-FR")}
                       </div>
-                      
+
                       {/* Actions rapides */}
                       <div className="flex gap-1 opacity-0 group-hover:opacity-100 transition-opacity duration-200">
                         <ActionButton
@@ -469,7 +498,7 @@ export default function ChatbotManager() {
                         >
                           <MessageSquareText className="w-4 h-4" />
                         </ActionButton>
-                        
+
                         <ActionButton
                           onClick={() => {
                             setSelectedChatbotId(cb.id);
@@ -480,7 +509,7 @@ export default function ChatbotManager() {
                         >
                           <FileText className="w-4 h-4" />
                         </ActionButton>
-                        
+
                         <ActionButton
                           onClick={() => {
                             setSelectedChatbotId(cb.id);
@@ -514,10 +543,9 @@ export default function ChatbotManager() {
                       {search ? "Aucun résultat" : "Aucun chatbot"}
                     </h3>
                     <p className="text-gray-600 dark:text-gray-400 max-w-md mx-auto">
-                      {search 
+                      {search
                         ? "Essayez un autre terme de recherche ou créez un nouveau chatbot"
-                        : "Commencez par créer votre premier chatbot intelligent"
-                      }
+                        : "Commencez par créer votre premier chatbot intelligent"}
                     </p>
                   </div>
                   {!search && (
@@ -546,7 +574,7 @@ export default function ChatbotManager() {
             existing={editing}
           />
         )}
-        
+
         <Modal
           open={documentModalOpen}
           onClose={() => setDocumentModalOpen(false)}
@@ -555,7 +583,7 @@ export default function ChatbotManager() {
             <ChatbotDocumentsManager chatbotId={selectedChatbotId} />
           )}
         </Modal>
-        
+
         <Modal open={pgsqlModalOpen} onClose={() => setPgsqlModalOpen(false)}>
           {selectedChatbotId && (
             <ChatbotPostgresqlManager chatbotId={selectedChatbotId} />
