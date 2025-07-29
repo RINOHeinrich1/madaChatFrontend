@@ -18,6 +18,7 @@ import PgsqlVariableManager from "../pages/PgsqlVariableForm";
 import PgsqlTemplateManager from "./PgsqlTemplateManager";
 import PgsqlConnexionForm from "../pages/PgsqlConnexionForm";
 import Help from "../pages/HelpPage";
+import SoonPage from "../pages/SoonPage";
 function PrivateRoute({ children }) {
   const { user, loading } = useAuth();
 
@@ -147,6 +148,14 @@ export default function AppLayout() {
           element={
             <PrivateRoute>
               <PgsqlConnexionForm />
+            </PrivateRoute>
+          }
+        />
+            <Route
+          path="/mongodb"
+          element={
+            <PrivateRoute>
+              <SoonPage />
             </PrivateRoute>
           }
         />

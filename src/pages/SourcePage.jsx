@@ -18,6 +18,13 @@ const sources = [
     icon: Database,
     path: "/pgsql",
   },
+  {
+    title: "Base de données MongoDB",
+    description: "Connexion à une base MongoDB pour extraire des réponses",
+    icon: Database,
+    path: "/mongodb",
+    soon: true,
+  },
 ];
 
 export default function SourcePage() {
@@ -59,19 +66,28 @@ export default function SourcePage() {
 
         {/* Source Cards */}
         <div className="grid md:grid-cols-2 gap-8 animate-slide-up">
-          {sources.map(({ title, description, icon: Icon, path }, index) => (
-            <div
-              key={index}
-              onClick={() => navigate(path)}
-              className="bg-white/80 dark:bg-gray-800/80 backdrop-blur-xl border border-white/30 dark:border-gray-700/60 rounded-3xl shadow-xl p-6 cursor-pointer transition-all duration-300 hover:shadow-2xl hover:scale-[1.02] hover:border-indigo-500"
-            >
-              <div className="flex items-center gap-3 mb-3 text-indigo-600 dark:text-indigo-400">
-                <Icon className="w-6 h-6" />
-                <h2 className="text-xl font-semibold">{title}</h2>
+          {sources.map(
+            ({ title, description, icon: Icon, path, soon }, index) => (
+              <div
+                key={index}
+                onClick={() => navigate(path)}
+                className="relative bg-white/80 dark:bg-gray-800/80 backdrop-blur-xl border border-white/30 dark:border-gray-700/60 rounded-3xl shadow-xl p-6 cursor-pointer transition-all duration-300 hover:shadow-2xl hover:scale-[1.02] hover:border-indigo-500"
+              >
+                {soon && (
+                  <span className="absolute top-4 right-4 bg-yellow-200 text-yellow-800 text-xs font-semibold px-2 py-0.5 rounded-full">
+                    Bientôt
+                  </span>
+                )}
+                <div className="flex items-center gap-3 mb-3 text-indigo-600 dark:text-indigo-400">
+                  <Icon className="w-6 h-6" />
+                  <h2 className="text-xl font-semibold">{title}</h2>
+                </div>
+                <p className="text-gray-700 dark:text-gray-300">
+                  {description}
+                </p>
               </div>
-              <p className="text-gray-700 dark:text-gray-300">{description}</p>
-            </div>
-          ))}
+            )
+          )}
         </div>
       </div>
     </div>
