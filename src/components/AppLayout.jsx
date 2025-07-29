@@ -17,6 +17,7 @@ import PgsqlConnexionManager from "../pages/PgsqlConnexionManager";
 import PgsqlVariableManager from "../pages/PgsqlVariableForm";
 import PgsqlTemplateManager from "./PgsqlTemplateManager";
 import PgsqlConnexionForm from "../pages/PgsqlConnexionForm";
+import Help from "../pages/HelpPage";
 function PrivateRoute({ children }) {
   const { user, loading } = useAuth();
 
@@ -44,6 +45,7 @@ export default function AppLayout() {
       {!hideSidebar && user && <Sidebar />}
       <Routes>
         <Route path="/login" element={<LoginPage />} />
+        <Route path="/helps" element={<Help />} />
         <Route path="/chat-widget/:chatbot_id" element={<ChatWidget />} />
         <Route path="/register" element={<RegisterPage />} />
         {/* Routes protégées */}

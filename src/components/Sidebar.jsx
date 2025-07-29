@@ -7,6 +7,7 @@ import {
   LogOut,
   Menu,
   List,
+  HelpCircle,
   User,
 } from "lucide-react";
 import { supabase } from "../lib/supabaseClient";
@@ -23,12 +24,12 @@ export default function Sidebar() {
       ? "bg-indigo-700 text-white font-semibold"
       : "text-indigo-300 hover:bg-indigo-600 hover:text-white";
 
-const menuItems = [
-  { label: "Chatbots", icon: List, to: "/chatbots" },
-  { label: "Fine-Tune", icon: Cpu, to: "/finetune" },
-  { label: "Sources", icon: BookOpen, to: "/sources" }, 
-];
-
+  const menuItems = [
+    { label: "Chatbots", icon: List, to: "/chatbots" },
+    { label: "Fine-Tune", icon: Cpu, to: "/finetune" },
+    { label: "Sources", icon: BookOpen, to: "/sources" },
+    { label: "Aides", icon: HelpCircle, to: "/helps" },
+  ];
 
   const handleLogout = async () => {
     await supabase.auth.signOut();
@@ -110,7 +111,8 @@ const menuItems = [
 
         {/* ✅ Groupe Profil + Déconnexion */}
         <div className="flex flex-col">
-          <div onClick={goToProfile}
+          <div
+            onClick={goToProfile}
             className={`flex items-center py-3 mx-2 rounded-lg text-indigo-300 hover:bg-indigo-600 hover:text-white transition select-none cursor-default ${
               expanded || visible
                 ? "gap-4 px-6 justify-start"
