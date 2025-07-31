@@ -23,9 +23,11 @@ import {
   Calendar,
   Users,
   Activity,
+  Wifi,
 } from "lucide-react";
 import Modal from "../ui/Modal";
 import ChatbotPostgresqlManager from "../components/ChatbotPostgresqlManager";
+import ChatbotSlotManager from "../components/ChatbotSlotManager";
 
 export default function ChatbotManager() {
   const navigate = useNavigate();
@@ -40,6 +42,7 @@ export default function ChatbotManager() {
   const [selectedChatbotId, setSelectedChatbotId] = useState(null);
   const [viewMode, setViewMode] = useState("cards");
   const [pgsqlModalOpen, setPgsqlModalOpen] = useState(false);
+  const [slotModalOpen, setSlotModalOpen] = useState(false);
   const [loading, setLoading] = useState(false);
   const [activeDropdown, setActiveDropdown] = useState(null);
 
@@ -175,6 +178,18 @@ export default function ChatbotManager() {
       >
         <Pencil className="w-4 h-4 text-indigo-500" />
         Modifier
+      </button>
+
+      <button
+        onClick={() => {
+          setSelectedChatbotId(chatbot.id);
+          setSlotModalOpen(true);
+          onClose();
+        }}
+        className="w-full flex items-center gap-3 px-4 py-3 text-sm text-gray-700 dark:text-gray-300 hover:bg-purple-50 dark:hover:bg-purple-900/30 transition-colors"
+      >
+        <Wifi className="w-4 h-4 text-purple-500" />
+        Connecter à un slot
       </button>
 
       <button
@@ -520,6 +535,17 @@ export default function ChatbotManager() {
                         >
                           <Database className="w-4 h-4" />
                         </ActionButton>
+
+                        <ActionButton
+                          onClick={() => {
+                            setSelectedChatbotId(cb.id);
+                            setSlotModalOpen(true);
+                          }}
+                          className="bg-purple-100 hover:bg-purple-200 dark:bg-purple-900/30 dark:hover:bg-purple-900/50 text-purple-600 dark:text-purple-400"
+                          tooltip="Connecter à un slot"
+                        >
+                          <Wifi className="w-4 h-4" />
+                        </ActionButton>
                       </div>
                     </div>
                   </div>
@@ -587,6 +613,15 @@ export default function ChatbotManager() {
         <Modal open={pgsqlModalOpen} onClose={() => setPgsqlModalOpen(false)}>
           {selectedChatbotId && (
             <ChatbotPostgresqlManager chatbotId={selectedChatbotId} />
+          )}
+        </Modal>
+
+        <Modal open={slotModalOpen} onClose={() => setSlotModalOpen(false)}>
+          {selectedChatbotId && (
+            <ChatbotSlotManager 
+              chatbotId={selectedChatbotId}
+              onClose={() => setSlotModalOpen(false)}
+            />
           )}
         </Modal>
       </div>

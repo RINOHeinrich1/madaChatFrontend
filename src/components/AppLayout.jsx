@@ -18,6 +18,7 @@ import PgsqlVariableManager from "../pages/PgsqlVariableForm";
 import PgsqlTemplateManager from "./PgsqlTemplateManager";
 import PgsqlConnexionForm from "../pages/PgsqlConnexionForm";
 import Help from "../pages/HelpPage";
+import SlotManager from "./SlotForm";
 import SoonPage from "../pages/SoonPage";
 function PrivateRoute({ children }) {
   const { user, loading } = useAuth();
@@ -151,11 +152,19 @@ export default function AppLayout() {
             </PrivateRoute>
           }
         />
-            <Route
+        <Route
           path="/mongodb"
           element={
             <PrivateRoute>
               <SoonPage />
+            </PrivateRoute>
+          }
+        />
+        <Route
+          path="/slots"
+          element={
+            <PrivateRoute>
+              <SlotManager />
             </PrivateRoute>
           }
         />

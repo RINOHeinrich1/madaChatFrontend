@@ -9,6 +9,7 @@ import {
   List,
   HelpCircle,
   User,
+  PipetteIcon
 } from "lucide-react";
 import { supabase } from "../lib/supabaseClient";
 
@@ -28,6 +29,7 @@ export default function Sidebar() {
     { label: "Chatbots", icon: List, to: "/chatbots" },
     { label: "Fine-Tune", icon: Cpu, to: "/finetune" },
     { label: "Sources", icon: BookOpen, to: "/sources" },
+    {label:"Slots",icon:PipetteIcon,to:"/slots"},
     { label: "Aides", icon: HelpCircle, to: "/helps" },
   ];
 

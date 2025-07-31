@@ -22,6 +22,18 @@ export default function ChatUI({ chatbot_id }) {
       },
     ];
   });
+  const [slotState, setSlotState] = useState(() => {
+    const saved = localStorage.getItem(`slot_state_${chatbot_id}`);
+    return saved ? JSON.parse(saved) : null;
+  });
+  useEffect(() => {
+    if (chatbot_id && slotState) {
+      localStorage.setItem(
+        `slot_state_${chatbot_id}`,
+        JSON.stringify(slotState)
+      );
+    }
+  }, [slotState, chatbot_id]);
 
   const [loading, setLoading] = useState(false);
   const chatEndRef = useRef(null);
@@ -133,7 +145,15 @@ export default function ChatUI({ chatbot_id }) {
 
       const limitedHistory = fullHistory.slice(-limit);
 
-      const res = await askQuestion(trimmed, chatbot_id, [], limitedHistory);
+      const res = await askQuestion(
+        trimmed,
+        chatbot_id,
+        slotState,
+        limitedHistory
+      );
+      if (res.slot_state) {
+        setSlotState(res.slot_state);
+      }
 
       setMessages((prev) => [
         ...prev,
