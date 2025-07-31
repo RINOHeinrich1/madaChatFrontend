@@ -23,7 +23,7 @@ import {
   Calendar,
   Users,
   Activity,
-  Wifi,
+  PipetteIcon,
 } from "lucide-react";
 import Modal from "../ui/Modal";
 import ChatbotPostgresqlManager from "../components/ChatbotPostgresqlManager";
@@ -188,7 +188,7 @@ export default function ChatbotManager() {
         }}
         className="w-full flex items-center gap-3 px-4 py-3 text-sm text-gray-700 dark:text-gray-300 hover:bg-purple-50 dark:hover:bg-purple-900/30 transition-colors"
       >
-        <Wifi className="w-4 h-4 text-purple-500" />
+        <PipetteIcon className="w-4 h-4 text-purple-500" />
         Connecter à un slot
       </button>
 
@@ -544,7 +544,7 @@ export default function ChatbotManager() {
                           className="bg-purple-100 hover:bg-purple-200 dark:bg-purple-900/30 dark:hover:bg-purple-900/50 text-purple-600 dark:text-purple-400"
                           tooltip="Connecter à un slot"
                         >
-                          <Wifi className="w-4 h-4" />
+                          <PipetteIcon className="w-4 h-4" />
                         </ActionButton>
                       </div>
                     </div>
