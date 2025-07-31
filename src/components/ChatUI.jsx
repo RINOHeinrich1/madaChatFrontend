@@ -187,6 +187,7 @@ export default function ChatUI({ chatbot_id }) {
   const clearChat = () => {
     if (chatbot_id) {
       localStorage.removeItem(`chat_history_${chatbot_id}`);
+      localStorage.removeItem(`slot_state_${chatbot_id}`);
     }
     setMessages([
       {
