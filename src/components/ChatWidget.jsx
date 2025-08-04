@@ -1,4 +1,4 @@
-import { useParams } from "react-router-dom";
+import { useParams, useSearchParams } from "react-router-dom";
 import { useEffect, useState } from "react";
 import { supabase } from "../lib/supabaseClient";
 import ChatUI from "./ChatUI";
@@ -12,49 +12,47 @@ export const SpinnerLoaderComponent = () => {
   );
 };
 
-
 export default function ChatWidget() {
   const { chatbot_id } = useParams();
-  const [isAllowed, setIsAllowed] = useState(null); // null: loading, true: ok, false: interdit
+  const [searchParams] = useSearchParams();
+  const [isAllowed, setIsAllowed] = useState(null);
   const [error, setError] = useState("");
 
-  useEffect(() => {
-    const checkAccess = async () => {
-      try {
-        const { data, error } = await supabase
-          .from("chatbots")
-          .select("allowed_url")
-          .eq("id", chatbot_id)
-          .limit(1)
-       
+  const themeFromURL = searchParams.get("theme") || "light";
+useEffect(() => {
+  const checkAccess = async () => {
+    try {
+      const { data, error } = await supabase
+        .from("chatbots")
+        .select("allowed_url")
+        .eq("id", chatbot_id)
+        .limit(1); // on ne met pas .single()
 
-        if (error) throw error;
-        if (!data) throw new Error("Chatbot introuvable");
+      if (error) throw error;
 
-        const allowed = data.allowed_url
-          ?.split(",")
-          .map((u) => u.trim())
-          .filter(Boolean);
 
-        const currentOrigin = window.location.origin;
 
-        if (!allowed || allowed.length === 0 || allowed.includes(currentOrigin)) {
-          console.log("allowed");
-          setIsAllowed(true);
-        } else {
-          console.log("not allowed:", allowed);
-          console.log(currentOrigin);
-          setIsAllowed(false);
-        }
-      } catch (err) {
-        console.error(err);
-        setError(err.message || "Erreur d'autorisation");
-        setIsAllowed(false);
-      }
-    };
+      const allowedRaw = data[0]?.allowed_url || "";
+      const allowed = allowedRaw
+        .split(",")
+        .map((u) => u.trim())
+        .filter(Boolean);
 
-    checkAccess();
-  }, [chatbot_id]);
+      const currentOrigin = window.location.origin;
+
+      const isAllowedDomain =
+        allowed.length === 0 || allowed.includes(currentOrigin);
+
+      setIsAllowed(isAllowedDomain);
+    } catch (err) {
+      console.error(err);
+      setError(err.message || "Erreur d'autorisation");
+      setIsAllowed(false);
+    }
+  };
+
+  checkAccess();
+}, [chatbot_id]);
 
   if (isAllowed === null) {
     return <SpinnerLoaderComponent />;
@@ -62,7 +60,7 @@ export default function ChatWidget() {
 
   if (!isAllowed) {
     return (
-      <div className="flex items-center justify-center h-screen text-red-500 font-semibold text-lg">
+      <div className="flex items-center justify-center h-screen text-red-500 font-semibold text-lg text-center px-4">
         Accès refusé : cette URL n’est pas autorisée pour ce chatbot.
         {error && <p className="text-sm mt-2 text-gray-500">{error}</p>}
       </div>
@@ -71,7 +69,7 @@ export default function ChatWidget() {
 
   return (
     <div style={{ height: "100vh", width: "100%", overflow: "hidden" }}>
-      <ChatUI chatbot_id={chatbot_id} />
+      <ChatUI chatbot_id={chatbot_id} theme={themeFromURL} />
     </div>
   );
 }
