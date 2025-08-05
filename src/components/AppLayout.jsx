@@ -20,6 +20,7 @@ import PgsqlConnexionForm from "../pages/PgsqlConnexionForm";
 import Help from "../pages/HelpPage";
 import SlotManager from "./SlotForm";
 import SoonPage from "../pages/SoonPage";
+import WebActionManager from "../pages/WebActionManager";
 function PrivateRoute({ children }) {
   const { user, loading } = useAuth();
 
@@ -117,6 +118,14 @@ export default function AppLayout() {
           element={
             <PrivateRoute>
               <PgsqlConnexionManager />
+            </PrivateRoute>
+          }
+        />
+        <Route
+          path="/web_actions"
+          element={
+            <PrivateRoute>
+              <WebActionManager />
             </PrivateRoute>
           }
         />
