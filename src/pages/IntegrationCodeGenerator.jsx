@@ -1,15 +1,19 @@
 import React, { useState } from "react";
 import ChatUI from "../components/ChatUI";
-import { ClipboardCopy, X } from "lucide-react";
+import { ClipboardCopy, X, ExternalLink } from "lucide-react";
 import { useParams } from "react-router-dom";
 
 const FRONT_URL = import.meta.env.VITE_FRONT_URL;
 
 export default function EmbedGenerator() {
-  const { chatbot_id } = useParams(); // ✅
+  const { chatbot_id } = useParams();
 
   const [showModal, setShowModal] = useState(false);
   const [copied, setCopied] = useState(false);
+  const [copiedUrl, setCopiedUrl] = useState(false);
+  const [theme, setTheme] = useState("light");
+
+  const chatbotUrl = `${FRONT_URL}/chat-widget/${chatbot_id}?theme=${theme}`;
 
   const embedCode = `<div id="chatbot-container"></div>
 <script>
@@ -36,7 +40,7 @@ export default function EmbedGenerator() {
       iframe = null;
     } else {
       iframe = document.createElement("iframe");
-      iframe.src = "${FRONT_URL}/chat-widget/${chatbot_id}";
+      iframe.src = "${chatbotUrl}";
       iframe.style.position = "fixed";
       iframe.style.bottom = "80px";
       iframe.style.right = "20px";
@@ -50,29 +54,44 @@ export default function EmbedGenerator() {
   };
 </script>`;
 
-  const handleCopy = () => {
+  const handleCopyCode = () => {
     navigator.clipboard.writeText(embedCode);
     setCopied(true);
-    setTimeout(() => {
-      setCopied(false);
-      setShowModal(false);
-    }, 2000);
+    setTimeout(() => setCopied(false), 2000);
+  };
+
+  const handleCopyUrl = () => {
+    navigator.clipboard.writeText(chatbotUrl);
+    setCopiedUrl(true);
+    setTimeout(() => setCopiedUrl(false), 2000);
   };
 
   return (
     <div className="min-h-screen bg-gray-100 dark:bg-gray-900 text-gray-800 dark:text-gray-100 font-inter relative">
-      {/* Button to trigger modal */}
-<button
-  onClick={() => setShowModal(true)}
-  className="absolute top-5 right-5 bg-indigo-600 hover:bg-indigo-700 text-white px-4 py-2 rounded-lg flex items-center gap-2 shadow"
->
-  <ClipboardCopy className="w-4 h-4" />
-  <span className="hidden sm:inline">Copier le code</span>
-</button>
+      {/* Selecteur de thème */}
+      <div className="flex justify-start p-4">
+        <select
+          value={theme}
+          onChange={(e) => setTheme(e.target.value)}
+          className="px-3 py-2 rounded-md border border-gray-300 shadow bg-white dark:bg-gray-800 dark:text-white"
+        >
+          <option value="light">🌤️ Clair (Par défaut)</option>
+          <option value="light-green">🌿 Vert clair</option>
+          <option value="dark-green">🌲 Vert foncé</option>
+        </select>
+      </div>
 
+      {/* Bouton pour ouvrir le modal */}
+      <button
+        onClick={() => setShowModal(true)}
+        className="absolute top-5 right-5 bg-indigo-600 hover:bg-indigo-700 text-white px-4 py-2 rounded-lg flex items-center gap-2 shadow"
+      >
+        <ClipboardCopy className="w-4 h-4" />
+        <span className="hidden sm:inline">Copier le code</span>
+      </button>
 
-      {/* ChatUI avec le bon chatbot_id */}
-      <ChatUI chatbot_id={chatbot_id} />
+      {/* Composant Chat avec thème */}
+      <ChatUI chatbot_id={chatbot_id} theme={theme} />
 
       {/* Modal */}
       {showModal && (
@@ -85,7 +104,9 @@ export default function EmbedGenerator() {
               <X className="w-5 h-5" />
             </button>
 
-            <h2 className="text-xl font-semibold text-indigo-600 mb-4">Code à intégrer</h2>
+            <h2 className="text-xl font-semibold text-indigo-600 mb-4">
+              Code à intégrer
+            </h2>
 
             <textarea
               readOnly
@@ -94,11 +115,39 @@ export default function EmbedGenerator() {
             />
 
             <button
-              onClick={handleCopy}
+              onClick={handleCopyCode}
               className="mt-4 bg-indigo-600 hover:bg-indigo-700 text-white px-6 py-3 rounded-lg transition w-full"
             >
-              {copied ? "✅ Code copié dans le presse-papiers !" : "📋 Copier maintenant"}
+              {copied ? "✅ Code copié !" : "📋 Copier le code HTML"}
             </button>
+
+            <div className="mt-6">
+              <label className="text-sm text-gray-600 dark:text-gray-300 mb-2 block">
+                URL directe du chatbot :
+              </label>
+              <div className="flex items-center gap-2">
+                <input
+                  type="text"
+                  readOnly
+                  value={chatbotUrl}
+                  className="flex-grow px-4 py-2 rounded-md border bg-gray-100 dark:bg-gray-900 text-sm"
+                />
+                <button
+                  onClick={handleCopyUrl}
+                  className="bg-indigo-500 hover:bg-indigo-600 text-white px-3 py-2 rounded-md text-sm"
+                >
+                  {copiedUrl ? "✅" : "📎"}
+                </button>
+                <a
+                  href={chatbotUrl}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="text-indigo-500 hover:underline"
+                >
+                  <ExternalLink className="w-4 h-4" />
+                </a>
+              </div>
+            </div>
           </div>
         </div>
       )}
