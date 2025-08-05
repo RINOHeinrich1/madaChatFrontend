@@ -7,6 +7,7 @@ import {
   Eye,
   Copy,
   Check,
+  X,
 } from "lucide-react";
 import toast, { Toaster } from "react-hot-toast";
 import { askQuestion } from "../api";
@@ -30,6 +31,7 @@ export default function ChatUI({ chatbot_id, theme = "light" }) {
       },
     ];
   });
+  const [activeMessageIndex, setActiveMessageIndex] = useState(null);
   const [slotState, setSlotState] = useState(() => {
     const saved = localStorage.getItem(`slot_state_${chatbot_id}`);
     return saved ? JSON.parse(saved) : null;
@@ -52,11 +54,6 @@ export default function ChatUI({ chatbot_id, theme = "light" }) {
   const [chatbotName, setChatbotName] = useState("ONIR Chat");
   const [chatbotAvatar, setChatbotAvatar] = useState(null);
   const [copiedMessageId, setCopiedMessageId] = useState(null);
-  
-  // États pour l'appui long sur mobile
-  const [mobileActionsVisible, setMobileActionsVisible] = useState(null);
-  const [longPressTimer, setLongPressTimer] = useState(null);
-  const [isMobile, setIsMobile] = useState(false);
 
   useEffect(() => {
     if (chatbot_id) {
@@ -70,18 +67,6 @@ export default function ChatUI({ chatbot_id, theme = "light" }) {
   useEffect(() => {
     chatEndRef.current?.scrollIntoView({ behavior: "smooth" });
   }, [messages]);
-
-  useEffect(() => {
-    // Détecter si on est sur mobile
-    const checkIsMobile = () => {
-      setIsMobile(window.innerWidth <= 768);
-    };
-    
-    checkIsMobile();
-    window.addEventListener('resize', checkIsMobile);
-    
-    return () => window.removeEventListener('resize', checkIsMobile);
-  }, []);
 
   useEffect(() => {
     const fetchChatbotInfo = async () => {
@@ -104,53 +89,20 @@ export default function ChatUI({ chatbot_id, theme = "light" }) {
     };
     fetchChatbotInfo();
   }, [chatbot_id]);
-
-  // Gestion de l'appui long
-  const handleTouchStart = (index) => {
-    if (!isMobile) return;
-    
-    const timer = setTimeout(() => {
-      setMobileActionsVisible(index);
-      // Vibration légère si supportée
-      if (navigator.vibrate) {
-        navigator.vibrate(50);
-      }
-    }, 500); // 500ms pour déclencher l'appui long
-    
-    setLongPressTimer(timer);
-  };
-
-  const handleTouchEnd = () => {
-    if (longPressTimer) {
-      clearTimeout(longPressTimer);
-      setLongPressTimer(null);
-    }
-  };
-
-  const handleTouchMove = () => {
-    if (longPressTimer) {
-      clearTimeout(longPressTimer);
-      setLongPressTimer(null);
-    }
-  };
-
-  // Fermer les actions mobiles quand on clique ailleurs
   useEffect(() => {
-    const handleClickOutside = () => {
-      if (isMobile) {
-        setMobileActionsVisible(null);
+    const handleClickOutside = (e) => {
+      if (!e.target.closest(".message-block")) {
+        setActiveMessageIndex(null);
       }
     };
-
-    document.addEventListener('touchstart', handleClickOutside);
-    return () => document.removeEventListener('touchstart', handleClickOutside);
-  }, [isMobile]);
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => document.removeEventListener("mousedown", handleClickOutside);
+  }, []);
 
   const copyToClipboard = async (text, messageId) => {
     try {
       await navigator.clipboard.writeText(text);
       setCopiedMessageId(messageId);
-      setMobileActionsVisible(null); // Fermer les actions après copie sur mobile
       toast.success("Message copié !", {
         duration: 2000,
         position: "top-center",
@@ -187,7 +139,6 @@ export default function ChatUI({ chatbot_id, theme = "light" }) {
     setIsEditing(true);
     setQuestion(msg.text);
     setMessages(messages.slice(0, index));
-    setMobileActionsVisible(null); // Fermer les actions sur mobile
   };
 
   const cancelEdit = () => {
@@ -200,13 +151,17 @@ export default function ChatUI({ chatbot_id, theme = "light" }) {
   };
 
   const handleDeleteMessage = (index) => {
+    console.log("Deleting Message");
     const newMessages = [...messages];
     newMessages.splice(index, 1);
     if (newMessages[index] && newMessages[index].type === "answer") {
       newMessages.splice(index, 1);
     }
     setMessages(newMessages);
-    setMobileActionsVisible(null); // Fermer les actions sur mobile
+    toast.success("Message supprimé", {
+      duration: 2000,
+      position: "top-center",
+    });
   };
 
   const getMemoireContextuelle = async (chatbot_id) => {
@@ -286,7 +241,6 @@ export default function ChatUI({ chatbot_id, theme = "light" }) {
       },
     ]);
     setShowLogIndex(null);
-    setMobileActionsVisible(null);
     toast.success("Conversation effacée", {
       duration: 2000,
       position: "top-center",
@@ -295,7 +249,6 @@ export default function ChatUI({ chatbot_id, theme = "light" }) {
 
   const toggleLogs = (index) => {
     setShowLogIndex(showLogIndex === index ? null : index);
-    setMobileActionsVisible(null); // Fermer les actions sur mobile
   };
 
   const getThemeClasses = (theme) => {
@@ -318,7 +271,6 @@ export default function ChatUI({ chatbot_id, theme = "light" }) {
             "bg-gray-800/40 backdrop-blur-xl border border-gray-700/50",
           actionButton: "text-gray-400 hover:text-blue-400",
           clearButton: "text-red-400 hover:text-red-300",
-          mobileActions: "bg-gray-800/90 border-gray-600",
         };
 
       case "dark-green":
@@ -339,7 +291,6 @@ export default function ChatUI({ chatbot_id, theme = "light" }) {
             "bg-green-800/30 backdrop-blur-xl border border-green-700/50",
           actionButton: "text-green-300 hover:text-emerald-300",
           clearButton: "text-red-400 hover:text-red-300",
-          mobileActions: "bg-green-800/90 border-green-600",
         };
 
       case "light-green":
@@ -360,7 +311,6 @@ export default function ChatUI({ chatbot_id, theme = "light" }) {
             "bg-white/60 backdrop-blur-xl border border-green-200/50 shadow-xl shadow-green-900/5",
           actionButton: "text-green-500 hover:text-green-600",
           clearButton: "text-red-500 hover:text-red-600",
-          mobileActions: "bg-white/95 border-green-200",
         };
 
       case "ocean":
@@ -381,7 +331,6 @@ export default function ChatUI({ chatbot_id, theme = "light" }) {
             "bg-blue-800/30 backdrop-blur-xl border border-cyan-700/50",
           actionButton: "text-cyan-300 hover:text-cyan-200",
           clearButton: "text-red-400 hover:text-red-300",
-          mobileActions: "bg-blue-800/90 border-cyan-600",
         };
 
       case "sunset":
@@ -402,7 +351,6 @@ export default function ChatUI({ chatbot_id, theme = "light" }) {
             "bg-red-800/30 backdrop-blur-xl border border-orange-700/50",
           actionButton: "text-orange-300 hover:text-orange-200",
           clearButton: "text-red-400 hover:text-red-300",
-          mobileActions: "bg-red-800/90 border-orange-600",
         };
 
       case "purple":
@@ -423,7 +371,6 @@ export default function ChatUI({ chatbot_id, theme = "light" }) {
             "bg-violet-800/30 backdrop-blur-xl border border-purple-700/50",
           actionButton: "text-purple-300 hover:text-purple-200",
           clearButton: "text-red-400 hover:text-red-300",
-          mobileActions: "bg-violet-800/90 border-purple-600",
         };
 
       case "light":
@@ -444,7 +391,6 @@ export default function ChatUI({ chatbot_id, theme = "light" }) {
             "bg-white/60 backdrop-blur-xl border border-gray-200/50 shadow-xl shadow-gray-900/5",
           actionButton: "text-gray-500 hover:text-indigo-600",
           clearButton: "text-red-500 hover:text-red-600",
-          mobileActions: "bg-white/95 border-gray-200",
         };
     }
   };
@@ -499,7 +445,13 @@ export default function ChatUI({ chatbot_id, theme = "light" }) {
           {/* Messages */}
           <div className="flex-1 overflow-y-auto max-h-[60vh] space-y-6 p-4 rounded-2xl scrollbar-thin scrollbar-thumb-gray-300 scrollbar-track-transparent">
             {messages.map((msg, idx) => (
-              <div key={idx} className="message-block space-y-3 group relative">
+              <div
+                key={idx}
+                className="message-block space-y-3 group relative"
+                onClick={() =>
+                  setActiveMessageIndex(activeMessageIndex === idx ? null : idx)
+                }
+              >
                 <div
                   className={`flex ${
                     msg.type === "question" ? "justify-end" : "justify-start"
@@ -511,36 +463,49 @@ export default function ChatUI({ chatbot_id, theme = "light" }) {
                         ? themeClasses.userMsg
                         : themeClasses.botMsg
                     }`}
-                    onTouchStart={() => handleTouchStart(idx)}
-                    onTouchEnd={handleTouchEnd}
-                    onTouchMove={handleTouchMove}
                   >
-                    <div className="prose prose-sm max-w-none prose-invert">
+                    <div
+                      className="prose prose-sm max-w-none prose-invert select-none"
+                      onContextMenu={(e) => e.preventDefault()}
+                    >
                       <ReactMarkdown>{msg.text}</ReactMarkdown>
                     </div>
 
                     {/* Copy button pour desktop */}
-                    {!isMobile && (
-                      <button
-                        onClick={() =>
-                          copyToClipboard(msg.text, `${idx}-${msg.type}`)
-                        }
-                        className={`absolute -top-2 -right-2 opacity-0 group-hover:opacity-100 transition-all duration-200 p-2 rounded-full ${themeClasses.containerBg} ${themeClasses.actionButton} hover:scale-110 shadow-lg`}
-                        title="Copier le message"
-                      >
-                        {copiedMessageId === `${idx}-${msg.type}` ? (
-                          <Check className="w-4 h-4 text-green-500" />
-                        ) : (
-                          <Copy className="w-4 h-4" />
-                        )}
-                      </button>
-                    )}
+                    <button
+                      onClick={() =>
+                        copyToClipboard(msg.text, `${idx}-${msg.type}`)
+                      }
+                      className={`absolute -top-2 -right-2 
+  ${
+    activeMessageIndex === idx
+      ? "opacity-100"
+      : "opacity-0 sm:group-hover:opacity-100"
+  } 
+  transition-all duration-200 p-2 rounded-full 
+  ${themeClasses.containerBg} ${
+                        themeClasses.actionButton
+                      } hover:scale-110 shadow-lg`}
+                      title="Copier le message"
+                    >
+                      {copiedMessageId === `${idx}-${msg.type}` ? (
+                        <Check className="w-4 h-4 text-green-500" />
+                      ) : (
+                        <Copy className="w-4 h-4" />
+                      )}
+                    </button>
                   </div>
                 </div>
 
                 {/* Actions pour desktop (survol) */}
-                {!isMobile && msg.type === "question" && (
-                  <div className="flex justify-end pr-4 space-x-3 text-xs opacity-0 group-hover:opacity-100 transition-all duration-200">
+                {msg.type === "question" && (
+                  <div
+                    className={`flex justify-end pr-4 space-x-3 text-xs transition-all duration-200 ${
+                      activeMessageIndex === idx
+                        ? "opacity-100"
+                        : "opacity-0 sm:group-hover:opacity-100"
+                    }`}
+                  >
                     <button
                       onClick={() => handleEditMessage(idx)}
                       disabled={loading}
@@ -563,50 +528,6 @@ export default function ChatUI({ chatbot_id, theme = "light" }) {
                     >
                       <Eye className="w-4 h-4" />
                     </button>
-                  </div>
-                )}
-
-                {/* Actions pour mobile (appui long) */}
-                {isMobile && mobileActionsVisible === idx && (
-                  <div className={`absolute top-0 right-0 ${themeClasses.mobileActions} backdrop-blur-lg rounded-2xl p-3 shadow-2xl border-2 z-10 flex gap-2 animate-in slide-in-from-right-2 duration-200`}>
-                    <button
-                      onClick={() => copyToClipboard(msg.text, `${idx}-${msg.type}`)}
-                      className={`p-3 rounded-xl ${themeClasses.actionButton} hover:bg-white/10 transition-all duration-200`}
-                      title="Copier"
-                    >
-                      {copiedMessageId === `${idx}-${msg.type}` ? (
-                        <Check className="w-5 h-5 text-green-500" />
-                      ) : (
-                        <Copy className="w-5 h-5" />
-                      )}
-                    </button>
-                    
-                    {msg.type === "question" && (
-                      <>
-                        <button
-                          onClick={() => handleEditMessage(idx)}
-                          disabled={loading}
-                          className={`p-3 rounded-xl ${themeClasses.actionButton} hover:bg-white/10 transition-all duration-200`}
-                          title="Modifier"
-                        >
-                          <Pencil className="w-5 h-5" />
-                        </button>
-                        <button
-                          onClick={() => handleDeleteMessage(idx)}
-                          className={`p-3 rounded-xl ${themeClasses.clearButton} hover:bg-red-500/10 transition-all duration-200`}
-                          title="Supprimer"
-                        >
-                          <Trash2 className="w-5 h-5" />
-                        </button>
-                        <button
-                          onClick={() => toggleLogs(idx + 1)}
-                          className={`p-3 rounded-xl ${themeClasses.actionButton} hover:bg-white/10 transition-all duration-200`}
-                          title="Voir les logs"
-                        >
-                          <Eye className="w-5 h-5" />
-                        </button>
-                      </>
-                    )}
                   </div>
                 )}
 
