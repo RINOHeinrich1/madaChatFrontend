@@ -47,5 +47,5 @@ https://github.com/RINOHeinrich1/backend-finetune (service de finetuning et gest
 ### 1. Cloner le projet
 
 ```bash
-git clone https://github.com/RINOHeinrich1/madaChatFrontend.git
-cd madaChatFrontend
+git clone https://github.com/RINOHeinrich1/MadaTalkFrontend.git
+cd MadaTalkFrontend

@@ -74,7 +74,7 @@ export default function Features() {
             </span>
           </h2>
           <p className="text-xl text-gray-600 dark:text-gray-400 max-w-3xl mx-auto">
-            Découvrez les outils puissants qui font de MadaChat la plateforme de
+            Découvrez les outils puissants qui font de MadaTalk la plateforme de
             référence pour créer des chatbots IA intelligents et naturels.
           </p>
         </div>

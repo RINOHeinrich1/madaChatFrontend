@@ -59,7 +59,7 @@ export default function LoginPage() {
       {/* Form Container */}
       <div className="relative z-10 w-full max-w-md bg-white/10 backdrop-blur-xl border border-white/20 text-white rounded-2xl shadow-2xl p-8 space-y-6 animate-fade-in">
         <h1 className="text-4xl font-black text-center bg-gradient-to-r from-indigo-400 via-purple-400 to-pink-400 bg-clip-text text-transparent">
-          MadaChat
+          MadaTalk
         </h1>
         <p className="text-center text-sm text-white/70">
           Connectez-vous pour administrer vos Chatbots IA

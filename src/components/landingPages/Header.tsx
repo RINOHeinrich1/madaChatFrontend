@@ -29,7 +29,7 @@ export default function Header() {
               <span className="text-xl">💬</span>
             </div>
             <h1 className="text-2xl font-bold bg-gradient-to-r from-indigo-600 to-purple-600 bg-clip-text text-transparent">
-              MadaChat
+              MadaTalk
             </h1>
           </div>
 

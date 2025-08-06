@@ -47,7 +47,7 @@ export default function Community() {
       name: "Rakoto Andriamanitra",
       role: "Lead Developer, TechMada",
       content:
-        "MadaChat a révolutionné notre approche du support client. En 2 jours, nous avons déployé un chatbot qui répond à 80% des questions de nos utilisateurs.",
+        "MadaTalk a révolutionné notre approche du support client. En 2 jours, nous avons déployé un chatbot qui répond à 80% des questions de nos utilisateurs.",
       avatar: "RA",
     },
     {

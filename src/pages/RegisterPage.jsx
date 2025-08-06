@@ -56,7 +56,7 @@ export default function RegisterPage() {
               <span className="text-2xl">💬</span>
             </div>
             <h1 className="text-4xl font-bold bg-gradient-to-r from-indigo-600 to-purple-600 bg-clip-text text-transparent">
-              MadaChat
+              MadaTalk
             </h1>
           </div>
           <p className="text-xl font-semibold text-gray-700 dark:text-gray-300 mb-2">

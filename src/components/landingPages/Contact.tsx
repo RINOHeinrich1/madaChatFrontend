@@ -45,7 +45,7 @@ export default function Contact() {
           <h2 className="text-4xl md:text-5xl font-bold mb-6">
             <span className="text-gray-800 dark:text-gray-200">Rejoignez </span>
             <span className="bg-gradient-to-r from-indigo-600 to-purple-600 bg-clip-text text-transparent">
-              MadaChat
+              MadaTalk
             </span>
           </h2>
           <p className="text-xl text-gray-600 dark:text-gray-400 max-w-3xl mx-auto">
@@ -254,7 +254,7 @@ export default function Contact() {
 
               <div className="mt-6">
                 <a
-                  href="https://github.com/RINOHeinrich1/madaChatFrontend"
+                  href="https://github.com/RINOHeinrich1/MadaTalkFrontend"
                   target="_blank"
                   rel="noopener noreferrer"
                   className="w-full bg-indigo-700 hover:bg-indigo-800 text-white px-8 py-4 rounded-xl font-semibold transition-colors duration-300 inline-flex items-center justify-center"

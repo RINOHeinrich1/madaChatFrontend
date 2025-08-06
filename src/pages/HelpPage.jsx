@@ -53,15 +53,15 @@ function Help() {
 
   const faqData = [
     {
-      question: "Comment créer un chatbot avec Madachat ?",
+      question: "Comment créer un chatbot avec MadaTalk ?",
       answer:
         "Rendez-vous dans l'onglet 'Chatbots', cliquez sur 'Ajouter un chatbot', puis renseignez les paramètres souhaités : nom, description, mémoire contextuelle, sources autorisées, etc. Une fois créé, vous pourrez l’associer à vos sources de données.",
       icon: MessageSquare,
     },
     {
-      question: "Quels types de sources peut-on utiliser avec Madachat ?",
+      question: "Quels types de sources peut-on utiliser avec MadaTalk ?",
       answer:
-        "Madachat supporte plusieurs types de sources : documents PDF, Word (.docx, .odt), et également les bases de données PostgreSQL. Cela vous permet de créer un chatbot capable de répondre à partir de fichiers ou de données structurées.",
+        "MadaTalk supporte plusieurs types de sources : documents PDF, Word (.docx, .odt), et également les bases de données PostgreSQL. Cela vous permet de créer un chatbot capable de répondre à partir de fichiers ou de données structurées.",
       icon: FileText,
     },
     {
@@ -71,9 +71,9 @@ function Help() {
       icon: Database,
     },
     {
-      question: "Comment fonctionne la recherche avec Madachat ?",
+      question: "Comment fonctionne la recherche avec MadaTalk ?",
       answer:
-        "Madachat utilise la technique RAG (Retrieval-Augmented Generation) : lors d’une question, les documents ou données les plus pertinents sont d'abord récupérés, puis une réponse est générée en s’appuyant sur ces sources.D'un autre côté madaChat utilise aussi la puissance des LLM pour effectuer du text2SQL pour les bases PostgreSQL. Cela garantit des réponses précises et contextualisées.",
+        "MadaTalk utilise la technique RAG (Retrieval-Augmented Generation) : lors d’une question, les documents ou données les plus pertinents sont d'abord récupérés, puis une réponse est générée en s’appuyant sur ces sources.D'un autre côté MadaTalk utilise aussi la puissance des LLM pour effectuer du text2SQL pour les bases PostgreSQL. Cela garantit des réponses précises et contextualisées.",
       icon: Search,
     },
     {
@@ -106,7 +106,7 @@ function Help() {
     {
       title: "Importation de documents",
       description:
-        "Madachat permet de créer des chatbots à partir de plusieurs sources. La plus simple, ce sont les documents.",
+        "MadaTalk permet de créer des chatbots à partir de plusieurs sources. La plus simple, ce sont les documents.",
       icon: Upload,
       steps: [
         "Cliquez sur l'option 'Sources' de la barre latérale (SideBar)",
@@ -207,7 +207,7 @@ function Help() {
                     </h3>
                     <p className="text-blue-700 dark:text-blue-400 text-sm">
                       Les étapes suivantes vous permettraient de créer un
-                      chatbot avec Madachat
+                      chatbot avec MadaTalk
                     </p>
                   </div>
                 </div>

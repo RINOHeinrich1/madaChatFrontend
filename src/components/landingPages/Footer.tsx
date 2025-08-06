@@ -13,7 +13,7 @@ export default function Footer() {
                 <span className="text-xl">💬</span>
               </div>
               <h3 className="text-2xl font-bold bg-gradient-to-r from-indigo-400 to-purple-400 bg-clip-text text-transparent">
-                MadaChat
+                MadaTalk
               </h3>
             </div>
             <p className="text-gray-400 leading-relaxed">
@@ -38,7 +38,7 @@ export default function Footer() {
             <h4 className="text-lg font-semibold">Communauté</h4>
             <ul className="space-y-2">
               <li><a href="https://discord.gg/JhAq8rk4MW" className="text-gray-400 hover:text-white transition-colors">Discord</a></li>
-              <li><a href="https://github.com/RINOHeinrich1/madaChatFrontend" target='_blank' className="text-gray-400 hover:text-white transition-colors">Github</a></li>
+              <li><a href="https://github.com/RINOHeinrich1/MadaTalkFrontend" target='_blank' className="text-gray-400 hover:text-white transition-colors">Github</a></li>
               <li><a href="https://blog.onirtech.com/" target='_blank' className="text-gray-400 hover:text-white transition-colors">Blog</a></li>
             </ul>
           </div>
@@ -62,7 +62,7 @@ export default function Footer() {
         <div className="border-t border-gray-800 mt-8 pt-8">
           <div className="flex flex-col md:flex-row justify-between items-center">
             <p className="text-gray-400 text-sm">
-              © 2025 MadaChat. Projet open source sous licence Apache2.0.
+              © 2025 MadaTalk. Projet open source sous licence Apache2.0.
             </p>
             <div className="flex items-center gap-4 mt-4 md:mt-0">
               <a href="#" className="text-gray-400 hover:text-white transition-colors">

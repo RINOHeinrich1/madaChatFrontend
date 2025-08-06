@@ -70,7 +70,7 @@ export default function Hero() {
             {/* Main Heading with Enhanced Typography */}
             <h1 className="text-5xl md:text-6xl lg:text-7xl font-black mb-6 leading-tight">
               <span className="block bg-gradient-to-r from-white via-purple-200 to-white bg-clip-text text-transparent animate-gradient-x mb-2">
-                MadaChat
+                MadaTalk
               </span>
               <span className="block text-2xl md:text-3xl lg:text-4xl font-light text-white/80 tracking-wide">
                 Chatbots IA{' '}
@@ -103,7 +103,7 @@ export default function Hero() {
               </button>
               
               <a
-                href="https://github.com/RINOHeinrich1/madaChatFrontend"
+                href="https://github.com/RINOHeinrich1/MadaTalkFrontend"
                 target="_blank"
                 rel="noopener noreferrer"
                 className="group"
