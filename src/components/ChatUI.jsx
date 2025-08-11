@@ -497,7 +497,7 @@ export default function ChatUI({ chatbot_id, theme = "light" }) {
   return (
 
     <div
-      className={`min-h-screen ${themeClasses.background} ${themeClasses.text} transition-all duration-500 font-inter p-2 sm:p-5 flex justify-center mt-3`}
+      className={`min-h-screen ${themeClasses.background} ${themeClasses.text} transition-all duration-500 font-inter p-2 sm:p-5 flex justify-center`}
     >
       <Toaster />
       <div className="w-full max-w-7xl flex justify-center">
