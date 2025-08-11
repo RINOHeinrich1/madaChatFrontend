@@ -502,10 +502,10 @@ export default function ChatUI({ chatbot_id, theme = "light" }) {
       <Toaster />
       <div className="w-full max-w-7xl flex justify-center">
         <div
-          className={`flex-1 max-w-4xl ${themeClasses.containerBg} rounded-3xl p-6 sm:p-8 flex flex-col justify-between h-[90vh] sm:h-auto transition-all duration-300`}
+          className={`flex-1 max-w-4xl ${themeClasses.containerBg} rounded-3xl p-6 sm:p-8 flex flex-col justify-center h-[90vh] sm:h-auto transition-all duration-300`}
         >
           {loadingPage ? (<>
-            <div className="w-full h-screen flex items-center justify-center">
+            
               <div className="flex flex-col items-center">
                 {/* Cercle noir avec avatar */}
                 <div className="bg-black rounded-full flex items-center justify-center p-16">
@@ -520,7 +520,6 @@ export default function ChatUI({ chatbot_id, theme = "light" }) {
                 {/* Texte en dessous */}
                 <p className="text-black mt-4 text-4xl font-serif">Bonjour !</p>
               </div>
-            </div>
           </>
           ) : (
             <>
