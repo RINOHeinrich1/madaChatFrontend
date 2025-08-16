@@ -1,8 +1,8 @@
 import { useEffect, useState } from "react";
 import { supabase } from "../lib/supabaseClient";
-import { Plus, Trash2 } from "lucide-react";
+import { Plus, Trash2, X } from "lucide-react";
 
-export default function ChatbotDocumentsManager({ chatbotId }) {
+export default function ChatbotDocumentsManager({ chatbotId, onClose }) {
   const [documents, setDocuments] = useState([]);
   const [allDocuments, setAllDocuments] = useState([]);
   const [newDocName, setNewDocName] = useState("");
@@ -84,7 +84,7 @@ export default function ChatbotDocumentsManager({ chatbotId }) {
     : [];
 
   return (
-    <div className="bg-white dark:bg-gray-800 rounded-xl p-6 shadow-lg">
+    <div className="bg-white dark:bg-gray-800 rounded-xl p-6 shadow-lg relative">
       <h2 className="text-lg font-semibold mb-4 text-indigo-600 dark:text-indigo-400">
         Documents liés à ce chatbot
       </h2>
@@ -118,7 +118,6 @@ export default function ChatbotDocumentsManager({ chatbotId }) {
         )}
       </div>
 
-      {/* Zone de description conditionnelle */}
       {newDocName && (
         <div className="mb-4">
           <textarea
@@ -132,7 +131,6 @@ export default function ChatbotDocumentsManager({ chatbotId }) {
         </div>
       )}
 
-      {/* Bouton Associer désactivé si champs vides */}
       <button
         onClick={handleAdd}
         disabled={!newDocName.trim() || !description.trim()}
@@ -147,13 +145,15 @@ export default function ChatbotDocumentsManager({ chatbotId }) {
       </button>
 
       {loading ? (
-        <p className="text-sm text-gray-500 dark:text-gray-400 mt-4">Chargement…</p>
+        <p className="text-sm text-gray-500 dark:text-gray-400 mt-4">
+          Chargement…
+        </p>
       ) : (
-        <ul className="divide-y divide-gray-200 dark:divide-gray-700 mt-4">
+        <ul className="divide-y divide-gray-200 dark:divide-gray-700 mt-4 max-h-64 overflow-y-auto">
           {documents.map((doc) => (
             <li
               key={doc.id}
-              className="flex justify-between items-center py-3 text-sm text-gray-800 dark:text-gray-200"
+              className="flex justify-between items-center py-3 text-sm text-gray-800 dark:text-gray-200 px-2"
             >
               <span>
                 <strong>{doc.document_name}</strong>
