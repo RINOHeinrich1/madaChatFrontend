@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { supabase } from "../lib/supabaseClient";
-import { Plus, Trash2, X } from "lucide-react";
+import { Plus, Trash2 } from "lucide-react";
 
 export default function ChatbotDocumentsManager({ chatbotId, onClose }) {
   const [documents, setDocuments] = useState([]);
@@ -10,6 +10,7 @@ export default function ChatbotDocumentsManager({ chatbotId, onClose }) {
   const [ownerId, setOwnerId] = useState(null);
   const [loading, setLoading] = useState(false);
   const [showSuggestions, setShowSuggestions] = useState(false);
+  const [errorMessage, setErrorMessage] = useState("");
 
   useEffect(() => {
     const fetchUser = async () => {
@@ -56,6 +57,15 @@ export default function ChatbotDocumentsManager({ chatbotId, onClose }) {
 
     if (!docName || !desc || !ownerId || !chatbotId) return;
 
+    // Vérifie si déjà associé
+    const alreadyExists = documents.some(
+      (doc) => doc.document_name.toLowerCase() === docName.toLowerCase()
+    );
+    if (alreadyExists) {
+      setErrorMessage("⚠️ Ce document est déjà associé.");
+      return;
+    }
+
     const { error } = await supabase
       .from("chatbot_document_association")
       .insert({
@@ -68,6 +78,7 @@ export default function ChatbotDocumentsManager({ chatbotId, onClose }) {
     if (!error) {
       setNewDocName("");
       setDescription("");
+      setErrorMessage("");
       fetchDocuments();
     }
   };
@@ -83,6 +94,10 @@ export default function ChatbotDocumentsManager({ chatbotId, onClose }) {
       )
     : [];
 
+  const alreadyAssociated = documents.some(
+    (doc) => doc.document_name.toLowerCase() === newDocName.trim().toLowerCase()
+  );
+
   return (
     <div className="bg-white dark:bg-gray-800 rounded-xl p-6 shadow-lg relative">
       <h2 className="text-lg font-semibold mb-4 text-indigo-600 dark:text-indigo-400">
@@ -97,6 +112,7 @@ export default function ChatbotDocumentsManager({ chatbotId, onClose }) {
           onChange={(e) => {
             setNewDocName(e.target.value);
             setShowSuggestions(true);
+            setErrorMessage(""); // reset erreur quand l’utilisateur tape
           }}
           className="w-full px-4 py-2 border rounded-lg dark:bg-gray-700 dark:text-white border-gray-300 dark:border-gray-600"
         />
@@ -131,19 +147,27 @@ export default function ChatbotDocumentsManager({ chatbotId, onClose }) {
         </div>
       )}
 
+
       <button
         onClick={handleAdd}
-        disabled={!newDocName.trim() || !description.trim()}
+        disabled={
+          !newDocName.trim() || !description.trim() || alreadyAssociated
+        }
         className={`mt-2 px-4 py-2 rounded-lg flex items-center gap-2 ${
-          newDocName.trim() && description.trim()
-            ? "bg-indigo-600 hover:bg-indigo-700 text-white"
-            : "bg-gray-300 dark:bg-gray-600 text-gray-500 cursor-not-allowed"
+          !newDocName.trim() ||
+          !description.trim() ||
+          alreadyAssociated
+            ? "bg-gray-300 dark:bg-gray-600 text-gray-500 cursor-not-allowed"
+            : "bg-indigo-600 hover:bg-indigo-700 text-white"
         }`}
       >
         <Plus className="w-4 h-4" />
         Associer
       </button>
 
+      {errorMessage && (
+        <p className="text-sm text-red-500 mb-2">{errorMessage}</p>
+      )}
       {loading ? (
         <p className="text-sm text-gray-500 dark:text-gray-400 mt-4">
           Chargement…
