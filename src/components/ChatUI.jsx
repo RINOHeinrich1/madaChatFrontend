@@ -300,8 +300,10 @@ export default function ChatUI({ chatbot_id, theme = "light" }) {
           background:
             "bg-gradient-to-br from-gray-900 via-gray-800 to-gray-900",
           text: "text-black-900",
-          userMsg: "bg-white backdrop-blur-md rounded-tl-2xl rounded-bl-2xl rounded-br-2xl",
-          botMsg: "bg-white backdrop-blur-md rounded-tr-2xl rounded-br-2xl rounded-bl-2xl",
+          userMsg:
+            "bg-white backdrop-blur-md rounded-tl-2xl rounded-bl-2xl rounded-br-2xl",
+          botMsg:
+            "bg-white backdrop-blur-md rounded-tr-2xl rounded-br-2xl rounded-bl-2xl",
 
           input:
             "bg-white  text-black-900 placeholder-black-500 backdrop-blur-sm",
@@ -311,7 +313,8 @@ export default function ChatUI({ chatbot_id, theme = "light" }) {
           containerBg:
             "bg-[radial-gradient(ellipse_at_45%_100%,_#9FD2B7_0%,_#ADEDCB_25%,_#D3F2E4_50%,_#ECF5F1_75%,_#FEFEFE_100%)]",
           actionButton: "text-green-500 hover:text-green-600",
-          clearButton: "text-black-500 hover:text-black-600 bg-[#ADEDCB]/30 hover:bg-[#ADEDCB] ",
+          clearButton:
+            "text-black-500 hover:text-black-600 bg-[#ADEDCB]/30 hover:bg-[#ADEDCB] ",
         };
 
       case "ocean":
@@ -418,20 +421,21 @@ export default function ChatUI({ chatbot_id, theme = "light" }) {
     }
   }, []);
 
-  const rotateStyle = theme === "light-green" ? {
-    animationName: "rotate-left-pause",
-    animationDuration: "5.5s",
-    animationTimingFunction: "linear",
-    animationIterationCount: "infinite",
-  } : {};
-
+  const rotateStyle =
+    theme === "light-green"
+      ? {
+          animationName: "rotate-left-pause",
+          animationDuration: "5.5s",
+          animationTimingFunction: "linear",
+          animationIterationCount: "infinite",
+        }
+      : {};
 
   useEffect(() => {
     // Simule un délai de chargement, par ex 2 secondes
     const timer = setTimeout(() => setLoadingPage(false), 4000);
     return () => clearTimeout(timer);
   }, []);
-
 
   const animationCSS = `
   @keyframes logo-move-3d-circle-scaleY {
@@ -485,17 +489,15 @@ export default function ChatUI({ chatbot_id, theme = "light" }) {
   const animationStyle =
     theme === "light-green"
       ? {
-        animationName: "logo-move-3d-circle-scaleY",
-        animationDuration: "4s",
-        animationTimingFunction: "ease-in-out",
-        animationIterationCount: "infinite",
-        willChange: "transform, opacity",
-      }
+          animationName: "logo-move-3d-circle-scaleY",
+          animationDuration: "4s",
+          animationTimingFunction: "ease-in-out",
+          animationIterationCount: "infinite",
+          willChange: "transform, opacity",
+        }
       : {};
 
-
   return (
-
     <div
       className={`min-h-screen ${themeClasses.background} ${themeClasses.text} transition-all duration-500 font-inter p-2 sm:p-5 flex justify-center`}
     >
@@ -504,26 +506,25 @@ export default function ChatUI({ chatbot_id, theme = "light" }) {
         <div
           className={`flex-1 max-w-4xl ${themeClasses.containerBg} rounded-3xl p-6 sm:p-8 flex flex-col justify-center h-[90vh] sm:h-auto transition-all duration-300`}
         >
-          {loadingPage ? (<>
-            
+          {loadingPage ? (
+            <>
               <div className="flex flex-col items-center">
                 {/* Cercle noir avec avatar */}
-                <div className="bg-black rounded-full flex items-center justify-center p-16">
+                <div className="bg-black rounded-full flex items-center justify-center w-66 h-66 overflow-hidden">
                   <img
                     src={chatbotAvatar}
                     alt="Chatbot avatar"
                     style={animationStyle}
-                    className="w-32 h-32 rounded-full object-cover animate-pulse"
+                    className="w-46 h-46 object-scale-down rounded-full animate-pulse"
                   />
                 </div>
 
                 {/* Texte en dessous */}
                 <p className="text-black mt-4 text-4xl font-serif">Bonjour !</p>
               </div>
-          </>
+            </>
           ) : (
             <>
-
               {/* Header */}
               <div className="flex justify-between items-center mb-6">
                 <h1
@@ -534,7 +535,7 @@ export default function ChatUI({ chatbot_id, theme = "light" }) {
                       <img
                         src={chatbotAvatar}
                         alt="Avatar"
-                        className="w-14 h-14 sm:w-14 sm:h-14 rounded-full object-cover bg-black"
+                        className="w-14 h-14 sm:w-14 sm:h-14 rounded-full object-cover bg-black "
                         style={rotateStyle}
                       />
                       <span
@@ -549,8 +550,12 @@ export default function ChatUI({ chatbot_id, theme = "light" }) {
                     </div>
                   )}
                   <div>
-                    <div className="font-serif text-[22px] font-medium text-black tracking-[0.5px]">{chatbotName}</div>
-                    <div className="text-sm opacity-70 font-normal">En ligne</div>
+                    <div className="font-serif text-[22px] font-medium text-black tracking-[0.5px]">
+                      {chatbotName}
+                    </div>
+                    <div className="text-sm opacity-70 font-normal">
+                      En ligne
+                    </div>
                   </div>
                 </h1>
                 <div className="flex items-center gap-4">
@@ -566,33 +571,40 @@ export default function ChatUI({ chatbot_id, theme = "light" }) {
 
               {/* Messages */}
               <div className="flex-1 overflow-y-auto max-h-[60vh] space-y-6 p-4 rounded-2xl scrollbar-thin scrollbar-thumb-gray-300 scrollbar-track-transparent">
-
                 {messages.map((msg, idx) => (
                   <div
                     key={idx}
                     className="message-block space-y-3 group relative"
                     onClick={() =>
-                      setActiveMessageIndex(activeMessageIndex === idx ? null : idx)
+                      setActiveMessageIndex(
+                        activeMessageIndex === idx ? null : idx
+                      )
                     }
                   >
-
-
                     <div
-                      className={`flex ${msg.type === "question" ? "justify-end" : "justify-start"
-                        }`}
+                      className={`flex ${
+                        msg.type === "question"
+                          ? "justify-end"
+                          : "justify-start"
+                      }`}
                     >
-                      <div className="relative">
+                      <div className="relative mr-4 sm:mr-4 md:mr-4">
                         {msg.type !== "question" && chatbotAvatar ? (
-                          <img
-                            src={chatbotAvatar}
-                            alt="Avatar bot"
-                            className="w-12 h-12 object-cover mr-4"
-                          />
+                          <div className="w-12 h-12 sm:w-12 sm:h-12 flex-shrink-0">
+                            <img
+                              src={chatbotAvatar}
+                              alt="Avatar bot"
+                              className="w-full h-full object-cover"
+                            />
+                          </div>
                         ) : null}
                       </div>
                       <div
-                        className={`relative inline-block max-w-[85%] p-4 group-hover:pb-10 text-sm sm:text-base break-words transition-all duration-200 hover:scale-[1.01] font-awesome ${msg.type === "question" ? themeClasses.userMsg : themeClasses.botMsg
-                          }`}
+                        className={`relative inline-block max-w-[85%] p-4 group-hover:pb-10 text-sm sm:text-base break-words transition-all duration-200 hover:scale-[1.01] font-awesome ${
+                          msg.type === "question"
+                            ? themeClasses.userMsg
+                            : themeClasses.botMsg
+                        }`}
                       >
                         <div
                           className="prose prose-sm max-w-none prose-invert select-none"
@@ -603,7 +615,9 @@ export default function ChatUI({ chatbot_id, theme = "light" }) {
 
                         {/* Copy button pour desktop */}
                         <button
-                          onClick={() => copyToClipboard(msg.text, `${idx}-${msg.type}`)}
+                          onClick={() =>
+                            copyToClipboard(msg.text, `${idx}-${msg.type}`)
+                          }
                           className={`absolute bottom-2 right-2 
                        opacity-0 group-hover:opacity-100
                        transition-opacity duration-200 p-2 rounded-full
@@ -617,29 +631,31 @@ export default function ChatUI({ chatbot_id, theme = "light" }) {
                             <Copy className="w-4 h-4" />
                           )}
                         </button>
-
-
                       </div>
                       {/* Avatar ou loader à droite */}
                       <div className="ml-4">
                         {msg.type === "question" ? (
                           // Avatar infini animé (exemple)
                           <div className="w-10 h-10 mt-1 bg-black rounded-full flex items-center justify-center">
-                            <img width="20" height="20" src="https://img.icons8.com/ios-filled/50/FFFFFF/infinity-large.png" alt="infinity-large" />
+                            <img
+                              width="20"
+                              height="20"
+                              src="https://img.icons8.com/ios-filled/50/FFFFFF/infinity-large.png"
+                              alt="infinity-large"
+                            />
                           </div>
                         ) : null}
                       </div>
                     </div>
 
-
-
                     {/* Actions pour desktop (survol) */}
                     {msg.type === "question" && (
                       <div
-                        className={`flex justify-end pr-4 space-x-3 text-xs transition-all duration-200 ${activeMessageIndex === idx
-                          ? "opacity-100"
-                          : "opacity-0 sm:group-hover:opacity-100"
-                          }`}
+                        className={`flex justify-end pr-4 space-x-3 text-xs transition-all duration-200 ${
+                          activeMessageIndex === idx
+                            ? "opacity-100"
+                            : "opacity-0 sm:group-hover:opacity-100"
+                        }`}
                       >
                         <button
                           onClick={() => handleEditMessage(idx)}
@@ -678,15 +694,17 @@ export default function ChatUI({ chatbot_id, theme = "light" }) {
 
                 {loading && (
                   <div className="flex items-start gap-4 animate-fade-in">
-                    <div className="relative">
+                    <div className="relative mr-4 sm:mr-4 md:mr-4">
                       {chatbotAvatar && (
+                        <div className="w-12 h-12 sm:w-12 sm:h-12 flex-shrink-0">
                         <img
                           src={chatbotAvatar}
                           alt="Avatar bot"
-                          className="w-12 h-12  object-cover"
+                          className="w-12 h-12 object-cover"
                         />
+                        
+                    </div>
                       )}
-
                     </div>
                     <div
                       className={`${themeClasses.botMsg} text-sm p-4 rounded-2xl shadow-lg max-w-[85%] animate-pulse`}
@@ -701,8 +719,6 @@ export default function ChatUI({ chatbot_id, theme = "light" }) {
               {theme === "light-green" && (
                 <FeatureExchange onSelect={setQuestion} />
               )}
-
-
 
               {/* Input */}
               <div className="flex flex-col sm:flex-row gap-3 mt-6 max-w-4xl w-full mx-auto">
@@ -723,7 +739,6 @@ export default function ChatUI({ chatbot_id, theme = "light" }) {
                     </div>
                   )}
                 </div>
-
 
                 <div className="flex gap-3">
                   {isEditing && (
@@ -759,9 +774,6 @@ export default function ChatUI({ chatbot_id, theme = "light" }) {
     </div>
   );
 }
-
-
-
 
 export function FeatureExchange({ onSelect }) {
   const initialFeatures = [
@@ -808,6 +820,3 @@ export function FeatureExchange({ onSelect }) {
     </div>
   );
 }
-
-
-

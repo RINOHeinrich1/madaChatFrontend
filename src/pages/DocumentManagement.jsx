@@ -12,11 +12,15 @@ import {
   Files,
   SearchIcon,
   Plus,
+  Link,
 } from "lucide-react";
 
 import Swal from "sweetalert2";
 import "sweetalert2/dist/sweetalert2.min.css";
 import { Loader2 } from "lucide-react";
+import Modal from "../ui/Modal";
+import ChatBotLinkDocument, { LinkedChatbots } from "../components/ChatBotLinkDocument";
+
 
 const API_URL = import.meta.env.VITE_TUNE_API_URL;
 const SUPABASE_URL = import.meta.env.VITE_SUPABASE_URL;
@@ -32,6 +36,9 @@ function DocumentManager() {
   const [documentFilter, setDocumentFilter] = useState("");
   const [showDocumentsInfo, setShowDocumentsInfo] = useState(false);
   const [noChunking, setNoChunking] = useState(false);
+  const [openLinkModal,setOpenLinkModal]=useState(false);
+  const [selectedDocumentId,setSelectedDocumentId]=useState(null);
+
   const handleSearch = async () => {
     if (!query.trim()) return;
 
@@ -144,6 +151,45 @@ function DocumentManager() {
   const handleDelete = async (filename) => {
     const confirm = await Swal.fire({
       title: "Confirmer la suppression",
+      text: `Voulez-vous vraiment supprimer "${filename}" ?`,
+      icon: "warning",
+      showCancelButton: true,
+      confirmButtonColor: "#d33",
+      confirmButtonText: "Oui, supprimer",
+      cancelButtonText: "Annuler",
+    });
+
+    if (!confirm.isConfirmed) return;
+
+    try {
+      const {
+        data: { session },
+      } = await supabase.auth.getSession();
+      const token = session?.access_token || "";
+
+      await axios.delete(`${API_URL}/delete-document`, {
+        params: { filename },
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
+
+      Swal.fire("Supprimé !", "Le document a été supprimé.", "success");
+      fetchDocuments();
+    } catch (err) {
+      console.error(err);
+      Swal.fire(
+        "Erreur",
+        err.message || "Impossible de supprimer le document",
+        "error"
+      );
+    }
+  };
+
+
+  const handleLink = async (filename) => {
+    const confirm = await Swal.fire({
+      title: "Confirmer la liaison",
       text: `Voulez-vous vraiment supprimer "${filename}" ?`,
       icon: "warning",
       showCancelButton: true,
@@ -445,7 +491,7 @@ function DocumentManager() {
                             Date d'ajout
                           </th>
                           <th className="px-6 py-4 text-left text-sm font-semibold text-gray-700 dark:text-gray-300">
-                            Propriétaire
+                           Chatbot liés
                           </th>
                           <th className="px-6 py-4 text-right text-sm font-semibold text-gray-700 dark:text-gray-300">
                             Actions
@@ -491,16 +537,24 @@ function DocumentManager() {
                                 )}
                               </td>
                               <td className="px-6 py-4 text-gray-600 dark:text-gray-400">
-                                {doc.owner_id}
+                                <LinkedChatbots documentName={doc.name} />
                               </td>
                               <td className="px-6 py-4">
                                 <div className="flex gap-2 justify-end">
+                                <button
+                                    onClick={() => {setSelectedDocumentId(doc.name);setOpenLinkModal(true)}}
+                                    className="p-2 text-green-600 hover:text-red-800 hover:bg-red-50 dark:hover:bg-red-900/20 rounded-lg transition-all duration-150"
+                                    title="lier"
+                                  >
+                                    <Link className="w-5 h-5" />
+                                  </button>
                                   <button
                                     onClick={() => handleDownload(doc.url)}
                                     className="p-2 text-blue-600 hover:text-blue-800 hover:bg-blue-50 dark:hover:bg-blue-900/20 rounded-lg transition-all duration-150"
                                     title="Télécharger"
                                   >
                                     <Download className="w-5 h-5" />
+
                                   </button>
                                   <button
                                     onClick={() => handleDelete(doc.name)}
@@ -622,6 +676,16 @@ function DocumentManager() {
           </div>
         </div>
       )}
+       <Modal
+          open={openLinkModal}
+          onClose={() => setOpenLinkModal(false)}
+        >
+          {selectedDocumentId && (
+            <ChatBotLinkDocument documentName={selectedDocumentId} 
+              onClose={() => setOpenLinkModal(false)}
+            />
+          )}
+        </Modal>
     </div>
   );
 }
