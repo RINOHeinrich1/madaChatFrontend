@@ -18,6 +18,9 @@ import {
 import Swal from "sweetalert2";
 import "sweetalert2/dist/sweetalert2.min.css";
 import { Loader2 } from "lucide-react";
+import Modal from "../ui/Modal";
+import ChatBotLinkDocument, { LinkedChatbots } from "../components/ChatBotLinkDocument";
+
 
 const API_URL = import.meta.env.VITE_TUNE_API_URL;
 const SUPABASE_URL = import.meta.env.VITE_SUPABASE_URL;
@@ -33,6 +36,9 @@ function DocumentManager() {
   const [documentFilter, setDocumentFilter] = useState("");
   const [showDocumentsInfo, setShowDocumentsInfo] = useState(false);
   const [noChunking, setNoChunking] = useState(false);
+  const [openLinkModal,setOpenLinkModal]=useState(false);
+  const [selectedDocumentId,setSelectedDocumentId]=useState(null);
+
   const handleSearch = async () => {
     if (!query.trim()) return;
 
@@ -485,7 +491,7 @@ function DocumentManager() {
                             Date d'ajout
                           </th>
                           <th className="px-6 py-4 text-left text-sm font-semibold text-gray-700 dark:text-gray-300">
-                            Propriétaire
+                           Chatbot liés
                           </th>
                           <th className="px-6 py-4 text-right text-sm font-semibold text-gray-700 dark:text-gray-300">
                             Actions
@@ -531,12 +537,12 @@ function DocumentManager() {
                                 )}
                               </td>
                               <td className="px-6 py-4 text-gray-600 dark:text-gray-400">
-                                {doc.owner_id}
+                                <LinkedChatbots documentName={doc.name} />
                               </td>
                               <td className="px-6 py-4">
                                 <div className="flex gap-2 justify-end">
                                 <button
-                                    onClick={() => handleDelete(doc.name)}
+                                    onClick={() => {setSelectedDocumentId(doc.name);setOpenLinkModal(true)}}
                                     className="p-2 text-green-600 hover:text-red-800 hover:bg-red-50 dark:hover:bg-red-900/20 rounded-lg transition-all duration-150"
                                     title="lier"
                                   >
@@ -670,6 +676,16 @@ function DocumentManager() {
           </div>
         </div>
       )}
+       <Modal
+          open={openLinkModal}
+          onClose={() => setOpenLinkModal(false)}
+        >
+          {selectedDocumentId && (
+            <ChatBotLinkDocument documentName={selectedDocumentId} 
+              onClose={() => setOpenLinkModal(false)}
+            />
+          )}
+        </Modal>
     </div>
   );
 }
