@@ -32,7 +32,7 @@ function DocumentManager() {
   const [activeTab, setActiveTab] = useState("search");
   const [documentFilter, setDocumentFilter] = useState("");
   const [showDocumentsInfo, setShowDocumentsInfo] = useState(false);
-
+  const [noChunking, setNoChunking] = useState(false);
   const handleSearch = async () => {
     if (!query.trim()) return;
 
@@ -101,7 +101,7 @@ function DocumentManager() {
     setUploading(true);
     const formData = new FormData();
     formData.append("file", file);
-
+    formData.append("no_chunking", noChunking);
     Swal.fire({
       title: "Indexation du fichier...",
       didOpen: () => Swal.showLoading(),
@@ -636,7 +636,22 @@ function DocumentManager() {
                   className="block w-full text-sm text-gray-600 dark:text-gray-300 file:mr-4 file:py-3 file:px-6 file:rounded-xl file:border-0 file:text-sm file:font-semibold file:bg-indigo-50 dark:file:bg-indigo-900/30 file:text-indigo-700 dark:file:text-indigo-400 hover:file:bg-indigo-100 dark:hover:file:bg-indigo-900/50 disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-150"
                 />
               </div>
-
+              {/* Dans la modale d'upload (après le input file) */}
+              <div className="flex items-center mt-4">
+                <input
+                  type="checkbox"
+                  id="no-chunking"
+                  checked={noChunking}
+                  onChange={(e) => setNoChunking(e.target.checked)}
+                  className="w-4 h-4 text-indigo-600 rounded border-gray-300 focus:ring-indigo-500"
+                />
+                <label
+                  htmlFor="no-chunking"
+                  className="ml-2 text-sm text-gray-700 dark:text-gray-300"
+                >
+                  Ne pas découper le document (traitement complet)
+                </label>
+              </div>
               {uploading && (
                 <div className="bg-indigo-50 dark:bg-indigo-900/20 border border-indigo-200 dark:border-indigo-800 rounded-xl p-4">
                   <div className="flex items-center gap-3 text-indigo-700 dark:text-indigo-400">
