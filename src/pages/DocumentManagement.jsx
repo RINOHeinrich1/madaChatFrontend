@@ -12,6 +12,7 @@ import {
   Files,
   SearchIcon,
   Plus,
+  Link,
 } from "lucide-react";
 
 import Swal from "sweetalert2";
@@ -144,6 +145,45 @@ function DocumentManager() {
   const handleDelete = async (filename) => {
     const confirm = await Swal.fire({
       title: "Confirmer la suppression",
+      text: `Voulez-vous vraiment supprimer "${filename}" ?`,
+      icon: "warning",
+      showCancelButton: true,
+      confirmButtonColor: "#d33",
+      confirmButtonText: "Oui, supprimer",
+      cancelButtonText: "Annuler",
+    });
+
+    if (!confirm.isConfirmed) return;
+
+    try {
+      const {
+        data: { session },
+      } = await supabase.auth.getSession();
+      const token = session?.access_token || "";
+
+      await axios.delete(`${API_URL}/delete-document`, {
+        params: { filename },
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
+
+      Swal.fire("Supprimé !", "Le document a été supprimé.", "success");
+      fetchDocuments();
+    } catch (err) {
+      console.error(err);
+      Swal.fire(
+        "Erreur",
+        err.message || "Impossible de supprimer le document",
+        "error"
+      );
+    }
+  };
+
+
+  const handleLink = async (filename) => {
+    const confirm = await Swal.fire({
+      title: "Confirmer la liaison",
       text: `Voulez-vous vraiment supprimer "${filename}" ?`,
       icon: "warning",
       showCancelButton: true,
@@ -495,12 +535,20 @@ function DocumentManager() {
                               </td>
                               <td className="px-6 py-4">
                                 <div className="flex gap-2 justify-end">
+                                <button
+                                    onClick={() => handleDelete(doc.name)}
+                                    className="p-2 text-green-600 hover:text-red-800 hover:bg-red-50 dark:hover:bg-red-900/20 rounded-lg transition-all duration-150"
+                                    title="lier"
+                                  >
+                                    <Link className="w-5 h-5" />
+                                  </button>
                                   <button
                                     onClick={() => handleDownload(doc.url)}
                                     className="p-2 text-blue-600 hover:text-blue-800 hover:bg-blue-50 dark:hover:bg-blue-900/20 rounded-lg transition-all duration-150"
                                     title="Télécharger"
                                   >
                                     <Download className="w-5 h-5" />
+
                                   </button>
                                   <button
                                     onClick={() => handleDelete(doc.name)}
