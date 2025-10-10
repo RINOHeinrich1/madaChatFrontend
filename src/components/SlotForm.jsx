@@ -44,6 +44,25 @@ export default function SlotManager() {
     action_id: null,
   });
 
+  /* 🟩 === Ajout pour valeurs possibles === */
+  const [inputValue, setInputValue] = useState("");
+  const [possibleValues, setPossibleValues] = useState([]);
+
+  const handleKeyDown = (e) => {
+    if (e.key === "Enter" && inputValue.trim() !== "") {
+      e.preventDefault();
+      if (!possibleValues.includes(inputValue.trim())) {
+        setPossibleValues([...possibleValues, inputValue.trim()]);
+      }
+      setInputValue("");
+    }
+  };
+
+  const removeValue = (value) => {
+    setPossibleValues(possibleValues.filter((v) => v !== value));
+  };
+  /* 🟩 === Fin ajout valeurs possibles === */
+
   useEffect(() => {
     const fetchData = async () => {
       const {
@@ -95,6 +114,7 @@ export default function SlotManager() {
       action_id: null,
     });
     setShowEventsSection(false);
+    setPossibleValues([]); // 🟩 reset valeurs possibles aussi
   };
 
   const handleColumnChange = (index, field, value) => {
@@ -124,7 +144,7 @@ export default function SlotManager() {
       ...slotEvents,
       {
         ...newEvent,
-        id: Date.now().toString(), // Temporary ID for UI
+        id: Date.now().toString(),
         web_actions: webActions.find((a) => a.id === newEvent.action_id),
       },
     ]);
@@ -142,12 +162,12 @@ export default function SlotManager() {
     setSlotEvents(newEvents);
   };
 
+  /* 🟩 === Modification handleSubmit pour inclure valeurs_possibles === */
   const handleSubmit = async (e) => {
     e.preventDefault();
     setLoading(true);
     setErrorMsg("");
 
-    // Validate columns
     const columnObject = {};
     for (let col of columns) {
       if (!col.name || !col.type) {
@@ -158,33 +178,47 @@ export default function SlotManager() {
       columnObject[col.name] = col.type;
     }
 
+    if (possibleValues.some((v) => v.trim() === "")) {
+      setErrorMsg("Certaines valeurs possibles sont vides.");
+      setLoading(false);
+      return;
+    }
+
     try {
-      // 1. Save or update the slot
+      const valeursFormatees = possibleValues.map((v) => ({
+        label: v,
+        type: columns[0]?.type || "text",
+      }));
+
       const { data: slotData, error: slotError } = editingId
         ? await supabase
             .from("slots")
             .update({
               slot_name: slotName,
               columns: columnObject,
+              valeurs_possibles: valeursFormatees,
             })
             .eq("id", editingId)
+            .select()
+            .single()
         : await supabase
             .from("slots")
             .insert({
               slot_name: slotName,
               owner_id: ownerId,
               columns: columnObject,
+              valeurs_possibles: valeursFormatees,
             })
             .select()
             .single();
 
       if (slotError) throw slotError;
 
-      const slotId = editingId || slotData.id;
+      const slotId = editingId || slotData?.id;
+      if (!slotId) throw new Error("Impossible de récupérer l'ID du slot.");
 
-      // 2. Handle slot events
+      // === Gestion des événements ===
       if (slotEvents.length > 0) {
-        // Prepare events data for supabase
         const eventsToSave = slotEvents.map((event) => ({
           slot_id: slotId,
           event: event.event,
@@ -192,35 +226,26 @@ export default function SlotManager() {
           owner_id: ownerId,
         }));
 
-        // Delete existing events if editing
         if (editingId) {
-          const { error: deleteError } = await supabase
+          await supabase
             .from("slot_events")
             .delete()
             .eq("slot_id", editingId)
             .eq("owner_id", ownerId);
-
-          if (deleteError) throw deleteError;
         }
 
-        // Insert new events
         const { error: insertError } = await supabase
           .from("slot_events")
           .insert(eventsToSave);
-
         if (insertError) throw insertError;
       } else if (editingId) {
-        // If no events but editing, delete all existing events
-        const { error: deleteError } = await supabase
+        await supabase
           .from("slot_events")
           .delete()
           .eq("slot_id", editingId)
           .eq("owner_id", ownerId);
-
-        if (deleteError) throw deleteError;
       }
 
-      // 3. Refresh data
       const { data: updatedSlots } = await supabase
         .from("slots")
         .select("*")
@@ -242,6 +267,26 @@ export default function SlotManager() {
     } finally {
       setLoading(false);
     }
+  };
+
+  /* 🟩 === Fin modification === */
+
+  const handleEdit = async (slot) => {
+    setSlotName(slot.slot_name);
+    setEditingId(slot.id);
+
+    const columnsArray = Object.entries(slot.columns).map(([name, type]) => ({
+      name,
+      type,
+    }));
+    setColumns(columnsArray);
+
+    // 🟩 Récupère les valeurs possibles lors de l’édition
+    if (slot.valeurs_possibles) {
+      setPossibleValues(slot.valeurs_possibles.map((v) => v.label));
+    }
+
+    setShowEventsSection(true);
   };
 
   const handleDelete = async (id) => {
@@ -296,21 +341,6 @@ export default function SlotManager() {
     }
   };
 
-  const handleEdit = async (slot) => {
-    setSlotName(slot.slot_name);
-    setEditingId(slot.id);
-
-    // Convert columns object to array format
-    const columnsArray = Object.entries(slot.columns).map(([name, type]) => ({
-      name,
-      type,
-    }));
-    setColumns(columnsArray);
-
-    // Show events section when editing
-    setShowEventsSection(true);
-  };
-
   return (
     <div className="min-h-screen bg-gray-50 dark:bg-gray-900 text-gray-900 dark:text-white py-8 px-4">
       <div className="max-w-4xl mx-auto">
@@ -356,22 +386,61 @@ export default function SlotManager() {
               {editingId ? "Modifier le Slot" : "Créer un Nouveau Slot"}
             </h2>
 
-            <div className="space-y-6">
-              <div>
-                <label className="block text-sm font-medium mb-2 text-gray-700 dark:text-gray-300">
-                  Nom du Slot
-                </label>
+            <div className="mb-4">
+              <label className="block text-sm font-medium mb-2 text-gray-700 dark:text-gray-300">
+                Nom du Slot
+              </label>
+              <input
+                type="text"
+                value={slotName}
+                onChange={(e) => setSlotName(e.target.value)}
+                className="w-full px-4 py-2 rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition-all"
+                placeholder="ex: Rendez-vous médical"
+                required
+              />
+            </div>
+
+            <div className=" mb-4">
+              <label className="block text-sm font-medium mb-2 text-gray-700 dark:text-gray-300">
+                Valeurs possibles du Slot
+              </label>
+
+              <div className="w-full min-h-[48px] flex flex-wrap items-center gap-2 px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 focus-within:ring-2 focus-within:ring-indigo-500 transition-all">
+                {possibleValues.map((value, index) => (
+                  <div
+                    key={index}
+                    className="flex items-center gap-2 bg-indigo-100 dark:bg-indigo-800 text-indigo-800 dark:text-indigo-100 px-3 py-1 rounded-full"
+                  >
+                    <span>{value}</span>
+                    <button
+                      type="button"
+                      onClick={() => removeValue(value)}
+                      className="hover:text-red-500"
+                    >
+                      <X size={16} />
+                    </button>
+                  </div>
+                ))}
+
                 <input
                   type="text"
-                  value={slotName}
-                  onChange={(e) => setSlotName(e.target.value)}
-                  className="w-full px-4 py-2 rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition-all"
-                  placeholder="ex: Rendez-vous médical"
-                  required
+                  value={inputValue}
+                  onChange={(e) => setInputValue(e.target.value)}
+                  onKeyDown={handleKeyDown}
+                  placeholder={
+                    possibleValues.length === 0 ? "ex: Matin, Urgent..." : ""
+                  }
+                  className="flex-grow bg-transparent outline-none text-sm text-gray-700 dark:text-gray-200"
                 />
               </div>
 
-              <div>
+              <p className="text-xs text-gray-500 mt-1">
+                Appuyez sur <kbd>Entrée</kbd> pour ajouter une valeur.
+              </p>
+            </div>
+
+            <div className="mb-4">
+              <div className="mb-4">
                 <div className="flex items-center justify-between mb-2">
                   <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">
                     Colonnes
