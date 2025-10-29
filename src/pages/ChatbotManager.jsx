@@ -63,6 +63,7 @@ export default function ChatbotManager() {
         .order("created_at", { ascending: false });
 
       if (!error) {
+        console.log(data)
         setChatbots(data);
         setFiltered(data);
       }

@@ -10,7 +10,7 @@ import {
   X,
 } from "lucide-react";
 import toast, { Toaster } from "react-hot-toast";
-import { askQuestion } from "../api";
+import { askQuestion, askJudilibre } from "../api";
 import { supabase } from "../lib/supabaseClient";
 import { nanoid } from "nanoid";
 import TypingIndicator from "../ui/TypingIndicator";
@@ -176,6 +176,58 @@ export default function ChatUI({ chatbot_id, theme = "light" }) {
     return data.memoire_contextuelle;
   };
 
+  // const handleAsk = async () => {
+  //   const trimmed = question.trim();
+  //   if (!trimmed) return;
+
+  //   setQuestion("");
+  //   const questionMsg = { id: nanoid(), type: "question", text: trimmed };
+  //   setMessages((prev) => [...prev, questionMsg]);
+  //   setLoading(true);
+
+  //   try {
+  //     const limit = await getMemoireContextuelle(chatbot_id);
+  //     const fullHistory = [...messages, questionMsg]
+  //       .filter((msg) => msg.type === "question" || msg.type === "answer")
+  //       .map((msg) => ({
+  //         role: msg.type === "question" ? "user" : "assistant",
+  //         content: msg.text,
+  //       }));
+  //     const limitedHistory = fullHistory.slice(-limit);
+  //     const res = await askQuestion(
+  //       trimmed,
+  //       chatbot_id,
+  //       slotState,
+  //       limitedHistory
+  //     );
+  //     if (res.slot_state) setSlotState(res.slot_state);
+  //     setMessages((prev) => [
+  //       ...prev,
+  //       {
+  //         id: nanoid(),
+  //         type: "answer",
+  //         text: res.answer,
+  //         docs: res.documents,
+  //         logs: res.logs || [],
+  //       },
+  //     ]);
+  //     setShowLogIndex(null);
+  //   } catch (err) {
+  //     setMessages((prev) => [
+  //       ...prev,
+  //       {
+  //         id: nanoid(),
+  //         type: "answer",
+  //         text: "❌ Une erreur est survenue lors de l'appel au modèle.",
+  //         docs: [],
+  //         reasoning: null,
+  //       },
+  //     ]);
+  //   } finally {
+  //     setLoading(false);
+  //     setIsEditing(false);
+  //   }
+  // };
   const handleAsk = async () => {
     const trimmed = question.trim();
     if (!trimmed) return;
@@ -193,26 +245,33 @@ export default function ChatUI({ chatbot_id, theme = "light" }) {
           role: msg.type === "question" ? "user" : "assistant",
           content: msg.text,
         }));
+
       const limitedHistory = fullHistory.slice(-limit);
-      const res = await askQuestion(
+
+      const res = await askJudilibre(
         trimmed,
         chatbot_id,
         slotState,
-        limitedHistory
+        limitedHistory,
+        chatbotName 
       );
+
       if (res.slot_state) setSlotState(res.slot_state);
+
       setMessages((prev) => [
         ...prev,
         {
           id: nanoid(),
           type: "answer",
           text: res.answer,
-          docs: res.documents,
+          docs: res.documents || [],
           logs: res.logs || [],
         },
       ]);
+
       setShowLogIndex(null);
     } catch (err) {
+      console.error("❌ Erreur handleAsk :", err);
       setMessages((prev) => [
         ...prev,
         {
@@ -697,13 +756,12 @@ export default function ChatUI({ chatbot_id, theme = "light" }) {
                     <div className="relative mr-4 sm:mr-4 md:mr-4">
                       {chatbotAvatar && (
                         <div className="w-12 h-12 sm:w-12 sm:h-12 flex-shrink-0">
-                        <img
-                          src={chatbotAvatar}
-                          alt="Avatar bot"
-                          className="w-12 h-12 object-cover"
-                        />
-                        
-                    </div>
+                          <img
+                            src={chatbotAvatar}
+                            alt="Avatar bot"
+                            className="w-12 h-12 object-cover"
+                          />
+                        </div>
                       )}
                     </div>
                     <div

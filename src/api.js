@@ -16,10 +16,32 @@ export const askQuestion = async (question, chatbot_id, slot_state = {}, history
     question,
     chatbot_id,
     slot_state,
-    history, //  envoi du contexte
+    history, // envoi du contexte
   });
   return response.data;
 };
+
+// --- Fonction pourdemander à Judilibre ---
+export const askJudilibre = async (question, chatbot_id, slot_state = {}, history = [], chatbotName = "") => {
+  try {
+    if (chatbotName?.toLowerCase() !== "Place des avocats".toLowerCase()) {
+      return await askQuestion(question, chatbot_id, slot_state, history);
+    }
+
+    const response = await chatApi.post("/judilibre/ask", {
+      question,
+      chatbot_id,
+      slot_state,
+      history, // envoi du contexte
+    });
+    return response.data;
+
+  } catch (error) {
+    console.error("❌ Erreur dans askJudilibre :", error);
+    throw error;
+  }
+};
+
 
 
 
